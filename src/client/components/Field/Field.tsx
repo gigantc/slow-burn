@@ -2,7 +2,14 @@ import { useId } from 'react';
 import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
 import styles from './Field.module.scss';
 
-type Common = { label: string; hint?: string; error?: string; className?: string };
+type Common = {
+  label: string;
+  hint?: string;
+  error?: string;
+  className?: string;
+  /** Spans both columns when inside a form section grid. */
+  wide?: boolean;
+};
 
 type Props =
   | (Common & { multiline?: false } & InputHTMLAttributes<HTMLInputElement>)
@@ -12,6 +19,9 @@ const Field = (props: Props) => {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
+
+  const extra = (wide?: boolean, className?: string) =>
+    [wide && styles.wide, className].filter(Boolean).join(' ') || undefined;
 
   const wrap = (
     label: string,
@@ -37,11 +47,11 @@ const Field = (props: Props) => {
   );
 
   if (props.multiline) {
-    const { label, hint, error, className, multiline: _multiline, ...rest } = props;
+    const { label, hint, error, className, wide, multiline: _multiline, ...rest } = props;
     return wrap(
       label,
       hint,
-      className,
+      extra(wide, className),
       <textarea
         id={id}
         aria-describedby={[hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined}
@@ -52,11 +62,11 @@ const Field = (props: Props) => {
     );
   }
 
-  const { label, hint, error, className, multiline: _multiline, ...rest } = props;
+  const { label, hint, error, className, wide, multiline: _multiline, ...rest } = props;
   return wrap(
     label,
     hint,
-    className,
+    extra(wide, className),
     <input
       id={id}
       aria-describedby={[hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined}

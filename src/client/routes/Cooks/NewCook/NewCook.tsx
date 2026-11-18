@@ -14,14 +14,14 @@ const NewCook = () => {
         startedAt: fromLocalInput(past.startedAt),
         endedAt: fromLocalInput(past.endedAt),
       });
-      navigate(`/cooks/${cook.id}/wrap-up`);
+      navigate(`/cooks/${cook.id}/wrap-up`, { replace: true });
       return;
     }
 
     const startedAt = new Date().toISOString();
     const cook = saveCook({ ...setup, startedAt });
     addEvent(cook.id, { type: 'on_pit', at: startedAt });
-    navigate(`/cooks/${cook.id}`);
+    navigate(`/cooks/${cook.id}`, { replace: true });
   };
 
   return (

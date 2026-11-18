@@ -4,11 +4,13 @@ import type { CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
 import Callout from '@/components/Callout/Callout';
 import Field from '@/components/Field/Field';
+import { FormPage, FormSection } from '@/components/FormPage/FormPage';
 import type { CookFields } from '@/lib/cookActions';
 import { useCooks } from '@/lib/cookHooks';
 import { formatDay, fromLocalInput } from '@/lib/format';
-import { useNextTimeNote } from '@/lib/nextTime';
-import styles from './CookForm.module.scss';
+import { findLastCook, useNextTimeNote } from '@/lib/nextTime';
+import { useUnsaved } from '@/lib/unsaved';
+import LastCookSummary from '../LastCookSummary/LastCookSummary';
 
 export type Setup = Pick<
   CookFields,
@@ -48,7 +50,7 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
   const listId = useId();
   const defaulted = useRef(Boolean(initial));
 
-  const [values, setValues] = useState({
+  const initialValues = {
     name: text(initial?.name ?? null),
     protein: text(initial?.protein ?? null),
     cut: text(initial?.cut ?? null),
@@ -57,7 +59,9 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
     smoker: text(initial?.smoker ?? null),
     wood: text(initial?.wood ?? null),
     target: initial?.targetPitTempF?.toString() ?? '',
-  });
+  };
+  const [values, setValues] = useState(initialValues);
+  const [baseline, setBaseline] = useState(initialValues);
   const [past, setPast] = useState(false);
   const [dates, setDates] = useState({ startedAt: '', endedAt: '' });
 
@@ -86,6 +90,13 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
     dates.endedAt !== '' &&
     fromLocalInput(dates.endedAt) < fromLocalInput(dates.startedAt);
 
+  const lastCook = useMemo(
+    () => findLastCook(cooks, values.protein, initial?.id),
+    [cooks, values.protein, initial?.id],
+  );
+
+  useUnsaved(past || JSON.stringify(values) !== JSON.stringify(baseline));
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (badRange) return;
@@ -104,96 +115,94 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
     );
   };
 
+  const primaryLabel = initial ? submitLabel : past ? 'Continue to wrap-up' : submitLabel;
+
+  const lists: [string, string[]][] = [
+    ['protein', proteins],
+    ['smoker', smokers],
+    ['wood', woods],
+  ];
+  let section = 0;
+
   return (
-    <form
-      className={styles.form}
+    <FormPage
+      title={title}
       onSubmit={submit}
+      action={
+        <Button
+          type="submit"
+          disabled={badRange}
+        >
+          {primaryLabel}
+        </Button>
+      }
+      secondary={
+        !initial && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setPast((value) => !value)}
+          >
+            {past ? 'Start a live cook instead' : 'Log a past cook'}
+          </Button>
+        )
+      }
+      notes={
+        (nextTime || lastCook) && (
+          <>
+            {nextTime && (
+              <Callout title="Next time">
+                {`From your last ${values.protein.trim().toLowerCase()}, ${formatDay(nextTime.endedAt)}: ${nextTime.nextTimeNote}`}
+              </Callout>
+            )}
+            {lastCook && <LastCookSummary cook={lastCook} />}
+          </>
+        )
+      }
     >
-      <h1 className={styles.wide}>{title}</h1>
-      {nextTime && (
-        <Callout title="Next time">
-          {`From your last ${values.protein.trim().toLowerCase()}, ${formatDay(nextTime.endedAt)}: ${nextTime.nextTimeNote}`}
-        </Callout>
-      )}
-      <Field
-        className={styles.wide}
-        label="Name"
-        placeholder="Thanksgiving turkey"
-        value={values.name}
-        onChange={set('name')}
-        required
-      />
-      <Field
-        label="Protein"
-        list={`${listId}-protein`}
-        placeholder="Turkey"
-        value={values.protein}
-        onChange={set('protein')}
-      />
-      <Field
-        label="Cut"
-        value={values.cut}
-        onChange={set('cut')}
-      />
-      <Field
-        label="Weight (lb)"
-        inputMode="decimal"
-        value={values.weight}
-        onChange={set('weight')}
-      />
-      <Field
-        label="Target pit temp (°F)"
-        inputMode="numeric"
-        placeholder="275"
-        value={values.target}
-        onChange={set('target')}
-      />
-      <Field
-        className={styles.wide}
-        multiline
-        label="Prep"
-        hint="Brine, injection, rub."
-        value={values.prep}
-        onChange={set('prep')}
-      />
-      <Field
-        label="Smoker"
-        list={`${listId}-smoker`}
-        value={values.smoker}
-        onChange={set('smoker')}
-      />
-      <Field
-        label="Wood"
-        list={`${listId}-wood`}
-        value={values.wood}
-        onChange={set('wood')}
-      />
-      <datalist id={`${listId}-protein`}>
-        {proteins.map((value) => (
-          <option
-            key={value}
-            value={value}
-          />
-        ))}
-      </datalist>
-      <datalist id={`${listId}-smoker`}>
-        {smokers.map((value) => (
-          <option
-            key={value}
-            value={value}
-          />
-        ))}
-      </datalist>
-      <datalist id={`${listId}-wood`}>
-        {woods.map((value) => (
-          <option
-            key={value}
-            value={value}
-          />
-        ))}
-      </datalist>
+      <FormSection
+        number={++section}
+        title="The cook"
+      >
+        <Field
+          wide
+          label="Name"
+          placeholder="Thanksgiving turkey"
+          value={values.name}
+          onChange={set('name')}
+          required
+        />
+        <Field
+          label="Protein"
+          list={`${listId}-protein`}
+          placeholder="Turkey"
+          value={values.protein}
+          onChange={set('protein')}
+        />
+        <Field
+          label="Cut"
+          value={values.cut}
+          onChange={set('cut')}
+        />
+        <Field
+          label="Weight (lb)"
+          inputMode="decimal"
+          value={values.weight}
+          onChange={set('weight')}
+        />
+        <Field
+          label="Target pit temp (°F)"
+          inputMode="numeric"
+          placeholder="275"
+          value={values.target}
+          onChange={set('target')}
+        />
+      </FormSection>
       {past && (
-        <>
+        <FormSection
+          number={++section}
+          title="When"
+        >
           <Field
             label="Started"
             type="datetime-local"
@@ -209,26 +218,52 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
             error={badRange ? 'End time is before the start time.' : undefined}
             required
           />
-        </>
+        </FormSection>
       )}
-      <div className={styles.actions}>
-        <Button
-          type="submit"
-          disabled={badRange}
+      <FormSection
+        number={++section}
+        title="Pit"
+      >
+        <Field
+          label="Smoker"
+          list={`${listId}-smoker`}
+          value={values.smoker}
+          onChange={set('smoker')}
+        />
+        <Field
+          label="Wood"
+          list={`${listId}-wood`}
+          value={values.wood}
+          onChange={set('wood')}
+        />
+      </FormSection>
+      <FormSection
+        number={++section}
+        title="Prep"
+      >
+        <Field
+          wide
+          multiline
+          label="Prep"
+          hint="Brine, injection, rub."
+          value={values.prep}
+          onChange={set('prep')}
+        />
+      </FormSection>
+      {lists.map(([key, options]) => (
+        <datalist
+          key={key}
+          id={`${listId}-${key}`}
         >
-          {past ? 'Save and wrap up' : submitLabel}
-        </Button>
-        {!initial && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setPast((value) => !value)}
-          >
-            {past ? 'Start a live cook instead' : 'Log a past cook'}
-          </Button>
-        )}
-      </div>
-    </form>
+          {options.map((value) => (
+            <option
+              key={value}
+              value={value}
+            />
+          ))}
+        </datalist>
+      ))}
+    </FormPage>
   );
 };
 

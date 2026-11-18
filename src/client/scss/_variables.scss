@@ -146,6 +146,13 @@ $radius-xl:28px;
 $tap-target:56px;
 $container-width:720px;
 $sidebar-width:240px;
+$form-sidebar-width:320px;
+
+// Compact form controls. Greasy-hands controls (live screen, sheets) use $tap-target instead.
+$field-height:44px;
+$field-height-md:48px;
+$field-text:1.5rem;
+$label-text:1.3rem;
 $card-min-width:260px;
 
 //////////////////////////////////////
@@ -161,6 +168,12 @@ $bp-sm:480px;
 @mixin display-axes{
   font-optical-sizing:auto;
   font-variation-settings:'SOFT' 100, 'WONK' 0;
+}
+
+@mixin field-height{
+  min-height:$field-height;
+
+  @media (max-width:$bp-md){ min-height:$field-height-md; }
 }
 
 @mixin breakpoint($width){

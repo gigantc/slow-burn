@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { RATING_MAX } from 'shared/constants';
 import type { CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
 import Callout from '@/components/Callout/Callout';
 import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
+import Stars from '@/components/Stars/Stars';
 import EntryHead from '@/components/EntryHead/EntryHead';
 import { cookTags } from '@/components/CookList/cookCard';
 import { deleteCook } from '@/lib/cookActions';
@@ -44,15 +44,7 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
           {formatDay(cook.startedAt ?? cook.createdAt)}
         </time>
         {total && <span>{total} total</span>}
-        {cook.rating !== null && (
-          <span
-            role="img"
-            aria-label={`${cook.rating} out of ${RATING_MAX} stars`}
-          >
-            {'★'.repeat(cook.rating)}
-            {'☆'.repeat(RATING_MAX - cook.rating)}
-          </span>
-        )}
+        {cook.rating !== null && <Stars rating={cook.rating} />}
       </p>
       {cook.nextTimeNote && <Callout title="Next time">{cook.nextTimeNote}</Callout>}
       {stats.length > 0 && (

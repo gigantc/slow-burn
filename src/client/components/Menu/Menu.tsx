@@ -58,6 +58,7 @@ const Menu = () => {
           </span>
         </button>
         <Button
+          size="large"
           variant="secondary"
           onClick={signOut}
         >

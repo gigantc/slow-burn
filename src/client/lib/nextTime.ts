@@ -30,6 +30,26 @@ export const findNextTimeNote = (
   return best;
 };
 
+/** The most recent finished cook of this protein, with or without a note. */
+export const findLastCook = (
+  cooks: readonly CookWithEvents[],
+  protein: string,
+  excludeId?: string,
+): CookWithEvents | null => {
+  const key = normalize(protein);
+  if (!key) return null;
+  return cooks.reduce<CookWithEvents | null>(
+    (best, cook) =>
+      cook.id !== excludeId &&
+      cook.endedAt &&
+      normalize(cook.protein) === key &&
+      (!best?.endedAt || cook.endedAt > best.endedAt)
+        ? cook
+        : best,
+    null,
+  );
+};
+
 export const useNextTimeNote = (protein: string, excludeId?: string): NextTimeNote | null => {
   const { cooks } = useCooks();
   const local = useMemo(

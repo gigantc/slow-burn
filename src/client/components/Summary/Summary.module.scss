@@ -1,0 +1,33 @@
+//////////////////////////////////////
+// Summary
+
+//imports
+@use 'scss/variables' as v;
+
+.summary{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-sm;
+  padding:v.$space-md;
+  background-color:v.$card;
+  border:1px solid v.$border;
+  border-radius:v.$radius-md;
+
+  h2{ font:700 1.4rem/1.2 v.$font-body; }
+
+  dl{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:v.$space-xs v.$space-md;
+    margin:0px;
+    font-size:1.4rem;
+
+    // Each dt/dd pair is wrapped for React keys only
+    div{ display:contents; }
+    dt{ color:v.$muted; }
+    dd{
+      margin:0px;
+      font-weight:600;
+    }
+  }
+}

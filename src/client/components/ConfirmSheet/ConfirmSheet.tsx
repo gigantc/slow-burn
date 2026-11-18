@@ -20,12 +20,14 @@ const ConfirmSheet = ({ open, title, message, confirmLabel, onConfirm, onClose }
     <h2>{title}</h2>
     <p className={styles.confirm}>{message}</p>
     <Button
+      size="large"
       variant="danger"
       onClick={onConfirm}
     >
       {confirmLabel}
     </Button>
     <Button
+      size="large"
       variant="secondary"
       onClick={onClose}
       data-autofocus

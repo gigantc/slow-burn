@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { RATING_MAX } from 'shared/constants';
+import Stars from '@/components/Stars/Stars';
 import EntryHead from '@/components/EntryHead/EntryHead';
 import Icon from '@/components/Icon/Icon';
 import type { EntryType } from '@/config';
@@ -77,15 +77,7 @@ const Card = (props: EntryCardProps | ResumeCardProps | AddCardProps) => {
       </EntryHead>
       <footer>
         <time dateTime={date}>{formatDay(date)}</time>
-        {rating !== undefined && (
-          <span
-            role="img"
-            aria-label={`${rating} out of ${RATING_MAX} stars`}
-          >
-            {'★'.repeat(rating)}
-            {'☆'.repeat(RATING_MAX - rating)}
-          </span>
-        )}
+        {rating !== undefined && <Stars rating={rating} />}
       </footer>
     </article>
   );

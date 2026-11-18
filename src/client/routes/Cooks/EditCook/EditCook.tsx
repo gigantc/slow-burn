@@ -1,12 +1,13 @@
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { saveCook } from '@/lib/cookActions';
 import { useCook, useCooks } from '@/lib/cookHooks';
+import { useBack } from '@/lib/useBack';
 import CookForm from '../CookForm/CookForm';
 import CookMissing from '../CookMissing/CookMissing';
 
 const EditCook = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const back = useBack();
   const cook = useCook(id);
   const { ready } = useCooks();
 
@@ -16,10 +17,10 @@ const EditCook = () => {
     <CookForm
       title="Edit setup"
       initial={cook}
-      submitLabel="Save"
+      submitLabel="Save changes"
       onSave={(setup) => {
         saveCook({ id: cook.id, ...setup });
-        navigate(`/cooks/${cook.id}`);
+        back(`/cooks/${cook.id}`);
       }}
     />
   );

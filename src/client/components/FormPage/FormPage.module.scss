@@ -1,0 +1,90 @@
+//////////////////////////////////////
+// Form page
+// Desktop: main column of numbered section cards plus a sticky sidebar.
+// Phone: one column, notes first, and the primary action in a sticky bar above the tab bar.
+
+//imports
+@use 'scss/variables' as v;
+
+.page{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) v.$form-sidebar-width;
+  gap:v.$space-lg;
+  align-items:start;
+
+  h1{ grid-column:1 / -1; }
+
+  .main{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-lg;
+    min-width:0px;
+  }
+
+  .side{
+    position:sticky;
+    top:v.$space-md;
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-md;
+  }
+
+  .bar button, .secondary button{ width:100%; }
+
+  .notes{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-md;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-columns:1fr;
+    padding:0px 0px calc(#{v.$field-height-md} + #{v.$space-xl}) 0px;
+
+    // The sidebar's children become grid items so they can be ordered around the sections
+    .side{ display:contents; }
+    .notes{ order:1; }
+    .main{ order:2; }
+    .secondary{ order:3; }
+
+    .bar{
+      position:fixed;
+      right:0px;
+      bottom:calc(#{v.$tap-target} + #{v.$space-sm} + env(safe-area-inset-bottom));
+      left:0px;
+      z-index:9;
+      padding:v.$space-sm v.$space-md;
+      background-color:v.$panel;
+      border-top:1px solid v.$border;
+    }
+  }
+}
+
+.card{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:v.$space-md;
+  padding:v.$space-lg;
+  background-color:v.$card;
+  border:1px solid v.$border;
+  border-radius:v.$radius-lg;
+  box-shadow:v.$shadow-card;
+
+  h2{
+    grid-column:1 / -1;
+    font:700 1.8rem/1.2 v.$font-body;
+
+    span{ color:v.$accent; }
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-columns:1fr;
+    padding:v.$space-md;
+  }
+}
+
+// The one section that must stand out (the note to future you)
+.highlight{
+  background-color:color-mix(in srgb, v.$accent 12%, v.$panel);
+  border-left:4px solid v.$accent;
+}

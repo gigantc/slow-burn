@@ -82,6 +82,7 @@ const EventForm = ({ cook, target, onClose, onLogged, onDelete }: FormProps) => 
           >
             {QUICK_MINUTES.map((minutes) => (
               <Button
+                size="large"
                 key={minutes}
                 type="button"
                 variant="secondary"
@@ -114,9 +115,15 @@ const EventForm = ({ cook, target, onClose, onLogged, onDelete }: FormProps) => 
           required={def.takesNote && !editing}
         />
       )}
-      <Button type="submit">Save</Button>
+      <Button
+        type="submit"
+        size="large"
+      >
+        Save
+      </Button>
       {target.mode === 'edit' && (
         <Button
+          size="large"
           type="button"
           variant="danger"
           onClick={() => onDelete(target.event)}

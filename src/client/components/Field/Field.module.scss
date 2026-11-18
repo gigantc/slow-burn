@@ -7,16 +7,18 @@
 .field{
   display:flex;
   flex-direction:column;
-  gap:v.$space-sm;
+  gap:v.$space-xs;
 
   label{
-    color:v.$text;
+    color:v.$muted;
   }
 
   p{
     color:v.$muted;
-    font:400 1.3rem/1.4 v.$font-body;
+    font:400 1.2rem/1.4 v.$font-body;
   }
+
+  &.wide{ grid-column:1 / -1; }
 
   .error{ color:v.$danger; }
 
@@ -24,8 +26,9 @@
 
   textarea{
     width:100%;
-    min-height:calc(#{v.$tap-target} * 2);
-    padding:v.$space-md;
+    min-height:calc(#{v.$field-height} * 2);
+    padding:v.$space-sm v.$space-md;
+    font-size:v.$field-text;
     background-color:v.$card;
     border:2px solid v.$border;
     border-radius:v.$radius-md;

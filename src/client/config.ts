@@ -28,6 +28,9 @@ export const THEME_LABELS = {
   dark: 'Dusk',
 } as const satisfies Record<'light' | 'dark', string>;
 
+// Cook screens that hide the sidebar nav on desktop and show a Close button (react-router patterns).
+export const FOCUS_ROUTES = ['/cooks/new', '/cooks/:id', '/cooks/:id/edit', '/cooks/:id/wrap-up'];
+
 export const NAV_ITEMS: readonly { label: string; path: string; icon: IconName }[] = [
   { label: 'Home', path: '/', icon: 'home' },
   { label: 'Cooks', path: '/cooks', icon: 'flame' },

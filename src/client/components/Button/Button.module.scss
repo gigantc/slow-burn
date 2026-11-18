@@ -9,11 +9,11 @@
   align-items:center;
   justify-content:center;
   gap:v.$space-sm;
-  min-height:v.$tap-target;
+  @include v.field-height;
   padding:0px v.$space-lg;
   border:2px solid transparent;
   border-radius:v.$radius-md;
-  font:600 1.6rem/1 v.$font-body;
+  font:600 1.5rem/1 v.$font-body;
   text-decoration:none;
   transition:background-color 0.15s, border-color 0.15s;
 
@@ -46,4 +46,10 @@
   color:v.$on-accent;
 
   &:hover:not(:disabled){ background-color:color-mix(in srgb, v.$danger 85%, v.$text); }
+}
+
+// Greasy-hands size: sheets, the live screen, anything tapped mid-cook
+.large{
+  min-height:v.$tap-target;
+  font:600 1.6rem/1 v.$font-body;
 }
