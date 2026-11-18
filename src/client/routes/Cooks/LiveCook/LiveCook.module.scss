@@ -24,41 +24,6 @@
     }
   }
 
-  .glance{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:v.$space-sm;
-    margin:0px;
-    padding:0px;
-    list-style:none;
-
-    li{
-      display:flex;
-      flex-direction:column;
-      gap:v.$space-xs;
-      min-width:0px;
-      padding:v.$space-md;
-      background-color:v.$card;
-      border:1px solid v.$border;
-      border-radius:v.$radius-md;
-    }
-
-    span, small{
-      color:v.$muted;
-      font:600 1.2rem/1.2 v.$font-body;
-    }
-
-    strong{
-      font:700 2.8rem/1.1 v.$font-body;
-      font-variant-numeric:tabular-nums;
-      overflow-wrap:anywhere;
-    }
-
-    @include v.breakpoint(v.$bp-sm){
-      strong{ font-size:2.2rem; }
-    }
-  }
-
   .events{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));

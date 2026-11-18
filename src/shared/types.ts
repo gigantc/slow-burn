@@ -3,16 +3,24 @@
 
 import type { CookEventTypeKey } from './cookEventTypes.js';
 
-export type Cook = {
+export type Meat = {
   id: string;
   name: string;
-  protein: string | null;
-  cut: string | null;
+  nameKey: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Cook = {
+  id: string;
+  meatId: string;
   weightLbs: number | null;
   prep: string | null;
+  /** Still stored, but no longer asked for. */
   smoker: string | null;
   wood: string | null;
   targetPitTempF: number | null;
+  targetInternalTempF: number | null;
   startedAt: string | null;
   endedAt: string | null;
   finalInternalTempF: number | null;
@@ -45,11 +53,15 @@ export type CookEventUpsert = Omit<CookEvent, 'id' | 'cookId' | 'createdAt'> & {
   createdAt?: string;
 };
 
-export type SyncResponse = { cooks: CookWithEvents[] };
+/** Body of PUT /api/meats/:id (the id comes from the path). */
+export type MeatUpsert = { name: string; createdAt?: string; updatedAt: string };
+
+export type SyncResponse = { cooks: CookWithEvents[]; meats: Meat[] };
 
 export type NextTimeNote = {
   cookId: string;
-  name: string;
+  meatId: string;
+  meatName: string;
   endedAt: string;
   nextTimeNote: string;
 };

@@ -1,78 +1,74 @@
 //////////////////////////////////////
 // Next-time note lookup
-// Local cache first (works offline), same match rule as the server's protein_key; the API is
-// only a fallback for notes that are not cached yet.
+// Matches on meatId. Local cache first (works offline); the API is only a fallback for notes
+// that are not cached yet.
 
 import { useEffect, useMemo, useState } from 'react';
-import type { CookWithEvents, NextTimeNote } from 'shared/types';
-import { useCooks } from '@/lib/cookHooks';
+import type { CookWithEvents, Meat, NextTimeNote } from 'shared/types';
 import { fetchNextTimeNote } from '@/lib/cookActions';
+import { useCooks } from '@/lib/cookHooks';
 
-const normalize = (protein: string | null) => protein?.trim().toLowerCase() ?? '';
-
-export const findNextTimeNote = (
-  cooks: readonly CookWithEvents[],
-  protein: string,
-  excludeId?: string,
-): NextTimeNote | null => {
-  const key = normalize(protein);
-  if (!key) return null;
-
-  let best: NextTimeNote | null = null;
-  for (const cook of cooks) {
-    const note = cook.nextTimeNote?.trim();
-    if (cook.id === excludeId || !cook.endedAt || !note || normalize(cook.protein) !== key)
-      continue;
-    if (!best || cook.endedAt > best.endedAt) {
-      best = { cookId: cook.id, name: cook.name, endedAt: cook.endedAt, nextTimeNote: note };
-    }
-  }
-  return best;
-};
-
-/** The most recent finished cook of this protein, with or without a note. */
+/** The most recent finished cook of this meat, with or without a note. */
 export const findLastCook = (
   cooks: readonly CookWithEvents[],
-  protein: string,
+  meatId: string,
   excludeId?: string,
-): CookWithEvents | null => {
-  const key = normalize(protein);
-  if (!key) return null;
-  return cooks.reduce<CookWithEvents | null>(
+): CookWithEvents | null =>
+  cooks.reduce<CookWithEvents | null>(
     (best, cook) =>
       cook.id !== excludeId &&
       cook.endedAt &&
-      normalize(cook.protein) === key &&
+      cook.meatId === meatId &&
       (!best?.endedAt || cook.endedAt > best.endedAt)
         ? cook
         : best,
     null,
   );
+
+export const findNextTimeNote = (
+  cooks: readonly CookWithEvents[],
+  meats: readonly Meat[],
+  meatId: string,
+  excludeId?: string,
+): NextTimeNote | null => {
+  const meat = meats.find((m) => m.id === meatId);
+  let best: NextTimeNote | null = null;
+  for (const cook of cooks) {
+    const note = cook.nextTimeNote?.trim();
+    if (!meat || cook.id === excludeId || !cook.endedAt || !note || cook.meatId !== meatId)
+      continue;
+    if (!best || cook.endedAt > best.endedAt) {
+      best = {
+        cookId: cook.id,
+        meatId,
+        meatName: meat.name,
+        endedAt: cook.endedAt,
+        nextTimeNote: note,
+      };
+    }
+  }
+  return best;
 };
 
-export const useNextTimeNote = (protein: string, excludeId?: string): NextTimeNote | null => {
-  const { cooks } = useCooks();
+export const useNextTimeNote = (meatId: string, excludeId?: string): NextTimeNote | null => {
+  const { cooks, meats } = useCooks();
   const local = useMemo(
-    () => findNextTimeNote(cooks, protein, excludeId),
-    [cooks, protein, excludeId],
+    () => findNextTimeNote(cooks, meats, meatId, excludeId),
+    [cooks, meats, meatId, excludeId],
   );
-  const [remote, setRemote] = useState<{ key: string; note: NextTimeNote | null } | null>(null);
-  const key = normalize(protein);
+  const [remote, setRemote] = useState<{ meatId: string; note: NextTimeNote | null } | null>(null);
 
   useEffect(() => {
-    if (local || !key) return;
+    if (local || !meatId) return;
     let stale = false;
-    const timer = setTimeout(() => {
-      void fetchNextTimeNote(protein).then((note) => {
-        if (!stale) setRemote({ key, note });
-      });
-    }, 400);
+    void fetchNextTimeNote(meatId).then((note) => {
+      if (!stale) setRemote({ meatId, note });
+    });
     return () => {
       stale = true;
-      clearTimeout(timer);
     };
-  }, [local, key, protein]);
+  }, [local, meatId]);
 
   if (local) return local;
-  return remote?.key === key && remote.note?.cookId !== excludeId ? remote.note : null;
+  return remote?.meatId === meatId && remote.note?.cookId !== excludeId ? remote.note : null;
 };

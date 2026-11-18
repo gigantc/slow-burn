@@ -3,7 +3,8 @@
 // Local-first: each action updates the cache and outbox immediately and returns; the sync
 // engine delivers to the server in the background.
 
-import type { Cook, CookEvent, CookWithEvents, NextTimeNote } from 'shared/types';
+import { meatKey } from 'shared/meats';
+import type { Cook, CookEvent, CookWithEvents, Meat, NextTimeNote } from 'shared/types';
 import { getCookState, mutate } from '@/lib/cookStore';
 import { requestSync } from '@/lib/sync';
 import { fetchNextTime } from '@/lib/transport';
@@ -14,14 +15,13 @@ export type EventInput = Pick<CookEvent, 'type'> &
   Partial<Pick<CookEvent, 'at' | 'value' | 'note'>>;
 
 const BLANK: CookFields = {
-  name: '',
-  protein: null,
-  cut: null,
+  meatId: '',
   weightLbs: null,
   prep: null,
   smoker: null,
   wood: null,
   targetPitTempF: null,
+  targetInternalTempF: null,
   startedAt: null,
   endedAt: null,
   finalInternalTempF: null,
@@ -37,6 +37,42 @@ const commit = (...args: Parameters<typeof mutate>) => {
 };
 
 const byTime = (a: CookEvent, b: CookEvent) => a.at.localeCompare(b.at);
+
+//////////////////////////////////////
+// Cooks
+
+//////////////////////////////////////
+// Meats
+
+/** The meat with this name (matched by normalized key), creating it locally if it's new. */
+export const addMeat = (name: string): Meat => {
+  const trimmed = name.trim();
+  const nameKey = meatKey(trimmed);
+  if (!nameKey) throw new Error('A meat needs a name.');
+
+  const existing = getCookState().meats.find((meat) => meat.nameKey === nameKey);
+  if (existing) return existing;
+
+  const now = new Date().toISOString();
+  const meat: Meat = {
+    id: crypto.randomUUID(),
+    name: trimmed,
+    nameKey,
+    createdAt: now,
+    updatedAt: now,
+  };
+  commit({
+    meatUpserts: [meat],
+    ops: [
+      {
+        method: 'PUT',
+        path: `/meats/${meat.id}`,
+        body: { name: meat.name, createdAt: meat.createdAt, updatedAt: meat.updatedAt },
+      },
+    ],
+  });
+  return meat;
+};
 
 //////////////////////////////////////
 // Cooks
@@ -57,7 +93,7 @@ export const saveCook = (input: CookInput): CookWithEvents => {
     id,
     updatedAt: now,
   };
-  if (!cook.name.trim()) throw new Error('A cook needs a name.');
+  if (!cook.meatId) throw new Error('A cook needs a meat.');
 
   const { id: _id, events: _events, ...body } = cook;
   commit({ upserts: [cook], ops: [{ method: 'PUT', path: `/cooks/${id}`, body }] });
@@ -133,10 +169,10 @@ export const deleteEvent = (cookId: string, eventId: string) => {
 //////////////////////////////////////
 // Next-time note (online only)
 
-export const fetchNextTimeNote = async (protein: string): Promise<NextTimeNote | null> => {
-  if (!navigator.onLine || !protein.trim()) return null;
+export const fetchNextTimeNote = async (meatId: string): Promise<NextTimeNote | null> => {
+  if (!navigator.onLine || !meatId) return null;
   try {
-    return await fetchNextTime(protein);
+    return await fetchNextTime(meatId);
   } catch {
     return null;
   }

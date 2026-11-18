@@ -24,6 +24,9 @@
     text-transform:uppercase;
   }
 
+  // Subtitle under the title (the date)
+  p{ font:500 1.3rem/1.2 v.$font-body; }
+
   ul{
     display:flex;
     flex-wrap:wrap;

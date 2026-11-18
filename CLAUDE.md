@@ -24,10 +24,10 @@ This replaces The Dock (`~/Sites/dev/The-Dock`), an all-in-one notes/lists/journ
 
 ## Product (summary of the brief)
 
-- **Cooks** are timelines over hours. Setup (protein/cut, weight, prep, smoker, wood, target pit temp), timestamped events with one tap each (on, pit temp, internal temp, spritz, wrap, add wood, off, rest), then a wrap-up (final temp, total time calculated, rating, notes, photos).
-- **"Next time" note:** written after a cook and shown first when starting the next cook of the same protein. This is a core feature.
+- **Cooks** are timelines over hours. Setup (meat, weight, target meat temp, target pit temp, wood, prep), timestamped events with one tap each (on, pit temp, internal temp, spritz, wrap, add wood, off, rest), then a wrap-up (final temp, total time calculated, rating, notes, photos).
+- **"Next time" note:** written after a cook and shown first when starting the next cook of the same meat. This is a core feature.
 - **Tastings** are single moments. Whisky, cigar and wine share one form (name, maker, date, impressions, rating, photo), and each category adds its own fields. New categories should be data, not code.
-- **Principles:** phone first; big tap targets ("greasy hands"); works with bad signal; every field optional except the name; desktop is for looking back (browse, search, sort by rating).
+- **Principles:** phone first; big tap targets ("greasy hands"); works with bad signal; every field optional except the meat; desktop is for looking back (browse, search, sort by rating).
 
 ---
 
@@ -105,14 +105,17 @@ Client imports use `@/` (src/client) and `shared/` (src/shared). Server imports 
 
 ## Current state
 
-- **Last worked on:** 2026-11-18, kickoff and scaffold. Stack locked; auth, cooks schema, placeholder screens, PWA config and deploy files are in. Build, typecheck and API checks pass. Screens not yet checked in a browser.
+- **Last worked on:** 2026-11-18. Cook MVP built end to end (new cook, live, wrap-up, detail, Cooks tab), offline-first sync, menu, Sonoran Dawn/Dusk design, Fraunces + DM Sans, gradient flame logo. Walkthrough with dFree reworked the cook form: Name/Protein/Cut/Smoker removed, **Meat** (managed list with add-new picker) is the star and the only required field, target meat temp added, Cancel/primary action bar replaced the close button, live screen tiles removed in favor of targets in the header. Not yet tested on a real phone.
 - **Server facts (2026-11-18):** Ubuntu 24.04 LAMP droplet, Node v26.13.1 via NodeSource (upgraded from 22 on 2026-11-18; `baseball-watcher` verified healthy after), certbot certs per subdomain, `slowburn.gigantc.com` DNS already resolves to the droplet. `mod_proxy` / `proxy_http` not enabled yet. No databases used by the other sites.
-- **In progress:** nothing.
+- **In progress:** nothing. dFree is walking through the app screen by screen and dumping feedback; the look is a placeholder and a real design pass is planned later.
 - **Next up:**
-  1. dFree runs `git init` and the initial commit.
-  2. dFree supplies PWA icons: `public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`.
-  3. One-time server setup per [docs/deploy.md](docs/deploy.md), then first deploy.
-  4. Build the cook MVP: start a cook, one-tap timeline events, wrap-up, next-time note, offline write queue.
+  1. Bug: on desktop the sticky form action bar overlaps the bottom of the last section card (panel needs bottom padding equal to the bar height).
+  2. Continue the walkthrough (detail, Cooks tab, home). Wrap-up is good for now.
+  3. Test on a real phone: `vite --host` over Wi-Fi now; a private staging deploy later in the week for PWA install + offline (dFree decides when). Deadline: turkey Thu 2026-11-26.
+  4. PWA icons from `src/client/components/Logo/logo.svg` once the logo is settled.
+  5. Polish pile: Dusk whisky card muddy, Dusk wine too saturated, Dawn secondary button on the backdrop washed out, Undo toast covers the Note button.
+  6. Later: "Manage meats" (rename, merge, delete unused) in the menu.
+- **Dev DB note:** a running `npm run dev` re-applies migrations as files change, so stop it while the schema is being edited.
 - **Data to re-enter:** The Dock's smoking and whisky notes are free-text Firestore entries (no structured fields). They'll be re-entered by hand as test data, which is why a cook with zero events and a past date is valid.
 - **Open questions:**
   - Do tastings (whisky/cigar) need to work by Thanksgiving, or is the turkey alone enough? (Also asked as a comment in the brief.)

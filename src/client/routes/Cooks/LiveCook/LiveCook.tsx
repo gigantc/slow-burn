@@ -4,12 +4,14 @@ import type { CookEventTypeKey } from 'shared/cookEventTypes';
 import type { CookEvent, CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
 import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
 import UndoToast from '@/components/UndoToast/UndoToast';
 import type { Toast } from '@/components/UndoToast/UndoToast';
 import { addEvent, deleteEvent } from '@/lib/cookActions';
-import { eventDef, eventTypeDefs, formatValue, latestEvent } from '@/lib/cookEvents';
-import { formatDuration, timeAgo } from '@/lib/format';
+import { eventDef, eventTypeDefs } from '@/lib/cookEvents';
+import { useMeatName } from '@/lib/cookHooks';
+import { clockTime, formatDayShort, formatDuration } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
 import { useWakeLock } from '@/lib/useWakeLock';
 import EventSheet from '../EventSheet/EventSheet';
@@ -19,15 +21,13 @@ import styles from './LiveCook.module.scss';
 
 const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
   useWakeLock();
+  const meatName = useMeatName(cook.meatId);
   const now = useNow(30_000);
   const navigate = useNavigate();
   const [target, setTarget] = useState<EventTarget | null>(null);
   const [deleting, setDeleting] = useState<CookEvent | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
 
-  const pit = latestEvent(cook.events, 'pit_temp');
-  const internal = latestEvent(cook.events, 'internal_temp');
-  const last = latestEvent(cook.events);
   const started = cook.startedAt ? new Date(cook.startedAt).getTime() : now;
 
   const announce = (event: CookEvent) =>
@@ -44,31 +44,28 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
     setToast(null);
   };
 
-  const glance = [
-    { label: 'Pit temp', event: pit, value: pit ? formatValue(pit) : 'None yet' },
-    { label: 'Internal', event: internal, value: internal ? formatValue(internal) : 'None yet' },
-    { label: 'Last', event: last, value: last ? eventDef(last.type).label : 'None yet' },
-  ];
+  const targets = [
+    cook.targetInternalTempF ? `Target meat ${cook.targetInternalTempF}°F` : '',
+    cook.targetPitTempF ? `Target pit ${cook.targetPitTempF}°F` : '',
+  ].filter(Boolean);
 
   return (
     <section className={styles.live}>
+      <Breadcrumb
+        to="/cooks"
+        label="Cooks"
+      />
       <header>
-        <h1>{cook.name}</h1>
+        <h1>{meatName}</h1>
+        {cook.startedAt && (
+          <p>{`${formatDayShort(cook.startedAt)} · ${clockTime(cook.startedAt)}`}</p>
+        )}
         <strong>{formatDuration(now - started)}</strong>
         <p>
-          {cook.targetPitTempF ? `Target pit ${cook.targetPitTempF}°F · ` : ''}
+          {targets.map((target) => `${target} · `)}
           <Link to={`/cooks/${cook.id}/edit`}>Edit setup</Link>
         </p>
       </header>
-      <ul className={styles.glance}>
-        {glance.map(({ label, event, value }) => (
-          <li key={label}>
-            <span>{label}</span>
-            <strong>{value}</strong>
-            <small>{event ? timeAgo(event.at, now) : ''}</small>
-          </li>
-        ))}
-      </ul>
       <div
         className={styles.events}
         role="group"

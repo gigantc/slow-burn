@@ -3,10 +3,27 @@
 // Source of truth. Generate migrations with `npm run db:generate`; never hand-edit them.
 
 import { sql } from 'drizzle-orm';
-import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, uniqueIndex, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import type { CookEventTypeKey } from '../../shared/cookEventTypes.js';
 
 const now = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
+
+//////////////////////////////////////
+// Meats
+// A managed list. `nameKey` is the name lowercased with every non-alphanumeric removed, so
+// "Pulled Pork", "pulled  pork" and "pulledpork" are the same meat.
+
+export const meats = sqliteTable(
+  'meats',
+  {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    nameKey: text('name_key').notNull(),
+    createdAt: text('created_at').notNull().default(now),
+    updatedAt: text('updated_at').notNull().default(now),
+  },
+  (t) => [uniqueIndex('meats_name_key_idx').on(t.nameKey)],
+);
 
 //////////////////////////////////////
 // Cooks
@@ -17,17 +34,14 @@ export const cooks = sqliteTable(
   'cooks',
   {
     id: text('id').primaryKey(),
-    name: text('name').notNull(),
-    protein: text('protein'),
-    // Lowercased, trimmed copy of `protein` for the indexed next-time lookup. The API keeps it
-    // in step on every write (a generated column breaks drizzle-kit's table recreate).
-    proteinKey: text('protein_key'),
-    cut: text('cut'),
     weightLbs: real('weight_lbs'),
     prep: text('prep'),
     smoker: text('smoker'),
     wood: text('wood'),
     targetPitTempF: integer('target_pit_temp_f'),
+    targetInternalTempF: integer('target_internal_temp_f'),
+    // Required by the API; nullable here because the column was added to existing rows.
+    meatId: text('meat_id').references(() => meats.id, { onDelete: 'restrict' }),
     startedAt: text('started_at'),
     endedAt: text('ended_at'),
     finalInternalTempF: integer('final_internal_temp_f'),
@@ -42,7 +56,7 @@ export const cooks = sqliteTable(
     createdAt: text('created_at').notNull().default(now),
     updatedAt: text('updated_at').notNull().default(now),
   },
-  (t) => [index('cooks_protein_key_idx').on(t.proteinKey)],
+  (t) => [index('cooks_meat_idx').on(t.meatId)],
 );
 
 //////////////////////////////////////

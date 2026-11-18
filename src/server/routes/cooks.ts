@@ -1,19 +1,33 @@
 //////////////////////////////////////
-// Cooks and cook events
+// Cooks, meats and cook events
 // Client-generated ids, upserts, and last-write-wins on the client's `updatedAt`.
 
 import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
 import { and, asc, desc, eq, isNotNull, sql } from 'drizzle-orm';
-import type { CookEvent, CookWithEvents, NextTimeNote, SyncResponse } from '../../shared/types.js';
+import { meatKey } from '../../shared/meats.js';
+import type {
+  Cook,
+  CookEvent,
+  CookWithEvents,
+  NextTimeNote,
+  SyncResponse,
+} from '../../shared/types.js';
 import { db } from '../db/index.js';
-import { cookEvents, cooks } from '../db/schema.js';
+import { cookEvents, cooks, meats } from '../db/schema.js';
 import { HttpError } from '../errors.js';
-import { cookBody, cookParams, eventBody, eventParams, nextTimeQuery } from './schemas.js';
+import {
+  cookBody,
+  cookParams,
+  eventBody,
+  eventParams,
+  meatBody,
+  meatParams,
+  nextTimeQuery,
+} from './schemas.js';
 
-const normalizeProtein = (protein: string | null) => protein?.trim().toLowerCase() || null;
-
-// Drop the internal lookup column from API output.
-const toCook = ({ proteinKey: _proteinKey, ...cook }: typeof cooks.$inferSelect) => cook;
+// `meat_id` is nullable in the table (it was added to existing rows); the API always sets it.
+const toCook = ({ meatId, ...cook }: typeof cooks.$inferSelect): Cook[] =>
+  meatId ? [{ ...cook, meatId }] : [];
 
 export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
   //////////////////////////////////////
@@ -30,8 +44,9 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
       .select()
       .from(cooks)
       .all()
-      .map((cook) => ({ ...toCook(cook), events: byCook.get(cook.id) ?? [] }));
-    return { cooks: rows };
+      .flatMap(toCook)
+      .map((cook) => ({ ...cook, events: byCook.get(cook.id) ?? [] }));
+    return { cooks: rows, meats: db.select().from(meats).all() };
   });
 
   //////////////////////////////////////
@@ -41,15 +56,13 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
     '/cooks/next-time',
     { schema: { querystring: nextTimeQuery } },
     async (request, reply) => {
-      const key = normalizeProtein(request.query.protein);
-      if (!key) return reply.send(null);
-
       const row = db
-        .select()
+        .select({ cook: cooks, meatName: meats.name })
         .from(cooks)
+        .innerJoin(meats, eq(meats.id, cooks.meatId))
         .where(
           and(
-            eq(cooks.proteinKey, key),
+            eq(cooks.meatId, request.query.meatId),
             isNotNull(cooks.endedAt),
             sql`trim(coalesce(${cooks.nextTimeNote}, '')) <> ''`,
           ),
@@ -58,34 +71,67 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
         .limit(1)
         .get();
 
-      if (!row?.endedAt || !row.nextTimeNote) return reply.send(null);
+      const { cook } = row ?? {};
+      if (!row || !cook?.endedAt || !cook.nextTimeNote || !cook.meatId) return reply.send(null);
       const note: NextTimeNote = {
-        cookId: row.id,
-        name: row.name,
-        endedAt: row.endedAt,
-        nextTimeNote: row.nextTimeNote,
+        cookId: cook.id,
+        meatId: cook.meatId,
+        meatName: row.meatName,
+        endedAt: cook.endedAt,
+        nextTimeNote: cook.nextTimeNote,
       };
       return reply.send(note);
     },
   );
 
   //////////////////////////////////////
+  // Meats: a managed list, deduplicated by normalized name
+
+  app.put('/meats/:id', { schema: { params: meatParams, body: meatBody } }, async (request) => {
+    const { id } = request.params;
+    const { createdAt, ...fields } = request.body;
+    const name = fields.name.trim();
+    const nameKey = meatKey(name);
+    if (!nameKey) throw new HttpError(400, 'invalid_request', 'Meat needs a name.');
+
+    return db.transaction((tx) => {
+      // Same meat under another id (e.g. added on two devices): hand back the existing one and
+      // the client remaps its cooks to it.
+      const sameKey = tx.select().from(meats).where(eq(meats.nameKey, nameKey)).get();
+      if (sameKey && sameKey.id !== id) return sameKey;
+
+      const existing = tx.select().from(meats).where(eq(meats.id, id)).get();
+      if (existing && existing.updatedAt > fields.updatedAt) return existing;
+
+      const values = { name, nameKey, updatedAt: fields.updatedAt };
+      tx.insert(meats)
+        .values({ id, ...values, ...(createdAt ? { createdAt } : {}) })
+        .onConflictDoUpdate({ target: meats.id, set: values })
+        .run();
+      return tx.select().from(meats).where(eq(meats.id, id)).get()!;
+    });
+  });
+
+  //////////////////////////////////////
   // Cook upsert and delete
 
   app.put('/cooks/:id', { schema: { params: cookParams, body: cookBody } }, async (request) => {
     const { id } = request.params;
-    const { createdAt, ...fields } = request.body;
-    const values = { ...fields, proteinKey: normalizeProtein(fields.protein) };
+    const { createdAt, ...values } = request.body;
 
     return db.transaction((tx) => {
+      if (!tx.select({ id: meats.id }).from(meats).where(eq(meats.id, values.meatId)).get()) {
+        throw new HttpError(404, 'meat_not_found', 'Meat not found.');
+      }
+
       const existing = tx.select().from(cooks).where(eq(cooks.id, id)).get();
-      if (existing && existing.updatedAt > fields.updatedAt) return toCook(existing);
+      if (existing && existing.updatedAt > values.updatedAt) return toCook(existing)[0] ?? existing;
 
       tx.insert(cooks)
         .values({ id, ...values, ...(createdAt ? { createdAt } : {}) })
         .onConflictDoUpdate({ target: cooks.id, set: values })
         .run();
-      return toCook(tx.select().from(cooks).where(eq(cooks.id, id)).get()!);
+      return tx.select().from(cooks).where(eq(cooks.id, id)).get()!;
     });
   });
 

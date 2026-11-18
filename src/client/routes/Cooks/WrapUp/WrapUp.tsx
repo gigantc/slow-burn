@@ -9,8 +9,8 @@ import RatingInput from '@/components/RatingInput/RatingInput';
 import Summary from '@/components/Summary/Summary';
 import { saveCook } from '@/lib/cookActions';
 import { latestEvent } from '@/lib/cookEvents';
-import { useCook, useCooks } from '@/lib/cookHooks';
-import { clockTime, formatDuration, fromLocalInput, toLocalInput } from '@/lib/format';
+import { useCook, useCooks, useMeatName } from '@/lib/cookHooks';
+import { formatDuration, formatWhen, fromLocalInput, toLocalInput } from '@/lib/format';
 import { useUnsaved } from '@/lib/unsaved';
 import { useBack } from '@/lib/useBack';
 import CookMissing from '../CookMissing/CookMissing';
@@ -18,6 +18,7 @@ import CookMissing from '../CookMissing/CookMissing';
 const END_BEFORE_START = 'End time is before the start time.';
 
 const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
+  const meatName = useMeatName(cook.meatId);
   const navigate = useNavigate();
   const back = useBack();
   // Editing a finished cook's wrap-up was pushed from the detail page, so saving goes back to it.
@@ -64,8 +65,7 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   };
 
   const rows: [string, string][] = [];
-  if (cook.protein) rows.push(['Protein', cook.protein]);
-  if (cook.startedAt) rows.push(['Started', clockTime(cook.startedAt)]);
+  if (cook.startedAt) rows.push(['Started', formatWhen(cook.startedAt)]);
   rows.push([
     'Total time',
     total === null ? 'Not started' : invalid ? 'Check end time' : formatDuration(total),
@@ -75,17 +75,12 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
     <FormPage
       title="Wrap-up"
       onSubmit={submit}
-      action={
-        <Button
-          type="submit"
-          disabled={invalid}
-        >
-          Save
-        </Button>
-      }
+      submitLabel="Save"
+      submitDisabled={invalid}
+      cancelFallback={`/cooks/${cook.id}`}
       notes={
         <Summary
-          title={cook.name}
+          title={meatName}
           rows={rows}
         />
       }

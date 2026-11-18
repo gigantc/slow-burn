@@ -1,18 +1,16 @@
 //////////////////////////////////////
 // Form page
-// Desktop: main column of numbered section cards plus a sticky sidebar.
-// Phone: one column, notes first, and the primary action in a sticky bar above the tab bar.
+// Desktop: numbered section cards in the panel; the sidebar is fixed on the backdrop to the
+// right of it, in the column AppShell reserves for form pages.
+// The action bar sticks to the bottom of the panel (above the tab bar on phone).
 
 //imports
 @use 'scss/variables' as v;
 
 .page{
   display:grid;
-  grid-template-columns:minmax(0, 1fr) v.$form-sidebar-width;
   gap:v.$space-lg;
   align-items:start;
-
-  h1{ grid-column:1 / -1; }
 
   .main{
     display:flex;
@@ -21,42 +19,65 @@
     min-width:0px;
   }
 
+  // Same edge spacing as the app Nav on the left of the backdrop
   .side{
-    position:sticky;
+    position:fixed;
     top:v.$space-md;
+    right:v.$space-md;
     display:flex;
     flex-direction:column;
     gap:v.$space-md;
+    width:v.$form-sidebar-width;
+    max-height:calc(100dvh - #{v.$space-md * 2});
+    padding:v.$space-lg v.$space-sm;
+    overflow:auto;
   }
 
-  .bar button, .secondary button{ width:100%; }
-
-  .notes{
+  .bar{
+    position:sticky;
+    bottom:v.$space-md;
+    z-index:9;
     display:flex;
-    flex-direction:column;
+    align-items:center;
     gap:v.$space-md;
+    padding:v.$space-sm v.$space-md;
+    background-color:v.$card;
+    border:1px solid v.$border;
+    border-radius:v.$radius-lg;
+    box-shadow:v.$shadow;
+
+    // Sync status on the left, actions on the right
+    p{ margin:0px auto 0px 0px; }
   }
 
   @include v.breakpoint(v.$bp-md){
-    grid-template-columns:1fr;
     padding:0px 0px calc(#{v.$field-height-md} + #{v.$space-xl}) 0px;
 
-    // The sidebar's children become grid items so they can be ordered around the sections
-    .side{ display:contents; }
-    .notes{ order:1; }
+    // The sidebar's context moves above the sections
+    .side{
+      position:static;
+      width:auto;
+      max-height:none;
+      padding:0px;
+      order:1;
+    }
     .main{ order:2; }
-    .secondary{ order:3; }
 
     .bar{
       position:fixed;
       right:0px;
       bottom:calc(#{v.$tap-target} + #{v.$space-sm} + env(safe-area-inset-bottom));
       left:0px;
-      z-index:9;
-      padding:v.$space-sm v.$space-md;
+      border-width:1px 0px 0px 0px;
+      border-radius:0px;
+      box-shadow:none;
       background-color:v.$panel;
-      border-top:1px solid v.$border;
     }
+  }
+
+  @include v.breakpoint(v.$bp-sm){
+    .bar p{ display:none; }
+    .bar button:last-child{ flex:1; }
   }
 }
 

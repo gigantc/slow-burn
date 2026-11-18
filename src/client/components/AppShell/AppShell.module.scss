@@ -21,32 +21,14 @@
     box-shadow:v.$shadow;
   }
 
-  // Cook screens: no sidebar on desktop, a Close button at the top right of the panel.
+  // Cook screens: no sidebar nav on desktop.
   &.focus{
     grid-template-columns:1fr;
 
     > nav{ display:none; }
-    main h1{ padding-right:calc(#{v.$field-height} + #{v.$space-md}); }
-  }
 
-  .close{
-    position:absolute;
-    top:v.$space-md;
-    right:v.$space-md;
-    z-index:5;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:v.$field-height;
-    height:v.$field-height;
-    border-radius:v.$radius-md;
-    color:v.$muted;
-
-    &:hover{ background-color:v.$hover; color:v.$text; }
-    &:focus-visible{
-      outline:none;
-      box-shadow:inset 0px 0px 0px 2px v.$accent;
-    }
+    // Form pages: an empty column on the right where FormPage's sidebar sits on the backdrop
+    &.withSidebar{ grid-template-columns:1fr v.$form-sidebar-width; }
   }
 
   @include v.breakpoint(v.$bp-md){
@@ -54,6 +36,7 @@
 
     // The tab bar stays on phone
     &.focus > nav{ display:flex; }
+    &.focus.withSidebar{ grid-template-columns:1fr; }
 
     gap:0px;
     padding:env(safe-area-inset-top) 0px 0px 0px;

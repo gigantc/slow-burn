@@ -1,0 +1,18 @@
+//////////////////////////////////////
+// Breadcrumb
+
+//imports
+@use 'scss/variables' as v;
+
+.crumb{
+  a{
+    display:inline-flex;
+    align-items:center;
+    min-height:v.$field-height;
+    color:v.$muted;
+    font:600 1.4rem/1 v.$font-body;
+    text-decoration:none;
+
+    &:hover{ color:v.$accent; }
+  }
+}

@@ -15,6 +15,27 @@
       "when": 1795034300632,
       "tag": "0001_cook_mvp",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795041307102,
+      "tag": "0002_meats_structure",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1795041325949,
+      "tag": "0003_meats_seed_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1795041334260,
+      "tag": "0004_drop_old_cook_fields",
+      "breakpoints": true
     }
   ]
 }

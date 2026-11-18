@@ -21,14 +21,13 @@ export const cookParams = Type.Object({ id: idParam });
 export const eventParams = Type.Object({ id: idParam, eventId: idParam });
 
 export const cookBody = Type.Object({
-  name: Type.String({ minLength: 1, maxLength: 200 }),
-  protein: text(200),
-  cut: text(200),
+  meatId: idParam,
   weightLbs: nullable(Type.Number({ minimum: 0, maximum: 1000 })),
   prep: text(5000),
   smoker: text(200),
   wood: text(200),
   targetPitTempF: nullable(Type.Integer({ minimum: 0, maximum: 1500 })),
+  targetInternalTempF: nullable(Type.Integer({ minimum: 0, maximum: 1500 })),
   startedAt: nullable(isoTimestamp()),
   endedAt: nullable(isoTimestamp()),
   finalInternalTempF: nullable(Type.Integer({ minimum: 0, maximum: 1500 })),
@@ -36,6 +35,14 @@ export const cookBody = Type.Object({
   notes: text(20000),
   nextTimeNote: text(20000),
   source: Type.Union([Type.Literal('app'), Type.Literal('import')]),
+  createdAt: Type.Optional(isoTimestamp()),
+  updatedAt: isoTimestamp(),
+});
+
+export const meatParams = Type.Object({ id: idParam });
+
+export const meatBody = Type.Object({
+  name: Type.String({ minLength: 1, maxLength: 100 }),
   createdAt: Type.Optional(isoTimestamp()),
   updatedAt: isoTimestamp(),
 });
@@ -49,6 +56,4 @@ export const eventBody = Type.Object({
   updatedAt: isoTimestamp(),
 });
 
-export const nextTimeQuery = Type.Object({
-  protein: Type.String({ minLength: 1, maxLength: 200 }),
-});
+export const nextTimeQuery = Type.Object({ meatId: idParam });

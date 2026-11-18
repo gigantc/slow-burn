@@ -17,18 +17,18 @@ export const classify = (err: unknown): Exclude<Outcome, 'ok'> => {
   return 'drop';
 };
 
-export const sendOp = async (op: OutboxOp): Promise<Outcome> => {
+export const sendOp = async (op: OutboxOp): Promise<{ outcome: Outcome; data?: unknown }> => {
   try {
-    await api(op.path, { method: op.method, body: op.body });
-    return 'ok';
+    const data = await api<unknown>(op.path, { method: op.method, body: op.body });
+    return { outcome: 'ok', data };
   } catch (err) {
     const outcome = classify(err);
     if (outcome === 'drop') console.warn('Dropping op the server rejected', op, err);
-    return outcome;
+    return { outcome };
   }
 };
 
 export const pullAll = () => api<SyncResponse>('/sync');
 
-export const fetchNextTime = (protein: string) =>
-  api<NextTimeNote | null>(`/cooks/next-time?protein=${encodeURIComponent(protein)}`);
+export const fetchNextTime = (meatId: string) =>
+  api<NextTimeNote | null>(`/cooks/next-time?meatId=${encodeURIComponent(meatId)}`);

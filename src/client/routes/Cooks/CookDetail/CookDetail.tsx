@@ -7,12 +7,15 @@ import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
 import Stars from '@/components/Stars/Stars';
 import EntryHead from '@/components/EntryHead/EntryHead';
 import { cookTags } from '@/components/CookList/cookCard';
+import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import { deleteCook } from '@/lib/cookActions';
-import { formatDay, formatDuration } from '@/lib/format';
+import { useMeatName } from '@/lib/cookHooks';
+import { formatDayShort, formatDuration } from '@/lib/format';
 import Timeline from '../Timeline/Timeline';
 import styles from './CookDetail.module.scss';
 
 const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
+  const meatName = useMeatName(cook.meatId);
   const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
 
@@ -22,26 +25,32 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
       : null;
 
   const stats = [
-    ['Protein', cook.protein],
-    ['Cut', cook.cut],
     ['Weight', cook.weightLbs === null ? null : `${cook.weightLbs} lb`],
     ['Smoker', cook.smoker],
     ['Wood', cook.wood],
+    [
+      'Target meat temp',
+      cook.targetInternalTempF === null ? null : `${cook.targetInternalTempF}°F`,
+    ],
     ['Target pit', cook.targetPitTempF === null ? null : `${cook.targetPitTempF}°F`],
     ['Final internal', cook.finalInternalTempF === null ? null : `${cook.finalInternalTempF}°F`],
   ].flatMap(([label, value]) => (value ? [[label, value] as const] : []));
 
   return (
     <section className={styles.detail}>
+      <Breadcrumb
+        to="/cooks"
+        label="Cooks"
+      />
       <EntryHead
         type="cook"
         tags={cookTags(cook)}
       >
-        <h1>{cook.name}</h1>
+        <h1>{meatName}</h1>
       </EntryHead>
       <p className={styles.meta}>
         <time dateTime={cook.startedAt ?? cook.createdAt}>
-          {formatDay(cook.startedAt ?? cook.createdAt)}
+          {formatDayShort(cook.startedAt ?? cook.createdAt)}
         </time>
         {total && <span>{total} total</span>}
         {cook.rating !== null && <Stars rating={cook.rating} />}

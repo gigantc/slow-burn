@@ -10,10 +10,13 @@ import {
   getMutationVersion,
   loadStore,
   pendingCookIds,
+  pendingMeatIds,
+  remapMeat,
   setSyncState,
 } from '@/lib/cookStore';
 import { dbGetAll, dbWrite } from '@/lib/idb';
 import { classify, pullAll, sendOp } from '@/lib/transport';
+import type { Meat } from 'shared/types';
 import type { OutboxOp } from '@/lib/types';
 
 type Result = 'ok' | 'retry' | 'auth';
@@ -45,9 +48,20 @@ const drain = async (): Promise<Result> => {
     const [op] = await readOutbox();
     if (!op) return 'ok';
 
-    const outcome = await sendOp(op);
+    const { outcome, data } = await sendOp(op);
     if (outcome === 'auth') return 'auth';
     if (outcome === 'retry') return 'retry';
+
+    // A meat PUT may come back as an existing meat with another id: remap before moving on.
+    const returned = data as Meat | null | undefined;
+    if (
+      outcome === 'ok' &&
+      op.path.startsWith('/meats/') &&
+      returned &&
+      `/meats/${returned.id}` !== op.path
+    ) {
+      await remapMeat(op.path.slice('/meats/'.length), returned);
+    }
 
     // Accepted or permanently rejected (already logged): either way it leaves the outbox.
     await dbWrite([{ store: 'outbox', delete: op.seq }]);
@@ -58,8 +72,9 @@ const drain = async (): Promise<Result> => {
 const pull = async (): Promise<Result> => {
   const readVersion = getMutationVersion();
   try {
-    const { cooks } = await pullAll();
-    applyPull(cooks, pendingCookIds(await readOutbox()), readVersion);
+    const { cooks, meats } = await pullAll();
+    const ops = await readOutbox();
+    applyPull(cooks, meats, pendingCookIds(ops), pendingMeatIds(ops), readVersion);
     return 'ok';
   } catch (err) {
     return classify(err) === 'auth' ? 'auth' : 'retry';

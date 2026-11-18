@@ -18,6 +18,19 @@ export const localDate = (iso: string) => localDateFormat.format(new Date(iso));
 export const formatDay = (iso: string) =>
   dayFormat.format(new Date(iso.length === 10 ? `${iso}T00:00:00` : iso));
 
+const dayShortFormat = new Intl.DateTimeFormat('en-US', {
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+});
+
+/** "Sat, Nov 21" from a YYYY-MM-DD date or an ISO timestamp (local time); adds the year if not this year. */
+export const formatDayShort = (iso: string) => {
+  const date = new Date(iso.length === 10 ? `${iso}T00:00:00` : iso);
+  const base = dayShortFormat.format(date);
+  return date.getFullYear() === new Date().getFullYear() ? base : `${base}, ${date.getFullYear()}`;
+};
+
 /** "2:15 PM" from epoch ms or an ISO timestamp. */
 export const clockTime = (when: number | string) => timeFormat.format(new Date(when));
 
@@ -27,6 +40,12 @@ export const formatDuration = (ms: number) => {
   const hours = Math.floor(minutes / 60);
   return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
 };
+
+/** "7:00 AM" for today, otherwise "Nov 27, 2025, 7:00 AM". */
+export const formatWhen = (iso: string, now = Date.now()) =>
+  localDate(iso) === localDate(new Date(now).toISOString())
+    ? clockTime(iso)
+    : `${formatDay(iso)}, ${clockTime(iso)}`;
 
 /** "just now", "42 min ago", "2h 5m ago". */
 export const timeAgo = (iso: string, now: number) => {

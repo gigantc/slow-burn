@@ -5,7 +5,7 @@
 
 import { IDB_NAME, IDB_VERSION } from '@/config';
 
-export type StoreName = 'cooks' | 'outbox';
+export type StoreName = 'cooks' | 'meats' | 'outbox';
 
 export type WriteOp = { store: StoreName; put: object } | { store: StoreName; delete: IDBValidKey };
 
@@ -19,8 +19,14 @@ const openDb = () => {
     try {
       const request = indexedDB.open(IDB_NAME, IDB_VERSION);
       request.onupgradeneeded = () => {
-        request.result.createObjectStore('cooks', { keyPath: 'id' });
-        request.result.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true });
+        const db = request.result;
+        if (!db.objectStoreNames.contains('cooks'))
+          db.createObjectStore('cooks', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('meats'))
+          db.createObjectStore('meats', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('outbox')) {
+          db.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true });
+        }
       };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => resolve(null);
@@ -39,12 +45,13 @@ const openDb = () => {
 
 const memory: Record<StoreName, Map<IDBValidKey, object>> = {
   cooks: new Map(),
+  meats: new Map(),
   outbox: new Map(),
 };
 let memorySeq = 1;
 
 const keyOf = (store: StoreName, value: object): IDBValidKey => {
-  if (store === 'cooks') return (value as { id: string }).id;
+  if (store !== 'outbox') return (value as { id: string }).id;
   const op = value as { seq?: number };
   op.seq ??= memorySeq++;
   return op.seq;

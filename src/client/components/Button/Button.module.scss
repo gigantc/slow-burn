@@ -53,3 +53,5 @@
   min-height:v.$tap-target;
   font:600 1.6rem/1 v.$font-body;
 }
+
+.wide{ grid-column:1 / -1; }

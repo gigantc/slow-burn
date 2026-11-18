@@ -3,7 +3,7 @@ import Stars from '@/components/Stars/Stars';
 import EntryHead from '@/components/EntryHead/EntryHead';
 import Icon from '@/components/Icon/Icon';
 import type { EntryType } from '@/config';
-import { formatDay } from '@/lib/format';
+import { formatDayShort } from '@/lib/format';
 import styles from './Card.module.scss';
 
 export type EntryCardProps = {
@@ -11,8 +11,10 @@ export type EntryCardProps = {
   type: EntryType;
   title: string;
   tags: string[];
-  /** ISO date, YYYY-MM-DD */
+  /** ISO date, YYYY-MM-DD; shown under the title */
   date: string;
+  /** Left of the footer, e.g. total time */
+  detail?: string;
   rating?: number;
   href?: string;
 };
@@ -21,6 +23,8 @@ type ResumeCardProps = {
   variant: 'resume';
   title: string;
   tags: string[];
+  /** ISO date, YYYY-MM-DD; shown under the title */
+  date: string;
   /** e.g. "Started 8:00 AM · 3h 12m" */
   status: string;
   href: string;
@@ -56,6 +60,7 @@ const Card = (props: EntryCardProps | ResumeCardProps | AddCardProps) => {
           <h3>
             <Link to={props.href}>{props.title}</Link>
           </h3>
+          <p>{formatDayShort(props.date)}</p>
         </EntryHead>
         <footer>
           <span>{props.status}</span>
@@ -65,7 +70,7 @@ const Card = (props: EntryCardProps | ResumeCardProps | AddCardProps) => {
     );
   }
 
-  const { type, title, tags, date, rating, href } = props;
+  const { type, title, tags, date, detail, rating, href } = props;
 
   return (
     <article className={styles.card}>
@@ -74,9 +79,10 @@ const Card = (props: EntryCardProps | ResumeCardProps | AddCardProps) => {
         tags={tags}
       >
         <h3>{href ? <Link to={href}>{title}</Link> : title}</h3>
+        <p>{formatDayShort(date)}</p>
       </EntryHead>
       <footer>
-        <time dateTime={date}>{formatDay(date)}</time>
+        <span>{detail}</span>
         {rating !== undefined && <Stars rating={rating} />}
       </footer>
     </article>
