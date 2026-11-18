@@ -1,0 +1,17 @@
+[Unit]
+Description=Slow Burn
+After=network.target
+
+[Service]
+Type=simple
+User=slowburn
+Group=slowburn
+WorkingDirectory=/opt/slow-burn
+EnvironmentFile=/opt/slow-burn/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node dist/server/index.js
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

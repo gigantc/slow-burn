@@ -1,0 +1,15 @@
+//////////////////////////////////////
+// Field
+
+//imports
+@use 'scss/variables' as v;
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-sm;
+
+  label{
+    color:v.$cream;
+  }
+}

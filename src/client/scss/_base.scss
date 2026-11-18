@@ -1,0 +1,105 @@
+//////////////////////////////////////
+// Base
+// Element typography lives here; components set color, margin and layout only.
+
+//imports
+@use 'scss/variables' as v;
+
+html{
+  font-size:62.5%;
+  -webkit-text-size-adjust:100%;
+}
+
+body{
+  background-color:v.$coal;
+  color:v.$cream;
+  font:400 1.6rem/1.5 v.$font;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6{
+  font-weight:700;
+  line-height:1.15;
+}
+h1{
+  font-size:3.6rem;
+}
+h2{
+  font-size:2.8rem;
+}
+h3{
+  font-size:2.2rem;
+}
+h4{
+  font-size:1.8rem;
+}
+h5{
+  font-size:1.6rem;
+}
+h6{
+  font-size:1.4rem;
+}
+
+p{
+  font-size:1.6rem;
+}
+
+a{
+  color:v.$ember;
+  text-decoration:underline;
+  text-underline-offset:3px;
+
+  &:focus-visible{
+    outline:2px solid v.$ember;
+    outline-offset:2px;
+  }
+}
+
+ul,
+ol{
+  padding-left:2.4rem;
+}
+
+label{
+  font-size:1.4rem;
+  font-weight:600;
+}
+
+input,
+textarea,
+select,
+button{
+  font:inherit;
+  color:inherit;
+}
+
+input,
+textarea,
+select{
+  font-size:1.6rem;
+  min-height:v.$tap-target;
+  width:100%;
+  padding:0px v.$space-md;
+  background-color:v.$charcoal;
+  border:2px solid v.$ash;
+  border-radius:v.$radius-md;
+
+  &::placeholder{
+    color:v.$smoke;
+  }
+  &:focus-visible{
+    outline:none;
+    border-color:v.$ember;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{
+    animation-duration:0.01ms !important;
+    transition-duration:0.01ms !important;
+  }
+}

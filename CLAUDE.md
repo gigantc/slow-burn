@@ -1,0 +1,111 @@
+# Slow Burn
+
+**Slow Burn. Smoke, sip, savor, repeat.** A journal for the unhurried.
+
+A personal, phone-first journal for backyard rituals: logging smoking cooks as a timeline, and tastings (whisky, cigar, wine). Single user (dFree). Entries are captured on the phone and browsed on the Mac.
+
+**Owner:** dFree  ·  **Live URL:** TBD (self-hosted on DigitalOcean)  ·  **Figma:** none yet
+
+---
+
+## Project status
+
+- **Requirements:** product brief (Claude Doc): https://claude.ai/artifact/6sehEn6JqjofPmVYrbKsiR
+- **Current phase:** kickoff. The folder was created on 2026-11-18; no code, no git repo yet.
+- **Hard deadline:** smoke the Thanksgiving turkey on **Thu 2026-11-26**. The cook MVP must be usable on the phone by **Wed 2026-11-25**.
+
+---
+
+## Background
+
+This replaces The Dock (`~/Sites/dev/The-Dock`), an all-in-one notes/lists/journals app built for an AI agent that published content. That premise is gone, so dFree decided on **separate single-purpose apps**. Notes stay in Apple Notes and Lists stay in Clear for now. Slow Burn is first because nothing else tracks smoking meat. **Don't carry over The Dock's design or architecture.**
+
+---
+
+## Product (summary of the brief)
+
+- **Cooks** are timelines over hours. Setup (protein/cut, weight, prep, smoker, wood, target pit temp), timestamped events with one tap each (on, pit temp, internal temp, spritz, wrap, add wood, off, rest), then a wrap-up (final temp, total time calculated, rating, notes, photos).
+- **"Next time" note:** written after a cook and shown first when starting the next cook of the same protein. This is a core feature.
+- **Tastings** are single moments. Whisky, cigar and wine share one form (name, maker, date, impressions, rating, photo), and each category adds its own fields. New categories should be data, not code.
+- **Principles:** phone first; big tap targets ("greasy hands"); works with bad signal; every field optional except the name; desktop is for looking back (browse, search, sort by rating).
+
+---
+
+## Stack
+
+- **Language:** TypeScript (strict) everywhere. One `package.json`, ESM, Node 22 (`.nvmrc`), npm.
+- **Frontend:** React + Vite + react-router. SCSS via CSS Modules (`*.module.scss`).
+- **Backend:** Fastify (TypeBox validation via `@fastify/type-provider-typebox`), serving `/api` and the built client (SPA fallback). Compiled with `tsc` to `dist/server`.
+- **Database:** SQLite via better-sqlite3 + Drizzle. `src/server/db/schema.ts` is the source of truth; migrations in `drizzle/` are generated, never hand-edited, and run at server start.
+- **Auth:** single user. Password hash in `APP_PASSWORD_HASH` (scrypt), session cookie via `@fastify/secure-session` (about 1 year). One guard in `src/server/auth/guard.ts`.
+- **Config:** server constants in `src/server/config.ts` (reads env, see `.env.example`); client constants in `src/client/config.ts`.
+- **Event types are data:** `src/shared/cookEventTypes.ts`.
+- **Photos:** server disk, resized to WebP on upload. Not built yet.
+- **Offline:** PWA service worker is set up (`vite-plugin-pwa`, `/api` is network-only). The local write queue is not built yet.
+- **Hosting:** DigitalOcean, systemd + Apache reverse proxy + certbot. See [docs/deploy.md](docs/deploy.md).
+- **Design:** placeholder dark/ember tokens in `src/client/scss/_variables.scss`. Direction TBD.
+- **Not used:** Firebase, Netlify, Tailwind.
+
+---
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Vite (5173, proxies `/api`) + `tsx watch` server (3100). Needs a `.env`. |
+| `npm run build` | Client (Vite to `dist/client`) then server (`tsc` to `dist/server`) |
+| `npm run typecheck` | Client and server `tsc --noEmit` |
+| `npm start` | Run the built server |
+| `npm run db:generate` | Generate a Drizzle migration from the schema |
+| `npm run db:migrate` | Apply migrations manually (the server also does this at start) |
+| `npm run hash-password` | Print `APP_PASSWORD_HASH` |
+| `npm run session-key` | Print `SESSION_KEY` |
+| `npm run deploy` | Typecheck, build, rsync, restart, health check |
+| `npm run format` | Prettier (skips `.scss`) |
+
+First run: `cp .env.example .env`, fill in the two secrets, `npm run dev`.
+
+---
+
+## Repo layout
+
+```
+src/
+  client/    main.tsx, App.tsx, config.ts, scss/, lib/, components/, routes/
+  server/    index.ts, app.ts, config.ts, errors.ts, auth/, db/, routes/
+  shared/    types and data used by both sides
+drizzle/     generated migrations
+deploy/      deploy.sh, systemd unit, Apache vhost
+docs/        deploy.md
+scripts/     hash-password, session-key
+public/      robots.txt, icons/ (PWA icons live here)
+data/        SQLite file (gitignored)
+```
+
+Client imports use `@/` (src/client) and `shared/` (src/shared). Server imports use relative paths with `.js` extensions (NodeNext).
+
+---
+
+## Deviations from global rules
+
+- CSS Modules (`*.module.scss`) imported per component instead of auto-imported partials.
+- `global.scss` (reset + base) is imported once from `main.tsx`.
+- `routes/` instead of `containers/`.
+- Prettier skips `.scss` so the compact SCSS style survives.
+
+---
+
+## Current state
+
+- **Last worked on:** 2026-11-18, kickoff and scaffold. Stack locked; auth, cooks schema, placeholder screens, PWA config and deploy files are in. Build, typecheck and API checks pass. Screens not yet checked in a browser.
+- **Server facts (2026-11-18):** Ubuntu 24.04 LAMP droplet, Node v22.23.4, certbot certs per subdomain, `slowburn.gigantc.com` DNS already resolves to the droplet. `mod_proxy` / `proxy_http` not enabled yet. No databases used by the other sites.
+- **In progress:** nothing.
+- **Next up:**
+  1. dFree runs `git init` and the initial commit.
+  2. dFree supplies PWA icons: `public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`.
+  3. One-time server setup per [docs/deploy.md](docs/deploy.md), then first deploy.
+  4. Build the cook MVP: start a cook, one-tap timeline events, wrap-up, next-time note, offline write queue.
+- **Data to re-enter:** The Dock's smoking and whisky notes are free-text Firestore entries (no structured fields). They'll be re-entered by hand as test data, which is why a cook with zero events and a past date is valid.
+- **Open questions:**
+  - Do tastings (whisky/cigar) need to work by Thanksgiving, or is the turkey alone enough? (Also asked as a comment in the brief.)
+  - Rating scale: stars, 1 to 10, or something else? Same for cooks and tastings?

@@ -1,0 +1,45 @@
+//////////////////////////////////////
+// Button
+
+//imports
+@use 'scss/variables' as v;
+
+.button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:v.$tap-target;
+  padding:0px v.$space-lg;
+  border:2px solid transparent;
+  border-radius:v.$radius-md;
+  font:600 1.6rem/1 v.$font;
+  text-decoration:none;
+  transition:background-color 0.15s, border-color 0.15s;
+
+  &:focus-visible{
+    outline:none;
+    box-shadow:inset 0px 0px 0px 3px v.$cream;
+  }
+  &:disabled{
+    opacity:0.5;
+    cursor:not-allowed;
+  }
+}
+
+.primary{
+  background-color:v.$ember;
+  color:v.$coal;
+
+  &:hover:not(:disabled){
+    background-color:v.$ember-dark;
+  }
+}
+
+.secondary{
+  border-color:v.$ash;
+  color:v.$cream;
+
+  &:hover:not(:disabled){
+    border-color:v.$smoke;
+  }
+}

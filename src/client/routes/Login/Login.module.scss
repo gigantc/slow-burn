@@ -1,0 +1,34 @@
+//////////////////////////////////////
+// Login
+
+//imports
+@use 'scss/variables' as v;
+
+.login{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:v.$space-lg;
+  max-width:420px;
+  min-height:100vh;
+  margin:0px auto;
+  padding:v.$space-lg v.$space-md;
+
+  h1{
+    color:v.$ember;
+  }
+
+  p{
+    color:v.$smoke;
+  }
+
+  form{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-md;
+  }
+
+  .error{
+    color:v.$danger;
+  }
+}

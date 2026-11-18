@@ -1,0 +1,33 @@
+//////////////////////////////////////
+// Home (placeholder)
+
+//imports
+@use 'scss/variables' as v;
+
+.home{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-lg;
+  max-width:v.$container-width;
+  margin:0px auto;
+  padding:v.$space-xl v.$space-md;
+
+  h1{
+    color:v.$ember;
+  }
+
+  .notice{
+    padding:v.$space-md;
+    background-color:v.$charcoal;
+    border-left:4px solid v.$ember;
+    border-radius:v.$radius-sm;
+  }
+
+  .status{
+    color:v.$smoke;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    padding:v.$space-lg v.$space-md;
+  }
+}
