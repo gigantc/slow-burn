@@ -1,0 +1,143 @@
+//////////////////////////////////////
+// Cook actions
+// Local-first: each action updates the cache and outbox immediately and returns; the sync
+// engine delivers to the server in the background.
+
+import type { Cook, CookEvent, CookWithEvents, NextTimeNote } from 'shared/types';
+import { getCookState, mutate } from '@/lib/cookStore';
+import { requestSync } from '@/lib/sync';
+import { fetchNextTime } from '@/lib/transport';
+
+export type CookFields = Omit<Cook, 'id' | 'createdAt' | 'updatedAt' | 'source'>;
+export type CookInput = Partial<CookFields> & { id?: string };
+export type EventInput = Pick<CookEvent, 'type'> &
+  Partial<Pick<CookEvent, 'at' | 'value' | 'note'>>;
+
+const BLANK: CookFields = {
+  name: '',
+  protein: null,
+  cut: null,
+  weightLbs: null,
+  prep: null,
+  smoker: null,
+  wood: null,
+  targetPitTempF: null,
+  startedAt: null,
+  endedAt: null,
+  finalInternalTempF: null,
+  rating: null,
+  notes: null,
+  nextTimeNote: null,
+};
+
+const findCook = (id: string) => getCookState().cooks.find((cook) => cook.id === id);
+
+const commit = (...args: Parameters<typeof mutate>) => {
+  void mutate(...args).then(requestSync);
+};
+
+const byTime = (a: CookEvent, b: CookEvent) => a.at.localeCompare(b.at);
+
+//////////////////////////////////////
+// Cooks
+
+/** Create (no id, or an unknown id) or update (known id) a cook. Returns it immediately. */
+export const saveCook = (input: CookInput): CookWithEvents => {
+  const now = new Date().toISOString();
+  const existing = input.id ? findCook(input.id) : undefined;
+  const { id = crypto.randomUUID(), ...fields } = input;
+
+  const cook: CookWithEvents = {
+    ...BLANK,
+    source: 'app',
+    createdAt: now,
+    events: [],
+    ...existing,
+    ...fields,
+    id,
+    updatedAt: now,
+  };
+  if (!cook.name.trim()) throw new Error('A cook needs a name.');
+
+  const { id: _id, events: _events, ...body } = cook;
+  commit({ upserts: [cook], ops: [{ method: 'PUT', path: `/cooks/${id}`, body }] });
+  return cook;
+};
+
+export const deleteCook = (id: string) => {
+  commit({ removals: [id], ops: [{ method: 'DELETE', path: `/cooks/${id}` }] });
+};
+
+//////////////////////////////////////
+// Events
+
+const eventBody = ({ id: _id, cookId: _cookId, ...body }: CookEvent) => body;
+
+const writeEvents = (
+  cook: CookWithEvents,
+  events: CookEvent[],
+  op: Parameters<typeof mutate>[0]['ops'],
+) => commit({ upserts: [{ ...cook, events: events.sort(byTime) }], ops: op });
+
+export const addEvent = (cookId: string, input: EventInput): CookEvent => {
+  const cook = findCook(cookId);
+  if (!cook) throw new Error('Cook not found.');
+
+  const now = new Date().toISOString();
+  const event: CookEvent = {
+    id: crypto.randomUUID(),
+    cookId,
+    at: now,
+    value: null,
+    note: null,
+    ...input,
+    createdAt: now,
+    updatedAt: now,
+  };
+  writeEvents(
+    cook,
+    [...cook.events, event],
+    [{ method: 'PUT', path: `/cooks/${cookId}/events/${event.id}`, body: eventBody(event) }],
+  );
+  return event;
+};
+
+export const updateEvent = (
+  cookId: string,
+  eventId: string,
+  patch: Partial<Pick<CookEvent, 'type' | 'at' | 'value' | 'note'>>,
+) => {
+  const cook = findCook(cookId);
+  const current = cook?.events.find((event) => event.id === eventId);
+  if (!cook || !current) throw new Error('Event not found.');
+
+  const event: CookEvent = { ...current, ...patch, updatedAt: new Date().toISOString() };
+  writeEvents(
+    cook,
+    cook.events.map((e) => (e.id === eventId ? event : e)),
+    [{ method: 'PUT', path: `/cooks/${cookId}/events/${eventId}`, body: eventBody(event) }],
+  );
+};
+
+export const deleteEvent = (cookId: string, eventId: string) => {
+  const cook = findCook(cookId);
+  if (!cook) return;
+
+  writeEvents(
+    cook,
+    cook.events.filter((event) => event.id !== eventId),
+    [{ method: 'DELETE', path: `/cooks/${cookId}/events/${eventId}` }],
+  );
+};
+
+//////////////////////////////////////
+// Next-time note (online only)
+
+export const fetchNextTimeNote = async (protein: string): Promise<NextTimeNote | null> => {
+  if (!navigator.onLine || !protein.trim()) return null;
+  try {
+    return await fetchNextTime(protein);
+  } catch {
+    return null;
+  }
+};

@@ -3,7 +3,7 @@
 // Source of truth. Generate migrations with `npm run db:generate`; never hand-edit them.
 
 import { sql } from 'drizzle-orm';
-import { check, index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import type { CookEventTypeKey } from '../../shared/cookEventTypes.js';
 
 const now = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
@@ -19,6 +19,9 @@ export const cooks = sqliteTable(
     id: text('id').primaryKey(),
     name: text('name').notNull(),
     protein: text('protein'),
+    // Lowercased, trimmed copy of `protein` for the indexed next-time lookup. The API keeps it
+    // in step on every write (a generated column breaks drizzle-kit's table recreate).
+    proteinKey: text('protein_key'),
     cut: text('cut'),
     weightLbs: real('weight_lbs'),
     prep: text('prep'),
@@ -28,7 +31,8 @@ export const cooks = sqliteTable(
     startedAt: text('started_at'),
     endedAt: text('ended_at'),
     finalInternalTempF: integer('final_internal_temp_f'),
-    // 5 stars, same scale for tastings later.
+    // 5 stars (1-5), same scale for tastings later. Enforced at the API: a CHECK would force
+    // drizzle-kit to recreate the table, which is unsafe with the cook_events cascade.
     rating: integer('rating'),
     notes: text('notes'),
     nextTimeNote: text('next_time_note'),
@@ -38,11 +42,7 @@ export const cooks = sqliteTable(
     createdAt: text('created_at').notNull().default(now),
     updatedAt: text('updated_at').notNull().default(now),
   },
-  (t) => [
-    check('cooks_rating_range', sql`${t.rating} is null or ${t.rating} between 1 and 5`),
-    // Next-time lookup matches protein case-insensitively and trimmed.
-    index('cooks_protein_idx').on(sql`lower(trim(${t.protein}))`),
-  ],
+  (t) => [index('cooks_protein_key_idx').on(t.proteinKey)],
 );
 
 //////////////////////////////////////
@@ -60,7 +60,8 @@ export const cookEvents = sqliteTable(
     value: real('value'),
     note: text('note'),
     createdAt: text('created_at').notNull().default(now),
-    updatedAt: text('updated_at').notNull().default(now),
+    // Constant default (SQLite can't add a column with an expression default to existing rows).
+    updatedAt: text('updated_at').notNull().default('1970-01-01T00:00:00.000Z'),
   },
   (t) => [index('cook_events_cook_idx').on(t.cookId)],
 );

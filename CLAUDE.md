@@ -41,7 +41,7 @@ This replaces The Dock (`~/Sites/dev/The-Dock`), an all-in-one notes/lists/journ
 - **Config:** server constants in `src/server/config.ts` (reads env, see `.env.example`); client constants in `src/client/config.ts`.
 - **Event types are data:** `src/shared/cookEventTypes.ts`.
 - **Photos:** server disk, resized to WebP on upload. Not built yet.
-- **Offline:** PWA service worker is set up (`vite-plugin-pwa`, `/api` is network-only). The local write queue is not built yet.
+- **Offline:** PWA service worker (`vite-plugin-pwa`, `/api` is network-only) plus a local-first data layer in `src/client/lib/`: IndexedDB cache and outbox (`idb.ts`, `cookStore.ts`), a sync engine (`sync.ts`), one transport module (`transport.ts`), actions and hooks (`cookActions.ts`, `cookHooks.ts`). Writes land locally first and sync in the background; the server resolves conflicts last-write-wins on the client's `updatedAt`. Ratings are 1 to 5 stars; temps are °F.
 - **Hosting:** DigitalOcean, systemd + Apache reverse proxy + certbot. See [docs/deploy.md](docs/deploy.md).
 - **Design:** Sonoran palette in two themes, **Dawn** (light) and **Dusk** (dark), user toggle (labels in `THEME_LABELS`, client config; internal keys stay `light`/`dark`), defaults to the system setting. Tokens in `src/client/scss/_variables.scss`; fonts are self-hosted variable woff2 in `src/client/fonts/` (Fraunces for h1-h3, DM Sans for everything else; tokens `$font-display` and `$font-body`).
 - **Not used:** Firebase, Netlify, Tailwind.

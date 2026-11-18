@@ -9,6 +9,7 @@ const PATHS = {
   moon: 'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',
   logout: 'M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4 M16 8l4 4-4 4 M20 12H9',
   plus: 'M12 5v14 M5 12h14',
+  menu: 'M4 7h16 M4 12h16 M4 17h16',
 } as const;
 
 export type IconName = keyof typeof PATHS;

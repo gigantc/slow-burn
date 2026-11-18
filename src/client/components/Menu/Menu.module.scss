@@ -1,0 +1,85 @@
+//////////////////////////////////////
+// Menu
+// Desktop: a popover above the trigger at the bottom of the sidebar.
+// Phone: a bottom sheet over the tab bar. The scrim also catches outside clicks.
+
+//imports
+@use 'scss/variables' as v;
+
+.scrim{
+  position:fixed;
+  inset:0px;
+  z-index:1;
+
+  @include v.breakpoint(v.$bp-md){
+    background-color:color-mix(in srgb, v.$text 35%, transparent);
+  }
+}
+
+.panel{
+  position:absolute;
+  bottom:calc(#{v.$tap-target} + #{v.$space-lg} + #{v.$space-sm});
+  left:v.$space-sm;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-md;
+  width:280px;
+  padding:v.$space-md;
+  background-color:v.$panel;
+  border:1px solid v.$border;
+  border-radius:v.$radius-lg;
+  box-shadow:v.$shadow;
+  animation:pop 0.15s ease-out;
+
+  button[role='switch']{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    min-height:v.$tap-target;
+    padding:v.$space-xs;
+    background-color:v.$sunken;
+    border:1px solid v.$border;
+    border-radius:999px;
+    color:v.$muted;
+
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 2px v.$accent;
+    }
+
+    span{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:v.$space-sm;
+      border-radius:999px;
+      font:600 1.4rem/1 v.$font-body;
+    }
+
+    span[data-active='true']{
+      background-color:v.$panel;
+      box-shadow:v.$shadow-card;
+      color:v.$text;
+    }
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    position:fixed;
+    right:0px;
+    bottom:0px;
+    left:0px;
+    width:auto;
+    padding:v.$space-lg v.$space-md calc(#{v.$space-lg} + env(safe-area-inset-bottom)) v.$space-md;
+    border-width:1px 0px 0px 0px;
+    border-radius:v.$radius-xl v.$radius-xl 0px 0px;
+    animation-name:sheet;
+  }
+}
+
+@keyframes pop{
+  from{ opacity:0; transform:translateY(8px); }
+}
+
+@keyframes sheet{
+  from{ transform:translateY(100%); }
+}

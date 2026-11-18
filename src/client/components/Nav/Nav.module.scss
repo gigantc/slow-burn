@@ -27,7 +27,7 @@
   // which would put the axes before the font shorthand that resets them.
   > strong{ @include v.display-axes; }
 
-  a, button{
+  > a, > button{
     display:flex;
     align-items:center;
     gap:12px;
@@ -52,8 +52,8 @@
     }
   }
 
-  // First of the bottom group (theme, logout)
-  button:first-of-type{ margin-top:auto; }
+  // Menu trigger sits at the bottom of the sidebar
+  > button{ margin-top:auto; }
 
   @include v.breakpoint(v.$bp-md){
     position:fixed;
@@ -71,7 +71,7 @@
 
     strong{ display:none; }
 
-    a, button{
+    > a, > button{
       flex:1;
       flex-direction:column;
       justify-content:center;
@@ -88,6 +88,6 @@
       &:focus-visible{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
     }
 
-    button:first-of-type{ margin-top:0px; }
+    > button{ margin-top:0px; }
   }
 }

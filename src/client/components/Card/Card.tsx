@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import Icon from '@/components/Icon/Icon';
+import { RATING_MAX } from 'shared/constants';
 import { ENTRY_TYPES } from '@/config';
 import type { EntryType } from '@/config';
 import styles from './Card.module.scss';
@@ -46,15 +47,25 @@ const Card = (props: EntryCardProps | AddCardProps) => {
       <header>
         <span className={styles.label}>{ENTRY_TYPES[type].label}</span>
         <h3>{href ? <Link to={href}>{title}</Link> : title}</h3>
-        <ul>
-          {tags.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
+        {tags.length > 0 && (
+          <ul>
+            {tags.map((tag) => (
+              <li key={tag}>{tag}</li>
+            ))}
+          </ul>
+        )}
       </header>
       <footer>
         <time dateTime={date}>{formatDate(date)}</time>
-        {rating !== undefined && <span>★ {rating}</span>}
+        {rating !== undefined && (
+          <span
+            role="img"
+            aria-label={`${rating} out of ${RATING_MAX} stars`}
+          >
+            {'★'.repeat(rating)}
+            {'☆'.repeat(RATING_MAX - rating)}
+          </span>
+        )}
       </footer>
     </article>
   );

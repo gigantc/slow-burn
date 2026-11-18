@@ -1,25 +1,34 @@
 import Card from '@/components/Card/Card';
-import { sampleCards } from './sampleCards';
+import SyncStatus from '@/components/SyncStatus/SyncStatus';
+import { useCooks } from '@/lib/cookHooks';
+import { cookToCard } from './cookCard';
 import styles from './Home.module.scss';
 
-const Home = () => (
-  <section className={styles.home}>
-    <h1>Recent</h1>
-    <p className={styles.note}>Sample data. These entries are placeholders.</p>
-    <div className={styles.grid}>
-      <Card
-        variant="add"
-        label="New cook"
-        href="/cooks"
-      />
-      {sampleCards.map((card) => (
+const Home = () => {
+  const { cooks, ready } = useCooks();
+
+  return (
+    <section className={styles.home}>
+      <h1>Recent</h1>
+      <SyncStatus quiet />
+      {ready && cooks.length === 0 && (
+        <p className={styles.note}>No cooks yet. Tap New cook to log your first one.</p>
+      )}
+      <div className={styles.grid}>
         <Card
-          key={card.title}
-          {...card}
+          variant="add"
+          label="New cook"
+          href="/cooks"
         />
-      ))}
-    </div>
-  </section>
-);
+        {cooks.map((cook) => (
+          <Card
+            key={cook.id}
+            {...cookToCard(cook)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export default Home;

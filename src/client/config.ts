@@ -6,6 +6,18 @@ import type { IconName } from '@/components/Icon/Icon';
 export const API_BASE = '/api';
 export const APP_NAME = 'Slow Burn';
 
+// Set after a successful login or session check, so a reload while offline stays signed in.
+export const AUTH_HINT_KEY = 'slowburn-authed';
+
+//////////////////////////////////////
+// Offline data and sync
+
+export const IDB_NAME = 'slowburn';
+export const IDB_VERSION = 1;
+export const SYNC_INTERVAL_MS = 30_000;
+export const SYNC_RETRY_BASE_MS = 2_000;
+export const SYNC_RETRY_MAX_MS = 60_000;
+
 // Also hard-coded in the inline script in index.html (it runs before the bundle loads).
 export const THEME_STORAGE_KEY = 'slowburn-theme';
 

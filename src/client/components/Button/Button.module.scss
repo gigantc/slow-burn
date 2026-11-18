@@ -8,6 +8,7 @@
   display:inline-flex;
   align-items:center;
   justify-content:center;
+  gap:v.$space-sm;
   min-height:v.$tap-target;
   padding:0px v.$space-lg;
   border:2px solid transparent;

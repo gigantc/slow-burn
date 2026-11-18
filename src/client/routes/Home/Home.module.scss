@@ -16,6 +16,7 @@
 
   .grid{
     display:grid;
+    margin:v.$space-md 0px 0px 0px;
     grid-template-columns:repeat(auto-fill, minmax(v.$card-min-width, 1fr));
     gap:v.$space-md;
 

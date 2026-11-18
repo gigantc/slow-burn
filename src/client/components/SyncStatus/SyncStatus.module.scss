@@ -1,0 +1,10 @@
+//////////////////////////////////////
+// Sync status
+
+//imports
+@use 'scss/variables' as v;
+
+.status{
+  color:v.$muted;
+  font:400 1.3rem/1.3 v.$font-body;
+}

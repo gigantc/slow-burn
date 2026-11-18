@@ -32,6 +32,26 @@ export type CookEvent = {
   value: number | null;
   note: string | null;
   createdAt: string;
+  updatedAt: string;
+};
+
+export type CookWithEvents = Cook & { events: CookEvent[] };
+
+/** Body of PUT /api/cooks/:id (the id comes from the path). */
+export type CookUpsert = Omit<Cook, 'id' | 'createdAt'> & { createdAt?: string };
+
+/** Body of PUT /api/cooks/:id/events/:eventId (ids come from the path). */
+export type CookEventUpsert = Omit<CookEvent, 'id' | 'cookId' | 'createdAt'> & {
+  createdAt?: string;
+};
+
+export type SyncResponse = { cooks: CookWithEvents[] };
+
+export type NextTimeNote = {
+  cookId: string;
+  name: string;
+  endedAt: string;
+  nextTimeNote: string;
 };
 
 export type ApiError = {
