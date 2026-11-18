@@ -1,0 +1,33 @@
+//////////////////////////////////////
+// Wrap-up
+
+//imports
+@use 'scss/variables' as v;
+
+.wrap{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-lg;
+  max-width:v.$container-width;
+
+  .total{
+    color:v.$muted;
+
+    strong{ color:v.$text; }
+  }
+
+  // The most prominent field: this is the note that shows up before the next cook
+  .future{
+    padding:v.$space-md;
+    background-color:color-mix(in srgb, v.$accent 12%, v.$panel);
+    border-left:4px solid v.$accent;
+    border-radius:v.$radius-md;
+
+    label{
+      color:v.$accent;
+      font:700 1.8rem/1.2 v.$font-body;
+    }
+
+    textarea{ min-height:calc(#{v.$tap-target} * 3); }
+  }
+}

@@ -1,0 +1,95 @@
+//////////////////////////////////////
+// Live cook
+
+//imports
+@use 'scss/variables' as v;
+
+.live{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-lg;
+
+  header{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-xs;
+
+    p{ color:v.$muted; }
+
+    // Elapsed time, readable at arm's length
+    strong{
+      color:v.$accent;
+      font:700 4.8rem/1 v.$font-body;
+      font-variant-numeric:tabular-nums;
+    }
+  }
+
+  .glance{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:v.$space-sm;
+    margin:0px;
+    padding:0px;
+    list-style:none;
+
+    li{
+      display:flex;
+      flex-direction:column;
+      gap:v.$space-xs;
+      min-width:0px;
+      padding:v.$space-md;
+      background-color:v.$card;
+      border:1px solid v.$border;
+      border-radius:v.$radius-md;
+    }
+
+    span, small{
+      color:v.$muted;
+      font:600 1.2rem/1.2 v.$font-body;
+    }
+
+    strong{
+      font:700 2.8rem/1.1 v.$font-body;
+      font-variant-numeric:tabular-nums;
+      overflow-wrap:anywhere;
+    }
+
+    @include v.breakpoint(v.$bp-sm){
+      strong{ font-size:2.2rem; }
+    }
+  }
+
+  .events{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+    gap:v.$space-sm;
+
+    button{
+      min-height:calc(#{v.$tap-target} * 1.4);
+      padding:0px v.$space-sm;
+      background-color:v.$card;
+      border:2px solid v.$border;
+      border-radius:v.$radius-md;
+      color:v.$text;
+      font:700 1.7rem/1.2 v.$font-body;
+      transition:transform 0.1s;
+
+      &:active{ transform:scale(0.97); }
+      &:focus-visible{
+        outline:none;
+        box-shadow:inset 0px 0px 0px 3px v.$accent;
+      }
+    }
+
+    @include v.breakpoint(v.$bp-sm){
+      grid-template-columns:1fr 1fr;
+    }
+  }
+
+  // Kept well away from the event grid so it can't be tapped by mistake
+  .finish{
+    margin:v.$space-lg 0px 0px 0px;
+    padding:v.$space-lg 0px 0px 0px;
+    border-top:1px solid v.$border;
+  }
+}

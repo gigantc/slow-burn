@@ -1,0 +1,29 @@
+//////////////////////////////////////
+// Cook form
+
+//imports
+@use 'scss/variables' as v;
+
+.form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:v.$space-lg v.$space-md;
+
+  .wide{ grid-column:1 / -1; }
+
+  input, textarea{ min-height:v.$tap-target; }
+
+  .actions{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-md;
+    grid-column:1 / -1;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-columns:1fr;
+
+    .wide{ grid-column:auto; }
+    .actions{ grid-column:auto; }
+  }
+}

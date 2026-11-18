@@ -1,0 +1,27 @@
+//////////////////////////////////////
+// Callout
+
+//imports
+@use 'scss/variables' as v;
+
+.callout{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-xs;
+  padding:v.$space-md v.$space-md v.$space-md v.$space-lg;
+  background-color:color-mix(in srgb, v.$accent 12%, v.$panel);
+  border-left:4px solid v.$accent;
+  border-radius:v.$radius-md;
+  color:v.$text;
+
+  strong{
+    color:v.$accent;
+    font:700 1.3rem/1.3 v.$font-body;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+
+  p{
+    white-space:pre-wrap;
+  }
+}

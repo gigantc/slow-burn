@@ -12,4 +12,28 @@
   label{
     color:v.$text;
   }
+
+  p{
+    color:v.$muted;
+    font:400 1.3rem/1.4 v.$font-body;
+  }
+
+  .error{ color:v.$danger; }
+
+  input[aria-invalid='true'], textarea[aria-invalid='true']{ border-color:v.$danger; }
+
+  textarea{
+    width:100%;
+    min-height:calc(#{v.$tap-target} * 2);
+    padding:v.$space-md;
+    background-color:v.$card;
+    border:2px solid v.$border;
+    border-radius:v.$radius-md;
+    resize:vertical;
+
+    &:focus-visible{
+      outline:none;
+      border-color:v.$accent;
+    }
+  }
 }

@@ -1,8 +1,9 @@
 import { Link } from 'react-router';
-import Icon from '@/components/Icon/Icon';
 import { RATING_MAX } from 'shared/constants';
-import { ENTRY_TYPES } from '@/config';
+import EntryHead from '@/components/EntryHead/EntryHead';
+import Icon from '@/components/Icon/Icon';
 import type { EntryType } from '@/config';
+import { formatDay } from '@/lib/format';
 import styles from './Card.module.scss';
 
 export type EntryCardProps = {
@@ -16,18 +17,22 @@ export type EntryCardProps = {
   href?: string;
 };
 
+type ResumeCardProps = {
+  variant: 'resume';
+  title: string;
+  tags: string[];
+  /** e.g. "Started 8:00 AM · 3h 12m" */
+  status: string;
+  href: string;
+};
+
 type AddCardProps = {
   variant: 'add';
   label: string;
   href: string;
 };
 
-const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(
-    new Date(`${iso}T00:00:00`),
-  );
-
-const Card = (props: EntryCardProps | AddCardProps) => {
+const Card = (props: EntryCardProps | ResumeCardProps | AddCardProps) => {
   if (props.variant === 'add') {
     return (
       <Link
@@ -40,23 +45,38 @@ const Card = (props: EntryCardProps | AddCardProps) => {
     );
   }
 
+  if (props.variant === 'resume') {
+    return (
+      <article className={`${styles.card} ${styles.resume}`}>
+        <EntryHead
+          type="cook"
+          label="In progress"
+          tags={props.tags}
+        >
+          <h3>
+            <Link to={props.href}>{props.title}</Link>
+          </h3>
+        </EntryHead>
+        <footer>
+          <span>{props.status}</span>
+          <strong>Resume</strong>
+        </footer>
+      </article>
+    );
+  }
+
   const { type, title, tags, date, rating, href } = props;
 
   return (
-    <article className={`${styles.card} ${styles[type]}`}>
-      <header>
-        <span className={styles.label}>{ENTRY_TYPES[type].label}</span>
+    <article className={styles.card}>
+      <EntryHead
+        type={type}
+        tags={tags}
+      >
         <h3>{href ? <Link to={href}>{title}</Link> : title}</h3>
-        {tags.length > 0 && (
-          <ul>
-            {tags.map((tag) => (
-              <li key={tag}>{tag}</li>
-            ))}
-          </ul>
-        )}
-      </header>
+      </EntryHead>
       <footer>
-        <time dateTime={date}>{formatDate(date)}</time>
+        <time dateTime={date}>{formatDay(date)}</time>
         {rating !== undefined && (
           <span
             role="img"

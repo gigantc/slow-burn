@@ -1,0 +1,52 @@
+//////////////////////////////////////
+// Undo toast
+// Sits above the phone tab bar; the wrapper is a persistent live region.
+
+//imports
+@use 'scss/variables' as v;
+
+.region{
+  position:fixed;
+  right:v.$space-md;
+  bottom:v.$space-lg;
+  left:v.$space-md;
+  z-index:35;
+  display:flex;
+  justify-content:center;
+  pointer-events:none;
+
+  @include v.breakpoint(v.$bp-md){
+    bottom:calc(#{v.$tap-target} + #{v.$space-xl} + env(safe-area-inset-bottom));
+  }
+
+  div{
+    display:flex;
+    align-items:center;
+    gap:v.$space-md;
+    padding:v.$space-sm v.$space-sm v.$space-sm v.$space-lg;
+    background-color:v.$text;
+    border-radius:v.$radius-lg;
+    box-shadow:v.$shadow;
+    color:v.$panel;
+    pointer-events:auto;
+    animation:rise 0.15s ease-out;
+  }
+
+  button{
+    min-height:v.$tap-target;
+    padding:0px v.$space-lg;
+    background-color:v.$accent;
+    border-radius:v.$radius-md;
+    color:v.$on-accent;
+    font:700 1.6rem/1 v.$font-body;
+
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$panel;
+    }
+  }
+}
+
+@keyframes rise{
+  from{ opacity:0; transform:translateY(8px); }
+}

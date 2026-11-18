@@ -1,0 +1,25 @@
+//////////////////////////////////////
+// Event sheet
+
+//imports
+@use 'scss/variables' as v;
+
+.form{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-md;
+
+  .quick{
+    display:flex;
+    gap:v.$space-sm;
+
+    button{ flex:1; }
+  }
+
+  .value input{
+    min-height:calc(#{v.$tap-target} * 1.5);
+    text-align:center;
+    font-size:3.2rem;
+    font-weight:700;
+  }
+}

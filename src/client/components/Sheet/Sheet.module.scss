@@ -1,0 +1,82 @@
+//////////////////////////////////////
+// Sheet
+// Desktop: a centered dialog. Phone: a bottom sheet. `popover` placement anchors above the
+// trigger inside the sidebar on desktop (used by the menu) and is a bottom sheet on phone.
+
+//imports
+@use 'scss/variables' as v;
+
+.scrim{
+  position:fixed;
+  inset:0px;
+  z-index:40;
+  background-color:color-mix(in srgb, v.$text 35%, transparent);
+}
+
+.clear{
+  background-color:transparent;
+
+  @include v.breakpoint(v.$bp-md){ background-color:color-mix(in srgb, v.$text 35%, transparent); }
+}
+
+.panel{
+  position:fixed;
+  inset:0px;
+  z-index:41;
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-md;
+  width:min(480px, calc(100% - #{v.$space-lg * 2}));
+  height:fit-content;
+  max-height:calc(100dvh - #{v.$space-lg * 2});
+  margin:auto;
+  padding:v.$space-lg;
+  overflow:auto;
+  background-color:v.$panel;
+  border:1px solid v.$border;
+  border-radius:v.$radius-lg;
+  box-shadow:v.$shadow;
+  animation:fade 0.15s ease-out;
+
+  @include v.breakpoint(v.$bp-md){
+    inset:auto 0px 0px 0px;
+    width:auto;
+    max-height:calc(100dvh - #{v.$space-xl});
+    margin:0px;
+    padding:v.$space-lg v.$space-md calc(#{v.$space-lg} + env(safe-area-inset-bottom)) v.$space-md;
+    border-width:1px 0px 0px 0px;
+    border-radius:v.$radius-xl v.$radius-xl 0px 0px;
+    animation-name:slide;
+  }
+}
+
+.popover{
+  position:absolute;
+  inset:auto auto calc(#{v.$tap-target} + #{v.$space-lg} + #{v.$space-sm}) v.$space-sm;
+  width:280px;
+  max-height:none;
+  margin:0px;
+  padding:v.$space-md;
+  overflow:visible;
+  animation-name:pop;
+
+  @include v.breakpoint(v.$bp-md){
+    position:fixed;
+    inset:auto 0px 0px 0px;
+    width:auto;
+    padding:v.$space-lg v.$space-md calc(#{v.$space-lg} + env(safe-area-inset-bottom)) v.$space-md;
+    animation-name:slide;
+  }
+}
+
+@keyframes fade{
+  from{ opacity:0; }
+}
+
+@keyframes pop{
+  from{ opacity:0; transform:translateY(8px); }
+}
+
+@keyframes slide{
+  from{ transform:translateY(100%); }
+}

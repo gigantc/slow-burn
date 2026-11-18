@@ -1,5 +1,5 @@
-import ComingSoon from '@/components/ComingSoon/ComingSoon';
+import CookList from '@/components/CookList/CookList';
 
-const Cooks = () => <ComingSoon title="Cooks" />;
+const Cooks = () => <CookList title="Cooks" />;
 
 export default Cooks;

@@ -1,0 +1,49 @@
+//////////////////////////////////////
+// Cook detail
+
+//imports
+@use 'scss/variables' as v;
+
+.detail{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-lg;
+  max-width:v.$container-width;
+
+  header h1{ padding:v.$space-sm 0px 0px 0px; }
+
+  .meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:v.$space-xs v.$space-md;
+    color:v.$muted;
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:v.$space-sm v.$space-lg;
+    margin:0px;
+
+    // Wrapper divs group each dt/dd for React keys; they take no part in the layout
+    div{ display:contents; }
+    dt{ color:v.$muted; }
+    dd{
+      margin:0px;
+      font-weight:600;
+    }
+  }
+
+  .notes{
+    color:v.$text;
+    white-space:pre-wrap;
+  }
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:v.$space-md;
+
+    button{ flex:1; }
+  }
+}

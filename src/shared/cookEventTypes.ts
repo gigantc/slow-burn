@@ -7,6 +7,8 @@ export type CookEventTypeDef = {
   label: string;
   /** Present when the event carries a numeric value (e.g. a temperature). */
   value?: { unit: string };
+  /** True when logging the event asks for a text note. */
+  takesNote?: boolean;
 };
 
 export const cookEventTypes = [
@@ -18,7 +20,7 @@ export const cookEventTypes = [
   { key: 'add_wood', label: 'Add wood' },
   { key: 'off_pit', label: 'Off the pit' },
   { key: 'rest', label: 'Rest' },
-  { key: 'note', label: 'Note' },
+  { key: 'note', label: 'Note', takesNote: true },
 ] as const satisfies readonly CookEventTypeDef[];
 
 export type CookEventTypeKey = (typeof cookEventTypes)[number]['key'];

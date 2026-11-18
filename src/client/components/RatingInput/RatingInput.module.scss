@@ -1,0 +1,25 @@
+//////////////////////////////////////
+// Rating input
+
+//imports
+@use 'scss/variables' as v;
+
+.stars{
+  display:flex;
+  gap:v.$space-sm;
+
+  button{
+    flex:1;
+    min-width:v.$tap-target;
+    min-height:v.$tap-target;
+    border-radius:v.$radius-md;
+    color:v.$muted;
+    font:400 3.2rem/1 v.$font-body;
+
+    &[aria-checked='true'], &[data-filled='true']{ color:v.$accent; }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$accent;
+    }
+  }
+}

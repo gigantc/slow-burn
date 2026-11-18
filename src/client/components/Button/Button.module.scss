@@ -40,3 +40,10 @@
 
   &:hover:not(:disabled){ border-color:v.$muted; }
 }
+
+.danger{
+  background-color:v.$danger;
+  color:v.$on-accent;
+
+  &:hover:not(:disabled){ background-color:color-mix(in srgb, v.$danger 85%, v.$text); }
+}
