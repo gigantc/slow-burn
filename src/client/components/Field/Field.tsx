@@ -12,7 +12,10 @@ const Field = ({ label, ...rest }: Props) => {
   return (
     <div className={styles.field}>
       <label htmlFor={id}>{label}</label>
-      <input id={id} {...rest} />
+      <input
+        id={id}
+        {...rest}
+      />
     </div>
   );
 };

@@ -1,23 +1,125 @@
 //////////////////////////////////////
 // Variables
-// PLACEHOLDER visual direction (dark, warm, ember accent). Replace once the design is settled.
+// Single source of truth for every token. Colors come from the two theme palettes below;
+// components only use the semantic tokens (v.$surface etc.) and never mention themes.
 
 //////////////////////////////////////
-// Colors (placeholders)
+// Theme palettes
+// Keep both maps on identical keys. _themes.scss emits them as CSS custom properties.
 
-$ember:#e8692a;
-$ember-dark:#b84d17;
-$coal:#161210;
-$charcoal:#231d19;
-$ash:#3a312b;
-$smoke:#8c8178;
-$cream:#f3eadf;
-$danger:#e5584f;
+// Dawn (light): Sonoran sunset
+$theme-light:(
+  backdrop:linear-gradient(135deg, #f8d3a8 0%, #f1b09a 55%, #dcb0c4 100%),
+  chrome:#f8d3a8,
+  panel:#f4ecdc,
+  card:#fbf6ec,
+  sunken:#ebe0cb,
+  border:#e0d3ba,
+  hover:rgba(255, 250, 240, 0.5),
+  text:#2e2340,
+  muted:#6b5f7a,
+  accent:#b83c16,
+  on-accent:#fffaf0,
+  danger:#b3261e,
+  logo-a:#d54d24,
+  logo-b:#f5a623,
+  cook:#a52c10,
+  cook-tint:#fde3d8,
+  cook-tint-strong:#ec8a73,
+  cook-grad-a:#f3a08c,
+  cook-grad-b:#f9c7b3,
+  whisky:#8f6200,
+  whisky-tint:#fff3c4,
+  whisky-tint-strong:#f1c244,
+  whisky-grad-a:#f8d56b,
+  whisky-grad-b:#fbe7a0,
+  cigar:#4a6e1e,
+  cigar-tint:#ecf3d4,
+  cigar-tint-strong:#a2bf6e,
+  cigar-grad-a:#b9d08a,
+  cigar-grad-b:#d6e2b0,
+  wine:#7a3a8a,
+  wine-tint:#f4ddea,
+  wine-tint-strong:#b98fc9,
+  wine-grad-a:#c9a8d6,
+  wine-grad-b:#e6bfd0,
+  shadow:(0px 0px 0px 6px rgba(255, 250, 240, 0.35), 0px 24px 60px rgba(90, 40, 60, 0.18)),
+  shadow-card:(0px 6px 20px rgba(90, 40, 60, 0.12)),
+);
+
+// Dusk (dark): Sonoran twilight (rough pass)
+$theme-dark:(
+  backdrop:linear-gradient(180deg, #232c47 0%, #2c3555 38%, #4d3d54 70%, #7a4538 100%),
+  chrome:#232c47,
+  panel:#1f2230,
+  card:#272a3a,
+  sunken:#191b27,
+  border:#363b52,
+  hover:rgba(255, 245, 225, 0.07),
+  text:#f5ecdc,
+  muted:#b3aa9c,
+  accent:#ff8a66,
+  on-accent:#1f2230,
+  danger:#ff8a80,
+  logo-a:#ff7a4d,
+  logo-b:#ffc15e,
+  cook:#ff8a70,
+  cook-tint:#7d3434,
+  cook-tint-strong:#8f4040,
+  cook-grad-a:#6b2a2f,
+  cook-grad-b:#4a2a45,
+  whisky:#f6c453,
+  whisky-tint:#7d6118,
+  whisky-tint-strong:#7a6118,
+  whisky-grad-a:#6b5314,
+  whisky-grad-b:#4a3d28,
+  cigar:#a9cf7a,
+  cigar-tint:#4a6e2a,
+  cigar-tint-strong:#4d7230,
+  cigar-grad-a:#3a5a22,
+  cigar-grad-b:#2f4030,
+  wine:#d4a4e8,
+  wine-tint:#6e3a8f,
+  wine-tint-strong:#7f4aa3,
+  wine-grad-a:#5a2d78,
+  wine-grad-b:#4a2a5e,
+  shadow:(0px 0px 0px 6px rgba(255, 245, 225, 0.07), 0px 24px 60px rgba(0, 0, 0, 0.5)),
+  shadow-card:(0px 6px 20px rgba(0, 0, 0, 0.4)),
+);
 
 //////////////////////////////////////
-// Fonts (placeholders, system stack)
+// Semantic color tokens (resolve to the active theme)
 
-$font:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$backdrop:var(--backdrop);
+$chrome:var(--chrome);
+$panel:var(--panel);
+$card:var(--card);
+$sunken:var(--sunken);
+$border:var(--border);
+$hover:var(--hover);
+$text:var(--text);
+$muted:var(--muted);
+$accent:var(--accent);
+$on-accent:var(--on-accent);
+$danger:var(--danger);
+$logo-a:var(--logo-a);
+$logo-b:var(--logo-b);
+$shadow:var(--shadow);
+$shadow-card:var(--shadow-card);
+
+//////////////////////////////////////
+// Entry types
+// Each type has the keys {type}, {type}-tint, {type}-tint-strong, {type}-grad-a and
+// {type}-grad-b in both theme maps. Card generates one class per type from this list.
+// Keep in sync with ENTRY_TYPES in client config.ts.
+
+$entry-types:(cook, whisky, cigar, wine);
+
+//////////////////////////////////////
+// Fonts (self-hosted, see scss/_fonts.scss)
+
+$font-display:'Fraunces', Georgia, 'Times New Roman', serif;
+$font-body:'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
 //////////////////////////////////////
 // Spacing
@@ -35,6 +137,7 @@ $space-2xl:64px;
 $radius-sm:6px;
 $radius-md:12px;
 $radius-lg:20px;
+$radius-xl:28px;
 
 //////////////////////////////////////
 // Sizes
@@ -42,6 +145,8 @@ $radius-lg:20px;
 // "Greasy hands": every tap target is at least this tall.
 $tap-target:56px;
 $container-width:720px;
+$sidebar-width:240px;
+$card-min-width:260px;
 
 //////////////////////////////////////
 // Breakpoints (desktop-first, max-width)
@@ -50,8 +155,14 @@ $bp-lg:1024px;
 $bp-md:768px;
 $bp-sm:480px;
 
+// Fraunces character: soft, round terminals, no wonky swashes. Declare it after the `font`
+// shorthand (which resets it), and never in the same rule: the build minifier merges identical
+// selectors and can reorder declarations.
+@mixin display-axes{
+  font-optical-sizing:auto;
+  font-variation-settings:'SOFT' 100, 'WONK' 0;
+}
+
 @mixin breakpoint($width){
-  @media (max-width: $width){
-    @content;
-  }
+  @media (max-width:$width){ @content; }
 }

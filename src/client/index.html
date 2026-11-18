@@ -2,17 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="robots" content="noindex" />
-    <meta name="theme-color" content="#e8692a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Slow Burn" />
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="robots"
+      content="noindex"
+    />
+    <meta
+      name="theme-color"
+      content="#f8d3a8"
+    />
+    <meta
+      name="apple-mobile-web-app-capable"
+      content="yes"
+    />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta
+      name="apple-mobile-web-app-title"
+      content="Slow Burn"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="/icons/apple-touch-icon.png"
+    />
+    <script>
+      // Runs before first paint so the saved theme never flashes. Same logic as lib/theme.ts;
+      // the key must match THEME_STORAGE_KEY in config.ts.
+      try {
+        var t = localStorage.getItem('slowburn-theme');
+        if (t !== 'light' && t !== 'dark') {
+          t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <title>Slow Burn</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/main.tsx"></script>
+    <script
+      type="module"
+      src="/main.tsx"
+    ></script>
   </body>
 </html>

@@ -1,0 +1,128 @@
+//////////////////////////////////////
+// Card
+
+//imports
+@use 'scss/variables' as v;
+
+.card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  padding:v.$space-sm;
+  background-color:v.$card;
+  border:1px solid v.$border;
+  border-radius:v.$radius-lg;
+  box-shadow:v.$shadow-card;
+  color:v.$text;
+  transition:transform 0.15s;
+
+  // The inset, tinted head
+  header{
+    display:flex;
+    flex:1;
+    flex-direction:column;
+    gap:v.$space-sm;
+    padding:v.$space-md v.$space-md v.$space-lg v.$space-md;
+    background:
+      radial-gradient(circle at 100% 0%, var(--type-tint), transparent 60%),
+      linear-gradient(135deg, var(--type-grad-a), var(--type-grad-b));
+    border-radius:v.$radius-md;
+  }
+
+  .label{
+    color:color-mix(in srgb, var(--type) 60%, v.$text);
+    font:700 1.1rem/1 v.$font-body;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  h3 a{
+    color:inherit;
+    text-decoration:none;
+
+    // Stretch the link over the whole card
+    &::after{
+      content:'';
+      position:absolute;
+      inset:0px;
+    }
+    &:focus-visible{ box-shadow:none; }
+  }
+
+  ul{
+    display:flex;
+    flex-wrap:wrap;
+    gap:v.$space-sm;
+    margin:v.$space-sm 0px 0px 0px;
+    padding:0px;
+    list-style:none;
+  }
+
+  li{
+    padding:6px 12px;
+    background-color:var(--type-tint-strong);
+    border-radius:999px;
+    color:v.$text;
+    font:600 1.3rem/1 v.$font-body;
+  }
+
+  footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:v.$space-md;
+    padding:v.$space-md v.$space-md v.$space-sm v.$space-md;
+    color:v.$muted;
+    font:400 1.3rem/1 v.$font-body;
+
+    // On the children: the build minifier can reorder this ahead of the font shorthand, which resets it.
+    span{ font-variant-numeric:tabular-nums; }
+  }
+
+  &:has(a:focus-visible){ box-shadow:inset 0px 0px 0px 3px v.$accent; }
+  &:has(a:hover){
+    transform:translateY(-2px);
+    box-shadow:v.$shadow;
+  }
+}
+
+@each $name in v.$entry-types{
+  .#{$name}{
+    --type:var(--#{$name});
+    --type-tint:var(--#{$name}-tint);
+    --type-tint-strong:var(--#{$name}-tint-strong);
+    --type-grad-a:var(--#{$name}-grad-a);
+    --type-grad-b:var(--#{$name}-grad-b);
+  }
+}
+
+//////////////////////////////////////
+// Add variant
+
+.add{
+  align-items:center;
+  justify-content:center;
+  gap:v.$space-sm;
+  min-height:v.$tap-target * 2;
+  padding:v.$space-md;
+  background-color:transparent;
+  border:2px dashed v.$border;
+  box-shadow:none;
+  color:v.$muted;
+  text-decoration:none;
+  font:600 1.5rem/1 v.$font-body;
+
+  &:hover{
+    transform:translateY(-2px);
+    color:v.$accent;
+  }
+  &:focus-visible{
+    outline:none;
+    box-shadow:inset 0px 0px 0px 3px v.$accent;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    flex-direction:row;
+    min-height:v.$tap-target;
+  }
+}

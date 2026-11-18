@@ -6,29 +6,27 @@
 
 .login{
   display:flex;
-  flex-direction:column;
+  align-items:center;
   justify-content:center;
-  gap:v.$space-lg;
-  max-width:420px;
-  min-height:100vh;
-  margin:0px auto;
-  padding:v.$space-lg v.$space-md;
-
-  h1{
-    color:v.$ember;
-  }
-
-  p{
-    color:v.$smoke;
-  }
+  min-height:100dvh;
+  padding:v.$space-md;
 
   form{
     display:flex;
     flex-direction:column;
     gap:v.$space-md;
+    width:100%;
+    max-width:420px;
+    padding:v.$space-xl v.$space-lg;
+    background-color:v.$panel;
+    border:1px solid v.$border;
+    border-radius:v.$radius-xl;
+    box-shadow:v.$shadow;
   }
 
-  .error{
-    color:v.$danger;
-  }
+  h1{ color:v.$accent; }
+
+  p{ color:v.$muted; }
+
+  .error{ color:v.$danger; }
 }

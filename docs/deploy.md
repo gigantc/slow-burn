@@ -1,8 +1,8 @@
 # Deploy
 
-Slow Burn runs as one Node process (Fastify serves `/api` and the built client) behind Apache, which only reverse-proxies the whole subdomain to `127.0.0.1:3100`. Server: Node 22, systemd, Apache + certbot.
+Slow Burn runs as one Node process (Fastify serves `/api` and the built client) behind Apache, which only reverse-proxies the whole subdomain to `127.0.0.1:3100`. Server: Node 26, systemd, Apache + certbot.
 
-`better-sqlite3` is a native module that compiles or installs per machine, so `node_modules` is never rsynced. `deploy.sh` runs `npm ci --omit=dev` on the server instead. The repo's `package.json` has an `allowScripts` entry approving `better-sqlite3`'s install script; keep it or npm will skip the native build.
+`better-sqlite3` is a native module with per-platform prebuilt binaries, so `node_modules` is never rsynced (the Mac's darwin binary is useless on Linux). `deploy.sh` runs `npm ci --omit=dev` on the server instead. The `allowScripts` entry in `package.json` approves its install script by name.
 
 ## One-time server setup
 

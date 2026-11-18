@@ -11,51 +11,37 @@ html{
 }
 
 body{
-  background-color:v.$coal;
-  color:v.$cream;
-  font:400 1.6rem/1.5 v.$font;
+  min-height:100dvh;
+  background:v.$backdrop;
+  background-attachment:fixed;
+  color:v.$text;
+  font:400 1.6rem/1.5 v.$font-body;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6{
-  font-weight:700;
-  line-height:1.15;
-}
-h1{
-  font-size:3.6rem;
-}
-h2{
-  font-size:2.8rem;
-}
-h3{
-  font-size:2.2rem;
-}
-h4{
-  font-size:1.8rem;
-}
-h5{
-  font-size:1.6rem;
-}
-h6{
-  font-size:1.4rem;
-}
+// Page titles (h1) are DM Sans bold. Card and entry titles (h2, h3) are Fraunces.
+h1{ font:700 3.6rem/1.1 v.$font-body; }
+h2{ font:600 2.8rem/1.15 v.$font-display; }
+h3{ font:600 2.2rem/1.2 v.$font-display; }
+h4{ font:700 1.8rem/1.15 v.$font-body; }
+h5{ font:700 1.6rem/1.15 v.$font-body; }
+h6{ font:700 1.4rem/1.15 v.$font-body; }
+
+h2, h3{ @include v.display-axes; }
+
+time, data{ font-variant-numeric:tabular-nums; }
 
 p{
   font-size:1.6rem;
 }
 
 a{
-  color:v.$ember;
+  color:v.$accent;
   text-decoration:underline;
   text-underline-offset:3px;
 
   &:focus-visible{
-    outline:2px solid v.$ember;
-    outline-offset:2px;
+    outline:none;
+    box-shadow:inset 0px 0px 0px 2px v.$accent;
   }
 }
 
@@ -84,16 +70,16 @@ select{
   min-height:v.$tap-target;
   width:100%;
   padding:0px v.$space-md;
-  background-color:v.$charcoal;
-  border:2px solid v.$ash;
+  background-color:v.$card;
+  border:2px solid v.$border;
   border-radius:v.$radius-md;
 
   &::placeholder{
-    color:v.$smoke;
+    color:v.$muted;
   }
   &:focus-visible{
     outline:none;
-    border-color:v.$ember;
+    border-color:v.$accent;
   }
 }
 

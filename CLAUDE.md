@@ -33,7 +33,7 @@ This replaces The Dock (`~/Sites/dev/The-Dock`), an all-in-one notes/lists/journ
 
 ## Stack
 
-- **Language:** TypeScript (strict) everywhere. One `package.json`, ESM, Node 22 (`.nvmrc`), npm.
+- **Language:** TypeScript (strict) everywhere. One `package.json`, ESM, Node 26 (`.nvmrc`), npm.
 - **Frontend:** React + Vite + react-router. SCSS via CSS Modules (`*.module.scss`).
 - **Backend:** Fastify (TypeBox validation via `@fastify/type-provider-typebox`), serving `/api` and the built client (SPA fallback). Compiled with `tsc` to `dist/server`.
 - **Database:** SQLite via better-sqlite3 + Drizzle. `src/server/db/schema.ts` is the source of truth; migrations in `drizzle/` are generated, never hand-edited, and run at server start.
@@ -43,7 +43,7 @@ This replaces The Dock (`~/Sites/dev/The-Dock`), an all-in-one notes/lists/journ
 - **Photos:** server disk, resized to WebP on upload. Not built yet.
 - **Offline:** PWA service worker is set up (`vite-plugin-pwa`, `/api` is network-only). The local write queue is not built yet.
 - **Hosting:** DigitalOcean, systemd + Apache reverse proxy + certbot. See [docs/deploy.md](docs/deploy.md).
-- **Design:** placeholder dark/ember tokens in `src/client/scss/_variables.scss`. Direction TBD.
+- **Design:** Sonoran palette in two themes, **Dawn** (light) and **Dusk** (dark), user toggle (labels in `THEME_LABELS`, client config; internal keys stay `light`/`dark`), defaults to the system setting. Tokens in `src/client/scss/_variables.scss`; fonts are self-hosted variable woff2 in `src/client/fonts/` (Fraunces for h1-h3, DM Sans for everything else; tokens `$font-display` and `$font-body`).
 - **Not used:** Firebase, Netlify, Tailwind.
 
 ---
@@ -91,14 +91,22 @@ Client imports use `@/` (src/client) and `shared/` (src/shared). Server imports 
 - CSS Modules (`*.module.scss`) imported per component instead of auto-imported partials.
 - `global.scss` (reset + base) is imported once from `main.tsx`.
 - `routes/` instead of `containers/`.
+- Theme palettes are Sass maps emitted as CSS custom properties under `[data-theme]` (`scss/_themes.scss`), because the theme switches at runtime. Components use semantic Sass tokens only (`v.$panel`, `v.$accent`), never theme names.
 - Prettier skips `.scss` so the compact SCSS style survives.
+
+---
+
+## Gotchas
+
+- **The CSS minifier reorders declarations.** It can merge same-selector rules and move `font-variant-numeric` / `font-variation-settings` ahead of the `font` shorthand, which then resets them. Put those in a separate rule (e.g. a child selector) and check the built CSS, not just the source.
+- **The service worker caches old builds.** After a change, hard-reload (or wipe the headless browser profile) before judging a screenshot.
 
 ---
 
 ## Current state
 
 - **Last worked on:** 2026-11-18, kickoff and scaffold. Stack locked; auth, cooks schema, placeholder screens, PWA config and deploy files are in. Build, typecheck and API checks pass. Screens not yet checked in a browser.
-- **Server facts (2026-11-18):** Ubuntu 24.04 LAMP droplet, Node v22.23.4, certbot certs per subdomain, `slowburn.gigantc.com` DNS already resolves to the droplet. `mod_proxy` / `proxy_http` not enabled yet. No databases used by the other sites.
+- **Server facts (2026-11-18):** Ubuntu 24.04 LAMP droplet, Node v26.13.1 via NodeSource (upgraded from 22 on 2026-11-18; `baseball-watcher` verified healthy after), certbot certs per subdomain, `slowburn.gigantc.com` DNS already resolves to the droplet. `mod_proxy` / `proxy_http` not enabled yet. No databases used by the other sites.
 - **In progress:** nothing.
 - **Next up:**
   1. dFree runs `git init` and the initial commit.
@@ -108,4 +116,4 @@ Client imports use `@/` (src/client) and `shared/` (src/shared). Server imports 
 - **Data to re-enter:** The Dock's smoking and whisky notes are free-text Firestore entries (no structured fields). They'll be re-entered by hand as test data, which is why a cook with zero events and a past date is valid.
 - **Open questions:**
   - Do tastings (whisky/cigar) need to work by Thanksgiving, or is the turkey alone enough? (Also asked as a comment in the brief.)
-  - Rating scale: stars, 1 to 10, or something else? Same for cooks and tastings?
+- **Decided:** rating is 5 stars (integer 1 to 5), the same for cooks and tastings. Temps are °F only. Sign out and the Dawn/Dusk theme switch live in a menu (sidebar popover on desktop, tab-bar sheet on phone).

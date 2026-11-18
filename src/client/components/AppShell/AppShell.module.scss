@@ -1,0 +1,35 @@
+//////////////////////////////////////
+// App shell
+
+//imports
+@use 'scss/variables' as v;
+
+.shell{
+  display:grid;
+  grid-template-columns:v.$sidebar-width 1fr;
+  gap:v.$space-md;
+  min-height:100dvh;
+  padding:v.$space-md;
+
+  main{
+    min-width:0px;
+    padding:v.$space-xl;
+    background-color:v.$panel;
+    border:1px solid v.$border;
+    border-radius:v.$radius-xl;
+    box-shadow:v.$shadow;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-columns:1fr;
+    gap:0px;
+    padding:env(safe-area-inset-top) 0px 0px 0px;
+
+    main{
+      padding:v.$space-lg v.$space-md calc(#{v.$tap-target} + #{v.$space-xl} + env(safe-area-inset-bottom)) v.$space-md;
+      border-width:1px 0px 0px 0px;
+      border-radius:v.$radius-xl v.$radius-xl 0px 0px;
+      box-shadow:none;
+    }
+  }
+}

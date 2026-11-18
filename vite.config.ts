@@ -6,9 +6,9 @@ import { resolve } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Placeholders: keep in sync with $coal and $ember in src/client/scss/_variables.scss.
-const BACKGROUND_COLOR = '#161210';
-const THEME_COLOR = '#e8692a';
+// Light theme values: keep in sync with `panel` and `chrome` in $theme-light (src/client/scss/_variables.scss).
+const BACKGROUND_COLOR = '#f4ecdc';
+const THEME_COLOR = '#f8d3a8';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -63,6 +63,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          globPatterns: ['**/*.{js,css,html,woff2}'],
           navigateFallback: '/index.html',
           // API calls always go to the network; never serve them from the app shell.
           navigateFallbackDenylist: [/^\/api\//],

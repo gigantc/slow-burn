@@ -12,13 +12,13 @@
   padding:0px v.$space-lg;
   border:2px solid transparent;
   border-radius:v.$radius-md;
-  font:600 1.6rem/1 v.$font;
+  font:600 1.6rem/1 v.$font-body;
   text-decoration:none;
   transition:background-color 0.15s, border-color 0.15s;
 
   &:focus-visible{
     outline:none;
-    box-shadow:inset 0px 0px 0px 3px v.$cream;
+    box-shadow:inset 0px 0px 0px 3px v.$text;
   }
   &:disabled{
     opacity:0.5;
@@ -27,19 +27,15 @@
 }
 
 .primary{
-  background-color:v.$ember;
-  color:v.$coal;
+  background-color:v.$accent;
+  color:v.$on-accent;
 
-  &:hover:not(:disabled){
-    background-color:v.$ember-dark;
-  }
+  &:hover:not(:disabled){ background-color:color-mix(in srgb, v.$accent 85%, v.$text); }
 }
 
 .secondary{
-  border-color:v.$ash;
-  color:v.$cream;
+  border-color:v.$border;
+  color:v.$text;
 
-  &:hover:not(:disabled){
-    border-color:v.$smoke;
-  }
+  &:hover:not(:disabled){ border-color:v.$muted; }
 }

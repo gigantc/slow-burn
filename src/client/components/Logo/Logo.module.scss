@@ -1,0 +1,15 @@
+//////////////////////////////////////
+// Logo
+
+//imports
+@use 'scss/variables' as v;
+
+.logo{
+  flex:none;
+  width:auto;
+  height:4rem;
+}
+
+.base{ stop-color:v.$logo-a; }
+
+.tip{ stop-color:v.$logo-b; }

@@ -1,0 +1,13 @@
+//////////////////////////////////////
+// Coming soon
+
+//imports
+@use 'scss/variables' as v;
+
+.soon{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-sm;
+
+  p{ color:v.$muted; }
+}

@@ -1,5 +1,5 @@
 //////////////////////////////////////
-// Home (placeholder)
+// Home
 
 //imports
 @use 'scss/variables' as v;
@@ -7,27 +7,20 @@
 .home{
   display:flex;
   flex-direction:column;
-  gap:v.$space-lg;
-  max-width:v.$container-width;
-  margin:0px auto;
-  padding:v.$space-xl v.$space-md;
+  gap:v.$space-sm;
 
-  h1{
-    color:v.$ember;
+  .note{
+    margin:0px 0px v.$space-md 0px;
+    color:v.$muted;
   }
 
-  .notice{
-    padding:v.$space-md;
-    background-color:v.$charcoal;
-    border-left:4px solid v.$ember;
-    border-radius:v.$radius-sm;
-  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(v.$card-min-width, 1fr));
+    gap:v.$space-md;
 
-  .status{
-    color:v.$smoke;
-  }
-
-  @include v.breakpoint(v.$bp-md){
-    padding:v.$space-lg v.$space-md;
+    @include v.breakpoint(v.$bp-sm){
+      grid-template-columns:1fr;
+    }
   }
 }

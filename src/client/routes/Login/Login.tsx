@@ -13,7 +13,13 @@ const Login = () => {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  if (status === 'in') return <Navigate to="/" replace />;
+  if (status === 'in')
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -29,9 +35,9 @@ const Login = () => {
 
   return (
     <main className={styles.login}>
-      <h1>{APP_NAME}</h1>
-      <p>Smoke, sip, savor, repeat.</p>
       <form onSubmit={onSubmit}>
+        <h1>{APP_NAME}</h1>
+        <p>Smoke, sip, savor, repeat.</p>
         <Field
           label="Password"
           type="password"
@@ -41,11 +47,17 @@ const Login = () => {
           required
         />
         {error && (
-          <p className={styles.error} role="alert">
+          <p
+            className={styles.error}
+            role="alert"
+          >
             {error}
           </p>
         )}
-        <Button type="submit" disabled={busy}>
+        <Button
+          type="submit"
+          disabled={busy}
+        >
           Sign in
         </Button>
       </form>

@@ -1,0 +1,93 @@
+//////////////////////////////////////
+// Nav
+
+//imports
+@use 'scss/variables' as v;
+
+.nav{
+  position:sticky;
+  top:v.$space-md;
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-xs;
+  align-self:start;
+  height:calc(100dvh - #{v.$space-md * 2});
+  padding:v.$space-lg v.$space-sm;
+
+  strong{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:0px 0px v.$space-lg 0px;
+    padding:0px v.$space-md;
+    color:v.$text;
+    font:600 2.2rem/1.1 v.$font-display;
+  }
+  // Separate selector on purpose: the minifier merges identical selectors and reorders them,
+  // which would put the axes before the font shorthand that resets them.
+  > strong{ @include v.display-axes; }
+
+  a, button{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-height:v.$tap-target;
+    padding:0px v.$space-md;
+    border-radius:v.$radius-md;
+    color:v.$text;
+    text-align:left;
+    text-decoration:none;
+    font:600 1.5rem/1 v.$font-body;
+    transition:background-color 0.15s;
+
+    &:hover{ background-color:v.$hover; }
+    &[aria-current='page']{
+      background-color:v.$panel;
+      color:v.$accent;
+      box-shadow:v.$shadow-card;
+    }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 2px v.$accent;
+    }
+  }
+
+  // First of the bottom group (theme, logout)
+  button:first-of-type{ margin-top:auto; }
+
+  @include v.breakpoint(v.$bp-md){
+    position:fixed;
+    top:auto;
+    right:0px;
+    bottom:0px;
+    left:0px;
+    z-index:10;
+    flex-direction:row;
+    gap:0px;
+    height:auto;
+    padding:v.$space-xs v.$space-xs calc(#{v.$space-xs} + env(safe-area-inset-bottom)) v.$space-xs;
+    background-color:v.$panel;
+    border-top:1px solid v.$border;
+
+    strong{ display:none; }
+
+    a, button{
+      flex:1;
+      flex-direction:column;
+      justify-content:center;
+      gap:4px;
+      min-width:0px;
+      padding:0px;
+      text-align:center;
+      font:600 1.1rem/1 v.$font-body;
+
+      &[aria-current='page']{
+        background-color:v.$sunken;
+        box-shadow:none;
+      }
+      &:focus-visible{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+    }
+
+    button:first-of-type{ margin-top:0px; }
+  }
+}
