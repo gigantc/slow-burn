@@ -12,7 +12,7 @@
   display:grid;
   grid-template-areas:
     'header header'
-    'title title'
+    'title control'
     'lead aside'
     'fields aside'
     'bar aside';
@@ -27,6 +27,13 @@
   }
   > h1{
     grid-area:title;
+    margin:0px 0px v.$space-lg 0px;
+  }
+
+  // Beside the title, level with its baseline
+  .control{
+    grid-area:control;
+    align-self:end;
     margin:0px 0px v.$space-lg 0px;
   }
 
@@ -67,6 +74,7 @@
     grid-template-areas:
       'header'
       'title'
+      'control'
       'lead'
       'notes'
       'fields'
@@ -86,6 +94,7 @@
     }
     > h1{ margin:0px 0px v.$space-20 0px; }
 
+    .control,
     .lead,
     .notes{ margin:0px 0px v.$space-20 0px; }
     .extra{ margin:v.$space-20 0px 0px 0px; }
@@ -101,12 +110,12 @@
     .cancel{
       align-items:center;
       min-height:v.$field-height;
-      color:v.$text;
+      color:v.$cat-text;
       font:600 1.6rem/1 v.$font-body;
 
       &:focus-visible{
         outline:none;
-        box-shadow:inset 0px 0px 0px 2px v.$accent;
+        box-shadow:inset 0px 0px 0px 2px v.$cat;
       }
     }
 

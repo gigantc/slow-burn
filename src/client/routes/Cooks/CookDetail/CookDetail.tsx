@@ -1,23 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { CookWithEvents } from 'shared/types';
-import Breadcrumb from '@/components/Breadcrumb/Breadcrumb';
 import Button from '@/components/Button/Button';
 import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
-import Icon from '@/components/Icon/Icon';
+import DetailHeader from '@/components/DetailHeader/DetailHeader';
 import NextTime from '@/components/NextTime/NextTime';
-import RatingInput from '@/components/RatingInput/RatingInput';
 import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
 import TempChart, { hasTrend } from '@/components/TempChart/TempChart';
 import UndoToast from '@/components/UndoToast/UndoToast';
-import type { Toast } from '@/components/UndoToast/UndoToast';
 import { deleteCook, saveCook } from '@/lib/cookActions';
 import { readings, wrapSpans } from '@/lib/cookEvents';
 import { useMeatName } from '@/lib/cookHooks';
 import { cookDate, cookDetails, cookTargets } from '@/lib/cookInfo';
 import { formatDuration, formatMonthDay } from '@/lib/format';
 import { averagePit, restedMs } from '@/lib/liveStats';
-import { useBack } from '@/lib/useBack';
+import { useRating } from '@/lib/useRating';
 import { TimelineCard } from '../Timeline/Timeline';
 import styles from './CookDetail.module.scss';
 
@@ -30,10 +27,7 @@ const toPoints = (cook: CookWithEvents, type: 'pit_temp' | 'internal_temp') =>
 const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
   const meatName = useMeatName(cook.meatId);
   const navigate = useNavigate();
-  const back = useBack();
   const [confirming, setConfirming] = useState(false);
-  const [toast, setToast] = useState<Toast | null>(null);
-  const [previous, setPrevious] = useState<number | null>(null);
 
   const date = formatMonthDay(cookDate(cook));
   const meta = [...cookDetails(cook), cookTargets(cook)].flatMap((part) => (part ? [part] : []));
@@ -59,50 +53,23 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
   const charted = cook.startedAt && cook.endedAt && hasTrend(pit, meat);
 
   // Rating happens after the meal, so it saves straight from here (with an Undo).
-  const rate = (rating: number | null) => {
-    setPrevious(cook.rating);
-    saveCook({ id: cook.id, rating });
-    setToast({ id: crypto.randomUUID(), message: 'Rating saved' });
-  };
+  const { toast, rate, undo, close } = useRating(cook.rating, (rating) =>
+    saveCook({ id: cook.id, rating }),
+  );
 
   return (
     <div className={styles.detail}>
-      <header>
-        <button
-          className={styles.back}
-          type="button"
-          aria-label="Back"
-          onClick={() => back('/cooks')}
-        >
-          <Icon name="chevronLeft" />
-        </button>
-        <Breadcrumb
-          to="/cooks"
-          label="Cooks"
-          current={date}
-        />
-        <Button
-          className={styles.edit}
-          to={`/cooks/${cook.id}/edit`}
-          variant="secondary"
-          aria-label="Edit cook"
-        >
-          <Icon name="pencil" />
-          <span>Edit</span>
-        </Button>
-        <span className={`${styles.eyebrow} ${styles.cook}`}>{`Cook · ${date}`}</span>
-        <h1>{meatName}</h1>
-        <div className={styles.rating}>
-          <RatingInput
-            compact
-            clearable={false}
-            value={cook.rating}
-            onChange={rate}
-          />
-          {cook.rating === null && <small>Rate it</small>}
-        </div>
-        {meta.length > 0 && <p className={styles.meta}>{meta.join(' · ')}</p>}
-      </header>
+      <DetailHeader
+        crumb={{ to: '/cooks', label: 'Cooks', current: date }}
+        editTo={`/cooks/${cook.id}/edit`}
+        editLabel="Edit cook"
+        eyebrow={`Cook · ${date}`}
+        category="cook"
+        title={meatName}
+        rating={cook.rating}
+        onRate={rate}
+        meta={meta.length > 0 ? meta.join(' · ') : undefined}
+      />
       <div className={styles.main}>
         {charted && cook.startedAt && cook.endedAt && (
           <TempChart
@@ -163,11 +130,8 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
       </div>
       <UndoToast
         toast={toast}
-        onUndo={() => {
-          saveCook({ id: cook.id, rating: previous });
-          setToast(null);
-        }}
-        onClose={() => setToast(null)}
+        onUndo={undo}
+        onClose={close}
       />
       <ConfirmSheet
         open={confirming}

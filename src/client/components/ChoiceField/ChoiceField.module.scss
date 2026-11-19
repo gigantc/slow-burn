@@ -1,0 +1,21 @@
+//////////////////////////////////////
+// Choice field
+// A legend over a row of Chips, straight on the page background (the same rhythm as the rating).
+
+//imports
+@use 'scss/variables' as v;
+
+.field{
+  min-width:0px;
+  margin:0px;
+  padding:0px;
+  border:0px;
+
+  legend{ @include v.group-legend; }
+
+  div{
+    display:flex;
+    flex-wrap:wrap;
+    gap:v.$space-sm;
+  }
+}

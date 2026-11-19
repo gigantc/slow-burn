@@ -1,5 +1,5 @@
 import { clockTime } from '@/lib/format';
-import { useSyncStatus } from '@/lib/cookHooks';
+import { useSyncStatus } from '@/lib/storeHooks';
 import styles from './SyncStatus.module.scss';
 
 /** `quiet` shows nothing unless the user is offline or has unsynced changes. */

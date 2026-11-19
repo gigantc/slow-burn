@@ -1,0 +1,101 @@
+//////////////////////////////////////
+// Tasting detail
+// Desktop: the header across the top, the notes in the main column and the spec tiles in a side
+// column. Phone: one column, tiles first.
+
+//imports
+@use 'scss/variables' as v;
+
+.detail{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:28px v.$space-32;
+
+  @include v.breakpoint(v.$bp-md){
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-items:stretch;
+    gap:v.$space-20;
+  }
+
+  .main{
+    display:flex;
+    flex:3 1 520px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:v.$space-lg;
+    min-width:0px;
+  }
+
+  .stats{
+    flex:2 1 320px;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    grid-auto-flow:row;
+
+    &[data-count='1']{ grid-template-columns:1fr; }
+
+    // Text specs (a varietal, a region) are longer than a number
+    data{
+      font-size:2.2rem;
+      overflow-wrap:anywhere;
+    }
+  }
+
+  // The spec tiles come first on phone; the flex bases above are widths, not heights
+  @include v.breakpoint(v.$bp-md){
+    .stats,
+    .main{ flex:none; }
+    .stats{ order:1; }
+    .main{
+      order:2;
+      align-items:stretch;
+    }
+  }
+
+  // The note fields: one card of label-left rows, as on the form
+  .notes{
+    align-self:stretch;
+    overflow:hidden;
+    margin:0px;
+    background-color:v.$card;
+    border-radius:v.$radius-field;
+    box-shadow:inset 0px 0px 0px 1px v.$field-ring;
+
+    div{
+      display:grid;
+      grid-template-columns:80px minmax(0, 1fr);
+      gap:0px v.$space-md;
+      padding:v.$space-md 18px;
+
+      & + div{ box-shadow:inset 0px 1px 0px v.$border; }
+
+      @include v.breakpoint(v.$bp-md){
+        grid-template-columns:64px minmax(0, 1fr);
+        gap:0px v.$space-12;
+        padding:v.$space-md;
+      }
+    }
+
+    dt{
+      padding:3px 0px 0px 0px;
+      color:v.$cat;
+      font:700 1.3rem/1.4 v.$font-body;
+    }
+    dd{
+      margin:0px;
+      white-space:pre-wrap;
+    }
+  }
+
+  .text{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-sm;
+
+    p{
+      max-width:640px;
+      white-space:pre-wrap;
+    }
+  }
+}

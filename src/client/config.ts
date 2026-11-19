@@ -1,6 +1,8 @@
 //////////////////////////////////////
 // Client config
 
+import { tastingCategories } from 'shared/tastingCategories';
+import type { TastingCategoryKey } from 'shared/tastingCategories';
 import type { IconName } from '@/components/Icon/Icon';
 
 export const API_BASE = '/api';
@@ -13,7 +15,7 @@ export const AUTH_HINT_KEY = 'slowburn-authed';
 // Offline data and sync
 
 export const IDB_NAME = 'slowburn';
-export const IDB_VERSION = 2;
+export const IDB_VERSION = 3;
 export const UNDO_TOAST_MS = 8_000;
 export const SYNC_INTERVAL_MS = 30_000;
 export const SYNC_RETRY_BASE_MS = 2_000;
@@ -33,6 +35,8 @@ export const FORM_ROUTES: readonly string[] = [
   '/cooks/new',
   '/cooks/:id/edit',
   '/cooks/:id/wrap-up',
+  '/tastings/new',
+  '/tastings/:id/edit',
 ];
 
 // Screens that get the phone sky as their page background (react-router patterns).
@@ -65,12 +69,11 @@ export const NAV_ITEMS: readonly { label: string; path: string; icon: IconName }
   { label: 'Tastings', path: '/tastings', icon: 'glass' },
 ];
 
-// Keep keys in sync with $categories in scss/_variables.scss.
+// Cooks plus every tasting category from shared/tastingCategories.ts. Keep keys in sync with
+// $categories in scss/_variables.scss (the colors).
 export const ENTRY_TYPES = {
   cook: { label: 'Cook' },
-  whisky: { label: 'Whisky' },
-  cigar: { label: 'Cigar' },
-  wine: { label: 'Wine' },
-} as const;
+  ...Object.fromEntries(tastingCategories.map((c) => [c.key, { label: c.label }])),
+} as { cook: { label: string } } & Record<TastingCategoryKey, { label: string }>;
 
 export type EntryType = keyof typeof ENTRY_TYPES;

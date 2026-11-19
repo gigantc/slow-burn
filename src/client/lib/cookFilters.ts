@@ -2,20 +2,30 @@
 // Cook filters, search and sort
 // Pure functions over the cached cooks. The Cooks tab keeps a CookView in the URL.
 
-import { RATING_MAX, RATING_MIN } from 'shared/constants';
 import type { CookWithEvents, Meat } from 'shared/types';
 import { compareCooks, cookDate } from '@/lib/cookInfo';
+import {
+  byRating,
+  knownValues,
+  matchesRating,
+  matchesWords,
+  parseRatings,
+  parseSort,
+  parseYears,
+  ratingOptions,
+  searchWords,
+  yearsOf,
+} from '@/lib/viewHelpers';
+import type { SortOption } from '@/lib/viewHelpers';
 
 export type SortKey = 'newest' | 'oldest' | 'rating' | 'longest';
 
-export const SORTS: readonly { key: SortKey; label: string }[] = [
+export const SORTS: readonly SortOption<SortKey>[] = [
   { key: 'newest', label: 'Newest first' },
   { key: 'oldest', label: 'Oldest first' },
   { key: 'rating', label: 'Highest rated' },
   { key: 'longest', label: 'Longest cook' },
 ];
-
-export const UNRATED = 'unrated';
 
 export type CookView = {
   q: string;
@@ -40,29 +50,21 @@ export const DEFAULT_VIEW: CookView = {
   sort: 'newest',
 };
 
-const RATING_VALUES = [
-  ...Array.from({ length: RATING_MAX - RATING_MIN + 1 }, (_, i) => String(RATING_MAX - i)),
-  UNRATED,
-];
-
-const isSort = (value: string | null): value is SortKey => SORTS.some((s) => s.key === value);
-
 //////////////////////////////////////
 // URL <-> view
 // Multi-value filters repeat the key (?meat=a&meat=b) because values such as
 // "Cherry, hickory" contain commas. Defaults are left out of the URL.
 
 export const parseView = (params: URLSearchParams): CookView => {
-  const sort = params.get('sort');
   return {
     q: params.get('q') ?? '',
     meats: params.getAll('meat'),
-    ratings: params.getAll('rating').filter((value) => RATING_VALUES.includes(value)),
+    ratings: parseRatings(params),
     woods: params.getAll('wood'),
     charcoals: params.getAll('charcoal'),
-    years: params.getAll('year').filter((value) => /^\d{4}$/.test(value)),
+    years: parseYears(params),
     next: params.get('next') === '1',
-    sort: isSort(sort) ? sort : DEFAULT_VIEW.sort,
+    sort: parseSort(params.get('sort'), SORTS, DEFAULT_VIEW.sort),
   };
 };
 
@@ -127,26 +129,21 @@ export const facetsOf = (cooks: readonly CookWithEvents[], meats: readonly Meat[
       .filter((meat) => used.has(meat.id))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((meat) => ({ value: meat.id, label: meat.name })),
-    ratings: RATING_VALUES.map((value) => ({
-      value,
-      label: value === UNRATED ? 'Unrated' : `${value} ★`,
-    })),
+    ratings: ratingOptions(),
     woods: valuesOf(cooks, 'wood'),
     charcoals: valuesOf(cooks, 'charcoal'),
-    years: [...new Set(cooks.map((cook) => cookDate(cook).slice(0, 4)))].sort().reverse(),
+    years: yearsOf(cooks.map(cookDate)),
     hasNextNotes: cooks.some((cook) => cook.nextTimeNote?.trim()),
   };
 };
 
 /** Drop selections the cooks no longer offer (a stale bookmark), and use the facet's own casing. */
 export const sanitizeView = (view: CookView, facets: Facets): CookView => {
-  const known = (picked: string[], options: string[]) =>
-    picked.flatMap((value) => options.find((o) => o.toLowerCase() === value.toLowerCase()) ?? []);
   return {
     ...view,
     meats: view.meats.filter((id) => facets.meats.some((m) => m.value === id)),
-    woods: known(view.woods, facets.woods),
-    charcoals: known(view.charcoals, facets.charcoals),
+    woods: knownValues(view.woods, facets.woods),
+    charcoals: knownValues(view.charcoals, facets.charcoals),
     years: view.years.filter((year) => facets.years.includes(year)),
   };
 };
@@ -174,38 +171,28 @@ export const filterCooks = (
   const names = new Map(meats.map((meat) => [meat.id, meat.name]));
   const woods = lower(view.woods);
   const charcoals = lower(view.charcoals);
-  const words = view.q.toLowerCase().split(/\s+/).filter(Boolean);
+  const words = searchWords(view.q);
 
   return cooks.filter((cook) => {
     if (view.meats.length > 0 && !view.meats.includes(cook.meatId)) return false;
-    if (view.ratings.length > 0) {
-      const own = cook.rating === null ? UNRATED : String(cook.rating);
-      if (!view.ratings.includes(own)) return false;
-    }
+    if (!matchesRating(view.ratings, cook.rating)) return false;
     if (woods.size > 0 && !hasAny(woods, cook.wood)) return false;
     if (charcoals.size > 0 && !hasAny(charcoals, cook.charcoal)) return false;
     if (view.years.length > 0 && !view.years.includes(cookDate(cook).slice(0, 4))) return false;
     if (view.next && !cook.nextTimeNote?.trim()) return false;
-    if (words.length > 0) {
-      const haystack = [
-        names.get(cook.meatId),
-        cook.notes,
-        cook.prep,
-        cook.wood,
-        cook.charcoal,
-        cook.nextTimeNote,
-      ]
-        .join(' ')
-        .toLowerCase();
-      if (!words.every((word) => haystack.includes(word))) return false;
-    }
-    return true;
+    return matchesWords(words, [
+      names.get(cook.meatId),
+      cook.notes,
+      cook.prep,
+      cook.wood,
+      cook.charcoal,
+      cook.nextTimeNote,
+    ]);
   });
 };
 
 /** A sorted copy. Ties fall back to newest first. */
 export const sortCooks = (cooks: readonly CookWithEvents[], sort: SortKey): CookWithEvents[] => {
-  const byRating = (a: CookWithEvents, b: CookWithEvents) => (b.rating ?? 0) - (a.rating ?? 0);
   const byLength = (a: CookWithEvents, b: CookWithEvents) => {
     const [x, y] = [duration(a), duration(b)];
     if (x === null || y === null) return x === y ? 0 : x === null ? 1 : -1;

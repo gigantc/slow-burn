@@ -22,6 +22,8 @@ type PageProps = {
   barCancel?: boolean;
   /** Small text at the top right on phone (e.g. the date and time). */
   meta?: string;
+  /** A control beside the title on desktop (right-aligned), under it on phone (the category switch). */
+  control?: ReactNode;
   /** The first block of the form (on New cook, the meat picker). */
   lead?: ReactNode;
   /** Context (Next time): right column on desktop, right below `lead` on phone. */
@@ -47,6 +49,7 @@ export const FormPage = ({
   cancelLabel = 'Cancel',
   barCancel = true,
   meta,
+  control,
   lead,
   notes,
   extra,
@@ -84,6 +87,7 @@ export const FormPage = ({
         />
       </header>
       <h1>{title}</h1>
+      {control && <div className={styles.control}>{control}</div>}
       {lead && <div className={styles.lead}>{lead}</div>}
       {(notes || extra) && (
         <div className={styles.side}>

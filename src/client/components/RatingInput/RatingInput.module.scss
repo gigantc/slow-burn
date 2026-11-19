@@ -11,13 +11,7 @@
   padding:0px;
   border:0px;
 
-  legend{
-    @include v.eyebrow;
-    margin:0px 0px v.$space-12 0px;
-    padding:0px;
-    color:v.$muted;
-    font-size:1.3rem;
-  }
+  legend{ @include v.group-legend; }
 
   div{
     display:flex;
@@ -50,7 +44,7 @@
     }
     &:focus-visible{
       outline:none;
-      box-shadow:inset 0px 0px 0px 2px v.$accent;
+      box-shadow:inset 0px 0px 0px 2px v.$cat;
     }
 
     @include v.breakpoint(v.$bp-md){
@@ -97,7 +91,7 @@
 
     &[aria-pressed='true']{
       background:none;
-      color:v.$accent;
+      color:v.$cat;
     }
   }
 }

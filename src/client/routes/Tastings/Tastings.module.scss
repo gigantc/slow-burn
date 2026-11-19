@@ -1,0 +1,37 @@
+//////////////////////////////////////
+// Tastings
+
+//imports
+@use 'scss/variables' as v;
+
+.tastings{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-32;
+
+  @include v.breakpoint(v.$bp-md){ gap:v.$space-20; }
+
+  > header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:v.$space-md;
+  }
+
+  .switch{
+    max-width:480px;
+
+    @include v.breakpoint(v.$bp-md){ max-width:none; }
+  }
+
+  > p{ color:v.$muted; }
+
+  .none{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:v.$space-md;
+
+    p{ color:v.$muted; }
+  }
+}

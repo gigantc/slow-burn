@@ -4,6 +4,7 @@
 import type { Cook, CookWithEvents } from 'shared/types';
 import type { Entry } from '@/components/EntryLink/EntryLink';
 import { formatDuration, formatMonthDay, fromLocalInput, localDate, nextDay } from '@/lib/format';
+import { distinctValues } from '@/lib/values';
 
 type DatedCook = Pick<Cook, 'cookedOn' | 'startedAt' | 'createdAt'>;
 
@@ -38,14 +39,8 @@ export const cookTargets = (
 };
 
 /** Distinct past values of a text field (wood, charcoal), most recent first, case-insensitive. */
-export const pastValues = (cooks: readonly CookWithEvents[], key: 'wood' | 'charcoal') => {
-  const seen = new Map<string, string>();
-  for (const cook of cooks) {
-    const value = cook[key]?.trim();
-    if (value && !seen.has(value.toLowerCase())) seen.set(value.toLowerCase(), value);
-  }
-  return [...seen.values()];
-};
+export const pastValues = (cooks: readonly CookWithEvents[], key: 'wood' | 'charcoal') =>
+  distinctValues(cooks.map((cook) => cook[key]));
 
 /** A past cook as typed: a required date and optional clock times (HH:mm). */
 export type PastDates = { date: string; start: string; end: string };

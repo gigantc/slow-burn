@@ -24,6 +24,7 @@ import {
   meatParams,
   nextTimeQuery,
 } from './schemas.js';
+import { listTastings } from './tastings.js';
 
 // `meat_id` is nullable in the table (it was added to existing rows); the API always sets it.
 const toCook = ({ meatId, ...cook }: typeof cooks.$inferSelect): Cook[] =>
@@ -46,7 +47,7 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
       .all()
       .flatMap(toCook)
       .map((cook) => ({ ...cook, events: byCook.get(cook.id) ?? [] }));
-    return { cooks: rows, meats: db.select().from(meats).all() };
+    return { cooks: rows, meats: db.select().from(meats).all(), tastings: listTastings() };
   });
 
   //////////////////////////////////////

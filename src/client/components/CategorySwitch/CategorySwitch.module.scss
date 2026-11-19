@@ -1,0 +1,39 @@
+//////////////////////////////////////
+// Category switch
+// Equal pills in a tray. The selected pill is filled with its category's color (the accent for a
+// pill that isn't a category, e.g. "All").
+
+//imports
+@use 'scss/variables' as v;
+
+.switch{
+  display:grid;
+  grid-auto-columns:minmax(0, 1fr);
+  grid-auto-flow:column;
+  gap:v.$space-xs;
+  padding:v.$space-xs;
+  background-color:v.$card;
+  border-radius:v.$radius-field;
+
+  button{
+    @include v.field-height;
+    padding:0px v.$space-sm;
+    background:none;
+    border-radius:v.$radius-md;
+    color:v.$muted;
+    font:600 1.5rem/1 v.$font-body;
+    transition:background-color 0.15s;
+
+    &:hover{ color:v.$text; }
+    &[aria-checked='true']{
+      background-color:var(--type, #{v.$accent});
+      color:v.$on-accent;
+    }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 2px v.$text;
+    }
+  }
+}
+
+@include v.category-classes;

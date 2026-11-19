@@ -1,0 +1,30 @@
+//////////////////////////////////////
+// Everything
+
+//imports
+@use 'scss/variables' as v;
+
+.everything{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-32;
+
+  @include v.breakpoint(v.$bp-md){ gap:v.$space-20; }
+
+  .switch{
+    max-width:600px;
+
+    @include v.breakpoint(v.$bp-md){ max-width:none; }
+  }
+
+  > p{ color:v.$muted; }
+
+  .none{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:v.$space-md;
+
+    p{ color:v.$muted; }
+  }
+}

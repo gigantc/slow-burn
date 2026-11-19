@@ -7,9 +7,13 @@ import Cooks from '@/routes/Cooks/Cooks';
 import EditCook from '@/routes/Cooks/EditCook/EditCook';
 import NewCook from '@/routes/Cooks/NewCook/NewCook';
 import WrapUp from '@/routes/Cooks/WrapUp/WrapUp';
+import Everything from '@/routes/Everything/Everything';
 import Home from '@/routes/Home/Home';
 import Login from '@/routes/Login/Login';
+import EditTasting from '@/routes/Tastings/EditTasting/EditTasting';
+import NewTasting from '@/routes/Tastings/NewTasting/NewTasting';
 import Tastings from '@/routes/Tastings/Tastings';
+import TastingDetail from '@/routes/Tastings/TastingDetail/TastingDetail';
 
 const RequireAuth = ({ children }: { children: ReactNode }) => {
   const { status } = useAuth();
@@ -44,6 +48,10 @@ const App = () => (
             element={<Home />}
           />
           <Route
+            path="/all"
+            element={<Everything />}
+          />
+          <Route
             path="/cooks"
             element={<Cooks />}
           />
@@ -66,6 +74,18 @@ const App = () => (
           <Route
             path="/tastings"
             element={<Tastings />}
+          />
+          <Route
+            path="/tastings/new"
+            element={<NewTasting />}
+          />
+          <Route
+            path="/tastings/:id"
+            element={<TastingDetail />}
+          />
+          <Route
+            path="/tastings/:id/edit"
+            element={<EditTasting />}
           />
         </Route>
         <Route

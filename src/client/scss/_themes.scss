@@ -27,3 +27,15 @@
   @each $key, $value in v.$theme-dark{ --#{$key}:#{$value}; }
   @include categories(dark);
 }
+
+// A tasting screen sets data-category on <html> (useCategoryAccent), which recolors everything
+// that uses v.$cat*: the Save button, selected pills, note labels, lit stars, the breadcrumb link
+// and the active sidebar item. In Dawn solid fills are the ink with the on-accent text.
+@each $key in v.$entry-types{
+  [data-category='#{$key}']{
+    --cat:var(--#{$key});
+    --cat-soft:var(--#{$key}-soft);
+    --cat-on:var(--on-accent);
+    --sidebar-active-text:var(--#{$key});
+  }
+}

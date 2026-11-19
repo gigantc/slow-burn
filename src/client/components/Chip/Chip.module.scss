@@ -15,9 +15,13 @@
 
   &:hover{ background-color:color-mix(in srgb, v.$raised 85%, v.$text); }
   &[aria-pressed='true']{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+  &[aria-checked='true']{
+    background-color:v.$cat;
+    color:v.$cat-on;
+  }
   &:focus-visible{
     outline:none;
-    box-shadow:inset 0px 0px 0px 2px v.$accent;
+    box-shadow:inset 0px 0px 0px 2px v.$cat;
   }
 
   @include v.breakpoint(v.$bp-md){ min-height:44px; }

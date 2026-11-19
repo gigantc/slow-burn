@@ -16,7 +16,7 @@
   border-radius:v.$radius-field;
   box-shadow:inset 0px 0px 0px 1px v.$field-ring;
 
-  &:focus-within{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+  &:focus-within{ box-shadow:inset 0px 0px 0px 2px v.$cat; }
   &.invalid{ box-shadow:inset 0px 0px 0px 2px v.$danger; }
   &.wide{ grid-column:1 / -1; }
 

@@ -1,6 +1,6 @@
 //////////////////////////////////////
 // Sync engine
-// Sends the outbox in order, then pulls the server's cooks into the cache. Triggered on
+// Sends the outbox in order, then pulls the server's cooks, meats and tastings into the cache. Triggered on
 // start, mutations, `online`, tab focus, and an interval. Retries back off on network/5xx.
 
 import { SYNC_INTERVAL_MS, SYNC_RETRY_BASE_MS, SYNC_RETRY_MAX_MS } from '@/config';
@@ -9,11 +9,9 @@ import {
   countPending,
   getMutationVersion,
   loadStore,
-  pendingCookIds,
-  pendingMeatIds,
   remapMeat,
   setSyncState,
-} from '@/lib/cookStore';
+} from '@/lib/store';
 import { dbGetAll, dbWrite } from '@/lib/idb';
 import { classify, pullAll, sendOp } from '@/lib/transport';
 import type { Meat } from 'shared/types';
@@ -72,9 +70,8 @@ const drain = async (): Promise<Result> => {
 const pull = async (): Promise<Result> => {
   const readVersion = getMutationVersion();
   try {
-    const { cooks, meats } = await pullAll();
-    const ops = await readOutbox();
-    applyPull(cooks, meats, pendingCookIds(ops), pendingMeatIds(ops), readVersion);
+    const server = await pullAll();
+    applyPull(server, await readOutbox(), readVersion);
     return 'ok';
   } catch (err) {
     return classify(err) === 'auth' ? 'auth' : 'retry';

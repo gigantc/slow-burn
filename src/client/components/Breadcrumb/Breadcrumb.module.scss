@@ -22,7 +22,7 @@
   // In a trail the parent link is the accent one, and doesn't need the tap-target height
   &.trail a{
     min-height:0px;
-    color:v.$accent;
+    color:v.$cat;
 
     &:hover{ color:v.$accent-hover; }
   }

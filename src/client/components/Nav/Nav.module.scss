@@ -22,7 +22,12 @@
     margin:0px 0px v.$space-20 0px;
     padding:0px v.$space-sm;
   }
-  .new{ margin:0px 0px v.$space-20 0px; }
+  // New cook stays the plain accent on tasting screens, which recolor the primary buttons
+  .new{
+    --cat:var(--accent);
+    --cat-on:var(--on-accent);
+    margin:0px 0px v.$space-20 0px;
+  }
 
   .item{
     display:flex;

@@ -1,11 +1,11 @@
 //////////////////////////////////////
 // IndexedDB
-// A thin promise wrapper over two stores: `cooks` (events embedded) and `outbox`.
+// A thin promise wrapper over the stores: `cooks` (events embedded), `meats`, `tastings` and `outbox`.
 // If IndexedDB is unavailable (some private modes), it falls back to memory for the session.
 
 import { IDB_NAME, IDB_VERSION } from '@/config';
 
-export type StoreName = 'cooks' | 'meats' | 'outbox';
+export type StoreName = 'cooks' | 'meats' | 'tastings' | 'outbox';
 
 export type WriteOp = { store: StoreName; put: object } | { store: StoreName; delete: IDBValidKey };
 
@@ -24,6 +24,8 @@ const openDb = () => {
           db.createObjectStore('cooks', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('meats'))
           db.createObjectStore('meats', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('tastings'))
+          db.createObjectStore('tastings', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('outbox')) {
           db.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true });
         }
@@ -46,6 +48,7 @@ const openDb = () => {
 const memory: Record<StoreName, Map<IDBValidKey, object>> = {
   cooks: new Map(),
   meats: new Map(),
+  tastings: new Map(),
   outbox: new Map(),
 };
 let memorySeq = 1;

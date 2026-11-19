@@ -4,8 +4,9 @@ import EntryList from '@/components/EntryList/EntryList';
 import LiveCookCard from '@/components/LiveCookCard/LiveCookCard';
 import { LATELY_COUNT } from '@/config';
 import { useActiveCook, useCooks } from '@/lib/cookHooks';
-import { cookToEntry } from '@/lib/cookInfo';
 import { greeting } from '@/lib/format';
+import { latelyEntries } from '@/lib/lately';
+import { useTastings } from '@/lib/tastingHooks';
 import { useNow } from '@/lib/useNow';
 import styles from './Home.module.scss';
 
@@ -14,11 +15,14 @@ const Home = () => {
   const active = useActiveCook();
   const now = useNow(60_000);
 
-  const meatName = (id: string) => meats.find((meat) => meat.id === id)?.name ?? '';
-  const entries = cooks
-    .filter((cook) => cook !== active)
-    .slice(0, LATELY_COUNT)
-    .map((cook) => cookToEntry(cook, meatName(cook.meatId)));
+  const { tastings } = useTastings();
+
+  const entries = latelyEntries(
+    cooks.filter((cook) => cook !== active),
+    meats,
+    tastings,
+    LATELY_COUNT,
+  );
 
   return (
     <div className={styles.home}>
@@ -35,7 +39,7 @@ const Home = () => {
           variant="primary"
         />
         <ActionTile
-          to="/tastings"
+          to="/tastings/new"
           icon="glass"
           label="Log a tasting"
         />
@@ -44,7 +48,7 @@ const Home = () => {
         <section>
           <header>
             <h2>Lately</h2>
-            <Link to="/cooks">See all</Link>
+            <Link to="/all">See all</Link>
           </header>
           {entries.length > 0 ? (
             <EntryList

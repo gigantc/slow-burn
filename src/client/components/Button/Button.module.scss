@@ -28,12 +28,12 @@
 }
 
 .primary{
-  background-color:v.$accent;
-  color:v.$on-accent;
+  background-color:v.$cat;
+  color:v.$cat-on;
 
   &:hover:not(:disabled){
-    background-color:color-mix(in srgb, v.$accent 85%, v.$text);
-    color:v.$on-accent;
+    background-color:color-mix(in srgb, v.$cat 85%, v.$text);
+    color:v.$cat-on;
   }
 }
 

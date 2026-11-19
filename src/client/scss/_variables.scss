@@ -186,10 +186,14 @@ $shadow-inverse:var(--shadow-inverse);
 $type:var(--type);
 $type-soft:var(--type-soft);
 
-// The category accent of a tasting screen (--cat, --cat-soft set on its root); cook screens fall
-// back to the accent and the cook tint.
+// The category accent of a tasting screen. data-category on <html> (see useCategoryAccent and
+// _themes.scss) sets --cat, --cat-soft and --cat-on; everywhere else they fall back to the accent,
+// the cook tint and the on-accent text, so shared components look the same on cook screens.
 $cat:var(--cat, var(--accent));
 $cat-soft:var(--cat-soft, var(--cook-soft));
+$cat-on:var(--cat-on, var(--on-accent));
+// Text that follows the category on a tasting screen and is plain text elsewhere (Cancel link)
+$cat-text:var(--cat, var(--text));
 
 // Gives a component one class per category (.cook, .whisky ...) that sets $type and $type-soft.
 @mixin category-classes{
@@ -275,6 +279,15 @@ $bp-sm:480px;
   font:700 1.2rem/1 $font-body;
   letter-spacing:0.08em;
   text-transform:uppercase;
+}
+
+// The legend of a form group that sits on the page background ("RATING", "TYPE")
+@mixin group-legend{
+  @include eyebrow;
+  margin:0px 0px $space-12 0px;
+  padding:0px;
+  color:$muted;
+  font-size:1.3rem;
 }
 
 @mixin field-height{

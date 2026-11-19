@@ -1,21 +1,23 @@
 //////////////////////////////////////
-// Cook store
+// Store (cooks, meats, tastings)
 // In-memory state (what the UI reads) mirrored to IndexedDB. Every mutation updates memory
 // synchronously, then persists the change and its outbox ops in one transaction.
 
-import type { CookWithEvents, Meat } from 'shared/types';
+import type { CookWithEvents, Meat, SyncResponse, Tasting } from 'shared/types';
 import { compareCooks } from '@/lib/cookInfo';
+import { compareTastings } from '@/lib/tastingInfo';
 import { dbGetAll, dbWrite } from '@/lib/idb';
 import type { WriteOp } from '@/lib/idb';
 import type { NewOutboxOp, OutboxOp, SyncState } from '@/lib/types';
 
-type CookState = {
+type StoreState = {
   ready: boolean;
   cooks: readonly CookWithEvents[];
   meats: readonly Meat[];
+  tastings: readonly Tasting[];
 };
 
-let cookState: CookState = { ready: false, cooks: [], meats: [] };
+let storeState: StoreState = { ready: false, cooks: [], meats: [], tastings: [] };
 let syncState: SyncState = {
   pending: 0,
   online: typeof navigator === 'undefined' ? true : navigator.onLine,
@@ -32,7 +34,7 @@ export const subscribe = (listener: () => void) => {
   return () => listeners.delete(listener);
 };
 
-export const getCookState = () => cookState;
+export const getStoreState = () => storeState;
 export const getSyncState = () => syncState;
 
 /** Bumps on every local mutation; sync uses it to detect writes that raced a pull. */
@@ -42,6 +44,7 @@ export const getMutationVersion = () => version;
 // State setters
 
 const sorted = (cooks: Iterable<CookWithEvents>) => [...cooks].sort(compareCooks);
+const sortedTastings = (tastings: Iterable<Tasting>) => [...tastings].sort(compareTastings);
 
 export const setSyncState = (patch: Partial<SyncState>) => {
   syncState = { ...syncState, ...patch };
@@ -57,12 +60,18 @@ export const countPending = async () => {
 // Load
 
 export const loadStore = async () => {
-  const [cooks, meats] = await Promise.all([
+  const [cooks, meats, tastings] = await Promise.all([
     dbGetAll<CookWithEvents>('cooks'),
     dbGetAll<Meat>('meats'),
+    dbGetAll<Tasting>('tastings'),
   ]);
   // Cooks saved before meats existed have no meatId; the next pull replaces them.
-  cookState = { ready: true, cooks: sorted(cooks.filter((cook) => cook.meatId)), meats };
+  storeState = {
+    ready: true,
+    cooks: sorted(cooks.filter((cook) => cook.meatId)),
+    meats,
+    tastings: sortedTastings(tastings),
+  };
   emit();
   await countPending();
 };
@@ -73,24 +82,36 @@ export const loadStore = async () => {
 type Mutation = {
   upserts?: CookWithEvents[];
   meatUpserts?: Meat[];
+  tastingUpserts?: Tasting[];
   removals?: string[];
+  tastingRemovals?: string[];
   ops?: NewOutboxOp[];
 };
 
 export const mutate = ({
   upserts = [],
   meatUpserts = [],
+  tastingUpserts = [],
   removals = [],
+  tastingRemovals = [],
   ops = [],
 }: Mutation): Promise<void> => {
   version += 1;
 
-  const byId = new Map(cookState.cooks.map((cook) => [cook.id, cook]));
+  const byId = new Map(storeState.cooks.map((cook) => [cook.id, cook]));
   upserts.forEach((cook) => byId.set(cook.id, cook));
   removals.forEach((id) => byId.delete(id));
-  const meatsById = new Map(cookState.meats.map((meat) => [meat.id, meat]));
+  const meatsById = new Map(storeState.meats.map((meat) => [meat.id, meat]));
   meatUpserts.forEach((meat) => meatsById.set(meat.id, meat));
-  cookState = { ready: true, cooks: sorted(byId.values()), meats: [...meatsById.values()] };
+  const tastingsById = new Map(storeState.tastings.map((tasting) => [tasting.id, tasting]));
+  tastingUpserts.forEach((tasting) => tastingsById.set(tasting.id, tasting));
+  tastingRemovals.forEach((id) => tastingsById.delete(id));
+  storeState = {
+    ready: true,
+    cooks: sorted(byId.values()),
+    meats: [...meatsById.values()],
+    tastings: sortedTastings(tastingsById.values()),
+  };
   syncState = { ...syncState, pending: syncState.pending + ops.length };
   emit();
 
@@ -98,7 +119,9 @@ export const mutate = ({
   const writes: WriteOp[] = [
     ...upserts.map((cook) => ({ store: 'cooks' as const, put: cook })),
     ...meatUpserts.map((meat) => ({ store: 'meats' as const, put: meat })),
+    ...tastingUpserts.map((tasting) => ({ store: 'tastings' as const, put: tasting })),
     ...removals.map((id) => ({ store: 'cooks' as const, delete: id })),
+    ...tastingRemovals.map((id) => ({ store: 'tastings' as const, delete: id })),
     ...ops.map((op) => ({
       store: 'outbox' as const,
       put: { id: crypto.randomUUID(), createdAt: now, ...op },
@@ -114,57 +137,64 @@ export const mutate = ({
 // Server pull
 
 const COOK_PATH = /^\/cooks\/([^/]+)/;
-const MEAT_PATH = /^\/meats\/([^/]+)/;
 
-/** Cook ids that still have unsent ops; the pull must not overwrite them. */
-export const pendingCookIds = (ops: OutboxOp[]) =>
-  new Set(ops.flatMap((op) => COOK_PATH.exec(op.path)?.[1] ?? []));
-
-/** Meat ids that still have unsent ops. */
-export const pendingMeatIds = (ops: OutboxOp[]) =>
-  new Set(ops.flatMap((op) => MEAT_PATH.exec(op.path)?.[1] ?? []));
+/** Ids of one collection (`cooks`, `meats`, `tastings`) that still have unsent ops. */
+const pendingIds = (ops: OutboxOp[], collection: string) => {
+  const path = new RegExp(`^/${collection}/([^/]+)`);
+  return new Set(ops.flatMap((op) => path.exec(op.path)?.[1] ?? []));
+};
 
 /**
- * Merge the server's cooks into the cache. Records with pending ops stay as they are; every
- * other record becomes the server's version (the server already resolved last-write-wins).
+ * One collection's merge: records with pending ops stay as they are, records the server no
+ * longer has are removed, everything else becomes the server's version. Pushes the IndexedDB
+ * writes onto `writes`.
+ */
+const mergePulled = <T extends { id: string }>(
+  store: 'cooks' | 'meats' | 'tastings',
+  local: readonly T[],
+  server: readonly T[],
+  pending: Set<string>,
+  writes: WriteOp[],
+): T[] => {
+  const serverIds = new Set(server.map((record) => record.id));
+  const next = new Map<string, T>();
+
+  for (const record of local) {
+    if (pending.has(record.id)) next.set(record.id, record);
+    else if (!serverIds.has(record.id)) writes.push({ store, delete: record.id });
+  }
+  for (const record of server) {
+    if (pending.has(record.id)) continue;
+    next.set(record.id, record);
+    writes.push({ store, put: record });
+  }
+  return [...next.values()];
+};
+
+/**
+ * Merge the server's snapshot into the cache (the server already resolved last-write-wins).
  * Returns false (and changes nothing) if a local mutation happened since `readVersion`.
  */
-export const applyPull = (
-  serverCooks: CookWithEvents[],
-  serverMeats: Meat[],
-  pendingIds: Set<string>,
-  pendingMeats: Set<string>,
-  readVersion: number,
-): boolean => {
+export const applyPull = (server: SyncResponse, ops: OutboxOp[], readVersion: number): boolean => {
   if (readVersion !== version) return false;
 
-  const serverIds = new Set(serverCooks.map((cook) => cook.id));
-  const next = new Map<string, CookWithEvents>();
   const writes: WriteOp[] = [];
-
-  for (const cook of cookState.cooks) {
-    if (pendingIds.has(cook.id)) next.set(cook.id, cook);
-    else if (!serverIds.has(cook.id)) writes.push({ store: 'cooks', delete: cook.id });
-  }
-  for (const cook of serverCooks) {
-    if (pendingIds.has(cook.id)) continue;
-    next.set(cook.id, cook);
-    writes.push({ store: 'cooks', put: cook });
-  }
-
-  const meatsNext = new Map<string, Meat>();
-  const serverMeatIds = new Set(serverMeats.map((meat) => meat.id));
-  for (const meat of cookState.meats) {
-    if (pendingMeats.has(meat.id)) meatsNext.set(meat.id, meat);
-    else if (!serverMeatIds.has(meat.id)) writes.push({ store: 'meats', delete: meat.id });
-  }
-  for (const meat of serverMeats) {
-    if (pendingMeats.has(meat.id)) continue;
-    meatsNext.set(meat.id, meat);
-    writes.push({ store: 'meats', put: meat });
-  }
-
-  cookState = { ready: true, cooks: sorted(next.values()), meats: [...meatsNext.values()] };
+  storeState = {
+    ready: true,
+    cooks: sorted(
+      mergePulled('cooks', storeState.cooks, server.cooks, pendingIds(ops, 'cooks'), writes),
+    ),
+    meats: mergePulled('meats', storeState.meats, server.meats, pendingIds(ops, 'meats'), writes),
+    tastings: sortedTastings(
+      mergePulled(
+        'tastings',
+        storeState.tastings,
+        server.tastings,
+        pendingIds(ops, 'tastings'),
+        writes,
+      ),
+    ),
+  };
   emit();
   dbWrite(writes).catch((err) => console.error('Could not save to IndexedDB', err));
   return true;
@@ -182,16 +212,16 @@ export const remapMeat = (oldId: string, meat: Meat): Promise<void> => {
     { store: 'meats', put: meat },
   ];
 
-  const cooks = cookState.cooks.map((cook) => {
+  const cooks = storeState.cooks.map((cook) => {
     if (cook.meatId !== oldId) return cook;
     const moved = { ...cook, meatId: meat.id };
     writes.push({ store: 'cooks', put: moved });
     return moved;
   });
-  cookState = {
-    ready: true,
+  storeState = {
+    ...storeState,
     cooks: sorted(cooks),
-    meats: [...cookState.meats.filter((m) => m.id !== oldId && m.id !== meat.id), meat],
+    meats: [...storeState.meats.filter((m) => m.id !== oldId && m.id !== meat.id), meat],
   };
   emit();
 

@@ -2,6 +2,7 @@
 // Shared API types
 
 import type { CookEventTypeKey } from './cookEventTypes.js';
+import type { TastingCategoryKey, TastingDetails } from './tastingCategories.js';
 
 export type Meat = {
   id: string;
@@ -59,7 +60,26 @@ export type CookEventUpsert = Omit<CookEvent, 'id' | 'cookId' | 'createdAt'> & {
 /** Body of PUT /api/meats/:id (the id comes from the path). */
 export type MeatUpsert = { name: string; createdAt?: string; updatedAt: string };
 
-export type SyncResponse = { cooks: CookWithEvents[]; meats: Meat[] };
+export type Tasting = {
+  id: string;
+  category: TastingCategoryKey;
+  name: string;
+  maker: string | null;
+  /** Local date (YYYY-MM-DD). */
+  tastedOn: string | null;
+  rating: number | null;
+  notes: string | null;
+  /** Category spec and note values, keyed by field key (see tastingCategories). */
+  details: TastingDetails;
+  source: 'app' | 'import';
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Body of PUT /api/tastings/:id (the id comes from the path). */
+export type TastingUpsert = Omit<Tasting, 'id' | 'createdAt'> & { createdAt?: string };
+
+export type SyncResponse = { cooks: CookWithEvents[]; meats: Meat[]; tastings: Tasting[] };
 
 export type NextTimeNote = {
   cookId: string;

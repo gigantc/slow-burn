@@ -5,6 +5,7 @@
 import { sql } from 'drizzle-orm';
 import { index, uniqueIndex, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import type { CookEventTypeKey } from '../../shared/cookEventTypes.js';
+import type { TastingCategoryKey } from '../../shared/tastingCategories.js';
 
 const now = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
 
@@ -82,4 +83,33 @@ export const cookEvents = sqliteTable(
     updatedAt: text('updated_at').notNull().default('1970-01-01T00:00:00.000Z'),
   },
   (t) => [index('cook_events_cook_idx').on(t.cookId)],
+);
+
+//////////////////////////////////////
+// Tastings
+// One table for every category. The category's own fields (age, vintage, nose...) live in
+// `details`, a JSON object keyed by the field keys in shared/tastingCategories.ts, so a new
+// category needs no migration. Only `name` is required. `updatedAt` is client-supplied
+// (last-write-wins, as with cooks).
+
+export const tastings = sqliteTable(
+  'tastings',
+  {
+    id: text('id').primaryKey(),
+    category: text('category').$type<TastingCategoryKey>().notNull(),
+    name: text('name').notNull(),
+    maker: text('maker'),
+    // Local calendar date (YYYY-MM-DD)
+    tastedOn: text('tasted_on'),
+    // 1-5, enforced at the API (same reason as cooks)
+    rating: integer('rating'),
+    notes: text('notes'),
+    details: text('details').notNull().default('{}'),
+    source: text('source', { enum: ['app', 'import'] })
+      .notNull()
+      .default('app'),
+    createdAt: text('created_at').notNull().default(now),
+    updatedAt: text('updated_at').notNull().default(now),
+  },
+  (t) => [index('tastings_category_idx').on(t.category)],
 );

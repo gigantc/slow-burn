@@ -12,6 +12,7 @@ import { config } from './config.js';
 import { errorBody, errorHandler } from './errors.js';
 import { cookRoutes } from './routes/cooks.js';
 import { healthRoutes } from './routes/health.js';
+import { tastingRoutes } from './routes/tastings.js';
 
 export const buildApp = async () => {
   const app = Fastify({
@@ -45,6 +46,7 @@ export const buildApp = async () => {
         guarded.addHook('preHandler', requireAuth);
         await guarded.register(guardedAuthRoutes);
         await guarded.register(cookRoutes);
+        await guarded.register(tastingRoutes);
       });
     },
     { prefix: '/api' },

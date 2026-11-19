@@ -1,5 +1,5 @@
 //////////////////////////////////////
-// Cook detail
+// Cook detail (the header is the shared DetailHeader)
 // Desktop: header, a main column (chart, prep, notes) and an aside (stats, next time, timeline).
 // Phone: one column in a reading order set with `order`: stats, next time, chart, notes,
 // timeline, actions.
@@ -19,102 +19,6 @@
     align-items:stretch;
     gap:v.$space-20;
   }
-
-  //////////////////////////////////////
-  // Header
-
-  > header{
-    display:grid;
-    grid-template-areas:
-      'crumb edit'
-      'title edit'
-      'rating edit'
-      'meta edit';
-    grid-template-columns:minmax(0, 1fr) auto;
-    align-items:end;
-    gap:v.$space-sm v.$space-md;
-    flex:0 0 100%;
-
-    nav{ grid-area:crumb; }
-    h1{ grid-area:title; }
-    .meta{ grid-area:meta; }
-    .rating{ grid-area:rating; }
-    .edit{ grid-area:edit; }
-
-    .back,
-    .eyebrow{ display:none; }
-
-    .meta{
-      color:v.$muted;
-      font-size:1.5rem;
-    }
-
-    // Stars with a quiet "Rate it" while unrated; the first star lines up with the title
-    .rating{
-      display:flex;
-      align-items:center;
-      gap:v.$space-sm;
-      margin:0px 0px 0px -12px;
-
-      small{ color:v.$muted; }
-    }
-    .eyebrow{ @include v.eyebrow; }
-
-    @include v.breakpoint(v.$bp-md){
-      grid-template-areas:
-        'back edit'
-        'eyebrow eyebrow'
-        'title title'
-        'rating rating'
-        'meta meta';
-      grid-template-columns:44px 44px;
-      justify-content:space-between;
-      align-items:center;
-      gap:v.$space-xs;
-      margin:0px -12px;
-
-      nav{ display:none; }
-
-      .back{
-        display:flex;
-        grid-area:back;
-        align-items:center;
-        justify-content:center;
-        width:44px;
-        height:44px;
-        border-radius:v.$radius-md;
-        color:v.$text;
-
-        &:focus-visible{
-          outline:none;
-          box-shadow:inset 0px 0px 0px 2px v.$accent;
-        }
-      }
-
-      // The Edit button shrinks to a plain 44px icon button
-      .edit{
-        min-height:44px;
-        padding:0px;
-        background:none;
-        border-radius:v.$radius-md;
-
-        span{ display:none; }
-      }
-
-      .eyebrow{
-        display:block;
-        grid-area:eyebrow;
-        margin:v.$space-sm 12px 0px 12px;
-        color:v.$type;
-      }
-      h1,
-      .meta{ margin:0px 12px; }
-      .rating{ margin:0px; }
-      .meta{ font-size:1.4rem; }
-    }
-  }
-
-  @include v.category-classes;
 
   //////////////////////////////////////
   // Columns

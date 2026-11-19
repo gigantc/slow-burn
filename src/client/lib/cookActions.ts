@@ -5,7 +5,7 @@
 
 import { meatKey } from 'shared/meats';
 import type { Cook, CookEvent, CookWithEvents, Meat, NextTimeNote } from 'shared/types';
-import { getCookState, mutate } from '@/lib/cookStore';
+import { getStoreState, mutate } from '@/lib/store';
 import { requestSync } from '@/lib/sync';
 import { fetchNextTime } from '@/lib/transport';
 
@@ -33,7 +33,7 @@ const BLANK: CookFields = {
   nextTimeNote: null,
 };
 
-const findCook = (id: string) => getCookState().cooks.find((cook) => cook.id === id);
+const findCook = (id: string) => getStoreState().cooks.find((cook) => cook.id === id);
 
 const commit = (...args: Parameters<typeof mutate>) => {
   void mutate(...args).then(requestSync);
@@ -53,7 +53,7 @@ export const addMeat = (name: string): Meat => {
   const nameKey = meatKey(trimmed);
   if (!nameKey) throw new Error('A meat needs a name.');
 
-  const existing = getCookState().meats.find((meat) => meat.nameKey === nameKey);
+  const existing = getStoreState().meats.find((meat) => meat.nameKey === nameKey);
   if (existing) return existing;
 
   const now = new Date().toISOString();

@@ -4,6 +4,7 @@
 import { Type } from 'typebox';
 import type { TSchema } from 'typebox';
 import { cookEventTypeKeys } from '../../shared/cookEventTypes.js';
+import { tastingCategoryKeys } from '../../shared/tastingCategories.js';
 import { RATING_MAX, RATING_MIN } from '../../shared/constants.js';
 
 // Null first: Fastify's Ajv coerces types, and would turn null into "" or 0 if the other branch led.
@@ -20,6 +21,7 @@ const text = (maxLength: number) => nullable(Type.String({ maxLength }));
 
 export const idParam = Type.String({ pattern: '^[A-Za-z0-9_-]{1,64}$' });
 
+export const tastingParams = Type.Object({ id: idParam });
 export const cookParams = Type.Object({ id: idParam });
 export const eventParams = Type.Object({ id: idParam, eventId: idParam });
 
@@ -63,3 +65,25 @@ export const eventBody = Type.Object({
 });
 
 export const nextTimeQuery = Type.Object({ meatId: idParam });
+
+//////////////////////////////////////
+// Tastings
+
+const tastingCategory = () => Type.Union(tastingCategoryKeys.map((key) => Type.Literal(key)));
+
+export const tastingBody = Type.Object({
+  category: tastingCategory(),
+  name: Type.String({ minLength: 1, maxLength: 200 }),
+  maker: text(200),
+  tastedOn: nullable(calendarDate()),
+  rating: nullable(Type.Integer({ minimum: RATING_MIN, maximum: RATING_MAX })),
+  notes: text(20000),
+  // Untyped on purpose: Ajv would coerce numbers to strings. The route checks each value against
+  // the category's fields (see cleanDetails).
+  details: Type.Record(Type.String(), Type.Unknown(), { maxProperties: 50 }),
+  source: Type.Union([Type.Literal('app'), Type.Literal('import')]),
+  createdAt: Type.Optional(isoTimestamp()),
+  updatedAt: isoTimestamp(),
+});
+
+export const tastingsQuery = Type.Object({ category: Type.Optional(tastingCategory()) });
