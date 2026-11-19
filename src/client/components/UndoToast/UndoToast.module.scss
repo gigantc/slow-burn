@@ -15,8 +15,10 @@
   justify-content:center;
   pointer-events:none;
 
+  // On phone it sits at the top: at the bottom it would cover the live event grid
   @include v.breakpoint(v.$bp-md){
-    bottom:calc(#{v.$tabbar-height} + #{v.$space-md} + env(safe-area-inset-bottom));
+    top:calc(#{v.$space-sm} + env(safe-area-inset-top));
+    bottom:auto;
   }
 
   div{

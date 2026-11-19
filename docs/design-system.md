@@ -258,6 +258,12 @@ Shared: name, maker, date, photo, rating. Category fields (as data, with the cat
 - **"Log a tasting"** links to the existing Tastings placeholder route until tastings are built. Whether whisky, cigar and wine stay under one Tastings item or become separate nav items is undecided.
 - **Phone Menu sheet** is not designed: restyle the existing menu with the new tokens. Expect it to change.
 - **Undesigned states** (no live cook, empty Lately, loading, sync pending/offline/error) are designed on the fly from these tokens and components, built to be easy to change.
+- **Est. done (Live cook) is out, not deferred.** Cook time can't be predicted reliably (too many variables), so the app doesn't guess.
+- **TempChart is in** (Live and Cook detail). Readings are logged occasionally, not constantly, so it hides until there are at least 2 and must read well with sparse points.
+- **Meat chips** under the picker show staples: most cooks first, ties to the least recently cooked.
+- **Wood** does not prefill from the last cook; past woods are suggestions only.
+- **Wrap-up stat tiles** show derived values only (Total time, Rested); End time and Final temp stay editable fields.
+- **Sign-in** sits on the active theme's sky with the badge lockup and a show/hide password toggle.
 
 ## Copy
 

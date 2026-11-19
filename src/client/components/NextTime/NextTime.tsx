@@ -12,6 +12,11 @@ type CardProps = {
   children: ReactNode;
 };
 
+type StripProps = {
+  variant: 'strip';
+  children: ReactNode;
+};
+
 type FieldProps = {
   variant: 'field';
   /** Under the eyebrow, e.g. "Shown first when you start your next pork shoulder." */
@@ -25,8 +30,22 @@ const Eyebrow = () => (
   </strong>
 );
 
-/** The note to future you: read-only `card` (New cook, Detail) or editable `field` (Wrap-up). */
-const NextTime = (props: CardProps | FieldProps) => {
+/**
+ * The note to future you: read-only `card` (New cook, Detail), one-line `strip` (Live) or
+ * editable `field` (Wrap-up).
+ */
+const NextTime = (props: CardProps | StripProps | FieldProps) => {
+  if (props.variant === 'strip') {
+    return (
+      <aside className={`${styles.card} ${styles.strip}`}>
+        <Icon name="arrow" />
+        <p>
+          <strong>Next time:</strong> {props.children}
+        </p>
+      </aside>
+    );
+  }
+
   if (props.variant === 'field') {
     const { variant: _variant, hint, ...rest } = props;
     return (

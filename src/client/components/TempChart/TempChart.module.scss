@@ -1,0 +1,102 @@
+//////////////////////////////////////
+// Temp chart
+// The SVG stretches to the card's width; every stroke is non-scaling so lines keep their weight.
+
+//imports
+@use 'scss/variables' as v;
+
+.chart{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-12;
+  margin:0px;
+  padding:v.$space-md v.$space-20;
+  background-color:v.$card;
+  border-radius:v.$radius-lg;
+  box-shadow:v.$shadow-card;
+
+  figcaption{
+    display:flex;
+    align-items:center;
+    gap:v.$space-md;
+    color:v.$muted;
+    font-size:1.3rem;
+
+    h3{
+      margin:0px auto 0px 0px;
+      color:v.$text;
+      font-size:1.8rem;
+    }
+
+    // Legend: a short bar in the series color
+    span{
+      display:flex;
+      align-items:center;
+      gap:6px;
+
+      &::before{
+        content:'';
+        width:14px;
+        height:4px;
+        border-radius:2px;
+        background-color:currentColor;
+      }
+    }
+    .meat{ color:v.$accent; }
+  }
+
+  svg{
+    width:100%;
+    height:170px;
+    overflow:visible;
+  }
+
+  line,
+  polyline{
+    fill:none;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+  }
+
+  .pitLine{
+    stroke:v.$muted;
+    stroke-width:2.5;
+  }
+  .meatLine{
+    stroke:v.$accent;
+    stroke-width:3;
+  }
+  // One marker per reading, so sparse data reads as points joined by straight lines
+  .pitDot{
+    stroke:v.$muted;
+    stroke-width:8;
+  }
+  .meatDot{
+    stroke:v.$accent;
+    stroke-width:8;
+  }
+  .latest{
+    stroke:v.$accent;
+    stroke-width:12;
+  }
+  .target{
+    stroke:v.$accent;
+    stroke-dasharray:5 5;
+    stroke-width:1.5;
+    opacity:0.5;
+  }
+  .wrap{
+    stroke:v.$muted;
+    stroke-dasharray:3 4;
+    stroke-width:1.5;
+    opacity:0.6;
+  }
+
+  p{
+    display:flex;
+    justify-content:space-between;
+    color:v.$muted;
+    font-size:1.2rem;
+  }
+}

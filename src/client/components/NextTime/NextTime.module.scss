@@ -20,7 +20,7 @@
     border-radius:v.$radius-lg;
   }
 
-  strong{
+  > strong{
     @include v.eyebrow;
     display:flex;
     align-items:center;
@@ -76,4 +76,35 @@
   }
   // Separate selector from the font shorthand above (the minifier reorders same-rule declarations)
   > textarea{ @include v.display-axes; }
+}
+
+// One line with the arrow, for the live screen: the note is read at a glance between taps
+.strip{
+  flex-direction:row;
+  align-items:flex-start;
+  gap:v.$space-12;
+  padding:v.$space-md;
+  border-radius:v.$radius-field;
+  box-shadow:v.$next-time-ring;
+
+  svg{
+    flex:none;
+    width:2rem;
+    height:2rem;
+    margin:2px 0px 0px 0px;
+    color:v.$next-time-label;
+  }
+
+  // Plain body text here, not the serif of the card
+  p{
+    font:400 1.5rem/1.4 v.$font-body;
+
+    @include v.breakpoint(v.$bp-md){ font-size:1.5rem; }
+  }
+  strong{
+    color:v.$next-time-label;
+    font-weight:700;
+  }
+  // Undo the card's display axes (the strip is DM Sans); separate rule, see the card's p
+  > p{ font-variation-settings:normal; }
 }

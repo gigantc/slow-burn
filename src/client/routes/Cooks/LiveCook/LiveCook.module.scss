@@ -1,60 +1,219 @@
 //////////////////////////////////////
 // Live cook
+// Phone: header row (back, pill, menu), meat and meta, the clock, temps, event grid, timeline,
+// on the phone sky. Desktop: breadcrumb header, a main column (stats, chart, note, events) and
+// the timeline in a card on the right.
 
 //imports
 @use 'scss/variables' as v;
 
 .live{
   display:flex;
-  flex-direction:column;
-  gap:v.$space-lg;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:28px v.$space-32;
 
-  header{
-    display:flex;
+  @include v.breakpoint(v.$bp-md){
     flex-direction:column;
-    gap:v.$space-xs;
-
-    p{ color:v.$muted; }
-
-    // Elapsed time, readable at arm's length
-    strong{
-      color:v.$accent;
-      font:700 4.8rem/1 v.$font-body;
-      font-variant-numeric:tabular-nums;
-    }
+    flex-wrap:nowrap;
+    align-items:stretch;
+    gap:v.$space-20;
   }
 
-  .events{
+  > p{ flex:0 0 100%; }
+
+  //////////////////////////////////////
+  // Header
+
+  > header{
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
-    gap:v.$space-sm;
+    grid-template-areas:
+      'crumb pill menu'
+      'title pill menu'
+      'meta pill menu';
+    grid-template-columns:minmax(0, 1fr) auto auto;
+    align-items:end;
+    gap:v.$space-sm v.$space-md;
+    flex:0 0 100%;
 
-    button{
-      min-height:calc(#{v.$tap-target} * 1.4);
-      padding:0px v.$space-sm;
-      background-color:v.$card;
-      border:2px solid v.$border;
-      border-radius:v.$radius-md;
-      color:v.$text;
-      font:700 1.7rem/1.2 v.$font-body;
-      transition:transform 0.1s;
+    nav{ grid-area:crumb; }
+    h1{ grid-area:title; }
+    .meta{ grid-area:meta; }
+    .pill{
+      grid-area:pill;
+      align-self:center;
+    }
+    .menu{
+      grid-area:menu;
+      align-self:center;
+    }
 
-      &:active{ transform:scale(0.97); }
-      &:focus-visible{
-        outline:none;
-        box-shadow:inset 0px 0px 0px 3px v.$accent;
+    .pill{
+      @include v.eyebrow;
+      display:flex;
+      align-items:center;
+      gap:v.$space-sm;
+      padding:v.$space-sm v.$space-12;
+      background-color:v.$cat-soft;
+      border-radius:v.$radius-pill;
+      color:v.$cat;
+
+      &::before{
+        content:'';
+        width:8px;
+        height:8px;
+        background-color:v.$accent;
+        border-radius:v.$radius-pill;
       }
     }
 
-    @include v.breakpoint(v.$bp-sm){
-      grid-template-columns:1fr 1fr;
+    .menu{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:44px;
+      height:44px;
+      border-radius:v.$radius-md;
+      color:v.$text;
+
+      &:hover{ color:v.$text; }
+      &:focus-visible{
+        outline:none;
+        box-shadow:inset 0px 0px 0px 2px v.$accent;
+      }
+    }
+
+    // Phone only: on desktop the breadcrumb is the way back
+    .back{ display:none; }
+
+    @include v.breakpoint(v.$bp-md){
+      grid-template-areas:
+        'back pill menu'
+        'title title title'
+        'meta meta meta';
+      grid-template-columns:44px 1fr 44px;
+      align-items:center;
+      gap:v.$space-xs v.$space-sm;
+      margin:0px -12px 0px -12px;
+
+      nav{ display:none; }
+      .back{
+        display:flex;
+        grid-area:back;
+        align-items:center;
+        justify-content:center;
+        width:44px;
+        height:44px;
+        border-radius:v.$radius-md;
+        color:v.$text;
+
+        &:focus-visible{
+          outline:none;
+          box-shadow:inset 0px 0px 0px 2px v.$accent;
+        }
+      }
+      .pill{ justify-self:center; }
+
+      h1,
+      .meta{ margin:0px 12px; }
+      .meta{
+        color:v.$muted-sky;
+
+        span{ display:none; }
+      }
     }
   }
 
-  // Kept well away from the event grid so it can't be tapped by mistake
-  .finish{
-    margin:v.$space-lg 0px 0px 0px;
-    padding:v.$space-lg 0px 0px 0px;
-    border-top:1px solid v.$border;
+  //////////////////////////////////////
+  // Main column
+
+  .main{
+    display:flex;
+    flex:3 1 520px;
+    flex-direction:column;
+    gap:v.$space-20;
+    min-width:0px;
+
+    @include v.breakpoint(v.$bp-md){ flex:none; }
+  }
+
+  // After the events on phone, so the buttons stay near the top
+  .chart{
+    @include v.breakpoint(v.$bp-md){ order:1; }
+  }
+
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:v.$space-12;
+
+    @include v.breakpoint(v.$bp-md){ grid-template-columns:1fr 1fr; }
+
+    // The elapsed clock: a tile on desktop, the big clock on the sky on phone
+    > p{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:v.$space-sm;
+      padding:v.$space-lg;
+      background-color:v.$card;
+      border-radius:v.$radius-lg;
+      box-shadow:v.$shadow-card;
+
+      @include v.breakpoint(v.$bp-md){
+        grid-column:1 / -1;
+        gap:0px;
+        padding:0px;
+        background:none;
+        box-shadow:none;
+      }
+    }
+
+    // Longhands: data gets tabular-nums from _base.scss; the `font` shorthand would reset it.
+    // Fraunces is set here because the clock is a number, not a heading.
+    > p data{
+      font-family:v.$font-display;
+      font-size:5.2rem;
+      font-weight:500;
+      line-height:1;
+      letter-spacing:-0.02em;
+      @include v.display-axes;
+
+      @include v.breakpoint(v.$bp-md){
+        font-size:8rem;
+        line-height:0.9;
+        letter-spacing:-0.03em;
+      }
+    }
+
+    .since{ display:none; }
+
+    @include v.breakpoint(v.$bp-md){
+      .label{ display:none; }
+      .since{
+        display:block;
+        margin:v.$space-sm 0px 0px 0px;
+        color:v.$muted-sky;
+      }
+    }
+  }
+
+  //////////////////////////////////////
+  // Timeline
+
+  .log{
+    flex:2 1 300px;
+    min-width:0px;
+    padding:v.$space-20 22px;
+    background-color:v.$panel-alt;
+    border-radius:v.$radius-lg;
+
+    h2{ margin:0px 0px v.$space-sm 0px; }
+
+    @include v.breakpoint(v.$bp-md){
+      flex:none;
+      padding:0px;
+      background:none;
+    }
   }
 }

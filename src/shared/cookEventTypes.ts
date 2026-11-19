@@ -14,7 +14,7 @@ export type CookEventTypeDef = {
 export const cookEventTypes = [
   { key: 'on_pit', label: 'On the pit' },
   { key: 'pit_temp', label: 'Pit temp', value: { unit: '°F' } },
-  { key: 'internal_temp', label: 'Internal temp', value: { unit: '°F' } },
+  { key: 'internal_temp', label: 'Meat temp', value: { unit: '°F' } },
   { key: 'spritz', label: 'Spritz' },
   { key: 'wrap', label: 'Wrap' },
   { key: 'add_wood', label: 'Add wood' },

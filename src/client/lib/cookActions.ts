@@ -138,6 +138,13 @@ export const addEvent = (cookId: string, input: EventInput): CookEvent => {
   return event;
 };
 
+/** Log "Off the pit" once: a cook that already has one (backed out of Wrap-up) isn't logged again. */
+export const markOffPit = (cookId: string) => {
+  const cook = findCook(cookId);
+  if (cook?.events.some((event) => event.type === 'off_pit')) return;
+  addEvent(cookId, { type: 'off_pit' });
+};
+
 export const updateEvent = (
   cookId: string,
   eventId: string,

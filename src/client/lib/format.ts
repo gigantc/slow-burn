@@ -61,6 +61,12 @@ export const formatDuration = (ms: number) => {
   return hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
 };
 
+/** "6:12": elapsed hours and minutes as a clock. */
+export const formatClock = (ms: number) => {
+  const minutes = Math.max(0, Math.round(ms / 60_000));
+  return `${Math.floor(minutes / 60)}:${pad(minutes % 60)}`;
+};
+
 /** "7:00 AM" for today, otherwise "Nov 27, 2025, 7:00 AM". */
 export const formatWhen = (iso: string, now = Date.now()) =>
   localDate(iso) === localDate(new Date(now).toISOString())

@@ -1,0 +1,79 @@
+//////////////////////////////////////
+// Event grid
+// Phone: three to a row, 92px tall; "Off the pit" is a full-width 64px row below. Desktop:
+// auto-fill, 84px tall; "Off the pit" is just the last cell.
+
+//imports
+@use 'scss/variables' as v;
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));
+  gap:v.$space-sm;
+
+  button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:v.$space-sm;
+    min-height:84px;
+    padding:0px v.$space-sm;
+    background-color:v.$raised;
+    border-radius:v.$radius-field;
+    color:v.$text;
+    font:600 1.5rem/1.2 v.$font-body;
+    transition:transform 0.1s, background-color 0.15s;
+
+    svg{
+      width:2.6rem;
+      height:2.6rem;
+      color:v.$accent;
+    }
+
+    &:hover{ background-color:color-mix(in srgb, v.$raised 85%, v.$text); }
+    &:active{ transform:scale(0.97); }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$accent;
+    }
+  }
+
+  .off{
+    background-color:v.$accent;
+    color:v.$on-accent;
+    font-weight:700;
+
+    svg{ color:inherit; }
+    &:hover{ background-color:color-mix(in srgb, v.$accent 85%, v.$text); }
+    &:focus-visible{ box-shadow:inset 0px 0px 0px 3px v.$text; }
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:v.$space-12;
+
+    button{
+      min-height:92px;
+      border-radius:v.$radius-button;
+
+      svg{
+        width:2.8rem;
+        height:2.8rem;
+      }
+    }
+
+    .off{
+      flex-direction:row;
+      grid-column:1 / -1;
+      gap:v.$space-12;
+      min-height:64px;
+      font-size:1.8rem;
+
+      svg{
+        width:2.2rem;
+        height:2.2rem;
+      }
+    }
+  }
+}

@@ -1,53 +1,66 @@
 //////////////////////////////////////
 // Timeline
+// 48px rows with a hairline: time, a ring dot by event kind, label, value.
 
 //imports
 @use 'scss/variables' as v;
 
 .timeline{
-  display:flex;
-  flex-direction:column;
-  gap:v.$space-sm;
   margin:0px;
   padding:0px;
   list-style:none;
 
-  li > button, li > div{
+  li > button,
+  li > div{
     display:grid;
-    grid-template-columns:auto 1fr auto;
-    gap:v.$space-xs v.$space-md;
-    align-items:baseline;
+    grid-template-columns:72px 16px minmax(0, 1fr) auto;
+    align-items:center;
+    column-gap:v.$space-12;
     width:100%;
-    min-height:v.$tap-target;
-    padding:v.$space-sm v.$space-md;
-    background-color:v.$card;
-    border:1px solid v.$border;
-    border-radius:v.$radius-md;
+    min-height:48px;
+    padding:0px;
+    box-shadow:inset 0px -1px 0px v.$border;
     color:v.$text;
     text-align:left;
+
+    @include v.breakpoint(v.$bp-md){ grid-template-columns:64px 16px minmax(0, 1fr) auto; }
   }
 
   li > button{
-    &:hover{ border-color:v.$muted; }
+    transition:background-color 0.15s;
+
+    &:hover{ background-color:v.$hover; }
     &:focus-visible{
       outline:none;
       box-shadow:inset 0px 0px 0px 3px v.$accent;
     }
   }
 
-  time{ color:v.$muted; }
-
-  small{
-    display:block;
+  time{
     color:v.$muted;
-    font:400 1.2rem/1.2 v.$font-body;
+    font-size:1.4rem;
   }
 
-  strong{ font:700 1.8rem/1 v.$font-body; }
+  // The dot: a ring in the series color (set per kind below)
+  i{
+    width:10px;
+    height:10px;
+    border:2px solid v.$muted;
+    border-radius:50%;
+  }
+  .start{ border-color:v.$text; }
+  .pit{ border-color:v.$pit; }
+  .meat{ border-color:v.$accent; }
+
+  span{ font-weight:500; }
+
+  data{ font-weight:600; }
 
   p{
-    grid-column:1 / -1;
+    grid-column:3 / -1;
+    padding:0px 0px v.$space-12 0px;
     color:v.$muted;
+    font-size:1.4rem;
     white-space:pre-wrap;
   }
 }

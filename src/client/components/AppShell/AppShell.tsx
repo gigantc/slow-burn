@@ -5,6 +5,7 @@ import Nav from '@/components/Nav/Nav';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
 import { FORM_ROUTES, SKY_ROUTES } from '@/config';
 import { startSync, stopSync } from '@/lib/sync';
+import { SkyProvider, useSkyState } from '@/lib/sky';
 import { UnsavedProvider } from '@/lib/unsaved';
 import styles from './AppShell.module.scss';
 
@@ -18,7 +19,10 @@ const Shell = () => {
     if (navigationType !== 'POP') window.scrollTo(0, 0);
   }, [pathname, navigationType]);
   const form = FORM_ROUTES.some((path) => matchPath({ path, end: true }, pathname));
-  const sky = SKY_ROUTES.some((path) => matchPath({ path, end: true }, pathname));
+  // Home-style screens: the sky and the phone brand header. Others ask for the sky alone (useSky).
+  const brandSky = SKY_ROUTES.some((path) => matchPath({ path, end: true }, pathname));
+  const asked = useSkyState();
+  const sky = brandSky || asked;
 
   return (
     <div
@@ -26,7 +30,7 @@ const Shell = () => {
     >
       <Nav />
       <main>
-        {sky && (
+        {brandSky && (
           <header>
             <Brand />
             <SyncStatus />
@@ -47,7 +51,9 @@ const AppShell = () => {
 
   return (
     <UnsavedProvider>
-      <Shell />
+      <SkyProvider>
+        <Shell />
+      </SkyProvider>
     </UnsavedProvider>
   );
 };

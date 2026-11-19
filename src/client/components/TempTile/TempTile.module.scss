@@ -1,0 +1,64 @@
+//////////////////////////////////////
+// Temp tile
+
+//imports
+@use 'scss/variables' as v;
+
+.tile{
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:v.$space-12;
+  min-width:0px;
+  padding:v.$space-md;
+  background-color:v.$card;
+  border-radius:v.$radius-button;
+  box-shadow:v.$shadow-card;
+
+  @include v.breakpoint(v.$bp-md){
+    padding:14px;
+    box-shadow:none;
+  }
+
+  p{
+    display:flex;
+    align-items:baseline;
+    gap:v.$space-sm;
+  }
+
+  // Longhands on purpose: data gets tabular-nums from _base.scss, and the `font` shorthand
+  // would reset it (the minifier also reorders it ahead of the shorthand).
+  data{
+    font-size:4.4rem;
+    font-weight:600;
+    line-height:1;
+
+    @include v.breakpoint(v.$bp-md){ font-size:3.4rem; }
+  }
+  p small{ font-variant-numeric:tabular-nums; }
+
+  progress{
+    appearance:none;
+    width:100%;
+    height:6px;
+    overflow:hidden;
+    background-color:v.$sunken;
+    border:0px;
+    border-radius:3px;
+    color:var(--bar);
+
+    &::-webkit-progress-bar{ background-color:v.$sunken; }
+    &::-webkit-progress-value{
+      background-color:var(--bar);
+      border-radius:3px;
+    }
+    &::-moz-progress-bar{
+      background-color:var(--bar);
+      border-radius:3px;
+    }
+  }
+}
+
+// The two series share a tile; only the bar color differs
+.pit{ --bar:#{v.$pit}; }
+.meat{ --bar:#{v.$accent}; }

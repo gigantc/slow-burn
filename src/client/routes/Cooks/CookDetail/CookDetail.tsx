@@ -79,14 +79,7 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
         </>
       )}
       <h2>Timeline</h2>
-      {cook.events.length > 0 ? (
-        <Timeline
-          events={cook.events}
-          startedAt={cook.startedAt}
-        />
-      ) : (
-        <p>No events were logged.</p>
-      )}
+      {cook.events.length > 0 ? <Timeline events={cook.events} /> : <p>No events were logged.</p>}
       <div className={styles.actions}>
         <Button
           variant="secondary"

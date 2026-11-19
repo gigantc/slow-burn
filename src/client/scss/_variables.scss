@@ -31,6 +31,7 @@ $theme-light:(
   accent:#b83c16,
   accent-hover:#8a2a0e,
   accent-soft:#fde3d8,
+  pit:#e0866a,
   on-accent:#fffaf0,
   success:#4a6e1e,
   danger:#b3261e,
@@ -80,6 +81,7 @@ $theme-dark:(
   accent:#ff8a4c,
   accent-hover:#ffc09a,
   accent-soft:#ffb38a,
+  pit:#ffb38a,
   on-accent:#1c1520,
   success:#a2bf6e,
   danger:#ff8a80,
@@ -152,6 +154,8 @@ $muted-sky:var(--muted-sky);
 $accent:var(--accent);
 $accent-hover:var(--accent-hover);
 $accent-soft:var(--accent-soft);
+// The pit series (temp bar, timeline dot): readable on both themes, unlike accent-soft in Dawn
+$pit:var(--pit);
 $on-accent:var(--on-accent);
 $success:var(--success);
 $danger:var(--danger);
