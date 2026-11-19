@@ -1,0 +1,25 @@
+//////////////////////////////////////
+// Entry list
+
+//imports
+@use 'scss/variables' as v;
+
+.list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+  gap:v.$space-md;
+  margin:0px;
+  padding:0px;
+  list-style:none;
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-columns:1fr;
+    gap:v.$space-sm;
+  }
+}
+
+.three{
+  @include v.breakpoint(v.$bp-md){
+    li:nth-child(n+4){ display:none; }
+  }
+}

@@ -1,0 +1,47 @@
+//////////////////////////////////////
+// Search field
+
+//imports
+@use 'scss/variables' as v;
+
+.search{
+  display:flex;
+  align-items:center;
+  gap:v.$space-12;
+  min-height:48px;
+  padding:0px v.$space-md;
+  background-color:v.$card;
+  border-radius:v.$radius-field;
+  box-shadow:inset 0px 0px 0px 1px v.$field-ring;
+  color:v.$muted;
+
+  &:focus-within{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+
+  svg{
+    width:2rem;
+    height:2rem;
+  }
+
+  // The visible placeholder is the label; this is for screen readers
+  span{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip-path:inset(50%);
+  }
+
+  input{
+    flex:1;
+    min-width:0px;
+    min-height:0px;
+    padding:0px;
+    background:none;
+    border:0px;
+    border-radius:0px;
+    color:v.$text;
+    font-size:1.6rem;
+
+    &:focus-visible{ outline:none; }
+  }
+}

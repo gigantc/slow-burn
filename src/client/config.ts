@@ -56,6 +56,9 @@ export const MEAT_CHIP_COUNT = 4;
 // Past cooks of the chosen meat listed beside the New cook form.
 export const PAST_COOKS_COUNT = 5;
 
+// Phone layout switches at this width; keep in sync with $bp-md in scss/_variables.scss.
+export const BP_MD = 768;
+
 export const NAV_ITEMS: readonly { label: string; path: string; icon: IconName }[] = [
   { label: 'Home', path: '/', icon: 'home' },
   { label: 'Cooks', path: '/cooks', icon: 'flame' },

@@ -15,7 +15,7 @@ import { deleteCook, saveCook } from '@/lib/cookActions';
 import { readings, wrapSpans } from '@/lib/cookEvents';
 import { useMeatName } from '@/lib/cookHooks';
 import { cookDate, cookDetails, cookTargets } from '@/lib/cookInfo';
-import { formatDay, formatDuration } from '@/lib/format';
+import { formatDuration, formatMonthDay } from '@/lib/format';
 import { averagePit, restedMs } from '@/lib/liveStats';
 import { useBack } from '@/lib/useBack';
 import { TimelineCard } from '../Timeline/Timeline';
@@ -35,7 +35,7 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
   const [toast, setToast] = useState<Toast | null>(null);
   const [previous, setPrevious] = useState<number | null>(null);
 
-  const date = formatDay(cookDate(cook));
+  const date = formatMonthDay(cookDate(cook));
   const meta = [...cookDetails(cook), cookTargets(cook)].flatMap((part) => (part ? [part] : []));
 
   // Only the stats we can derive

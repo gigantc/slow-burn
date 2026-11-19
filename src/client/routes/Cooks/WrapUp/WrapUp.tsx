@@ -110,7 +110,7 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
           />
         )}
         <Field
-          label="Final temp"
+          label="Final meat temp"
           unit="°F"
           inputMode="decimal"
           value={finalTemp}

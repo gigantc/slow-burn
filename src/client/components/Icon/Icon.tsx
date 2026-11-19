@@ -25,6 +25,7 @@ const PATHS = {
   check: 'M5 12l5 5L20 7',
   dots: 'M5 12h.01 M12 12h.01 M19 12h.01',
   chevronLeft: 'M15 18l-6-6 6-6',
+  search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M20 20l-4-4',
   chevronDown: 'M6 9l6 6 6-6',
   chevron: 'M9 6l6 6-6 6',
   close: 'M6 6l12 12 M18 6L6 18',

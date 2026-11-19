@@ -1,0 +1,138 @@
+//////////////////////////////////////
+// Cooks filters
+// Desktop: search and sort on one row, the facet buttons under them. Phone: search on its own
+// row, then Filter and Sort side by side.
+
+//imports
+@use 'scss/variables' as v;
+
+.filters{
+  display:grid;
+  grid-template-areas:
+    'search sort'
+    'controls controls'
+    'active active'
+    'count count';
+  grid-template-columns:minmax(0, 1fr) auto;
+  gap:v.$space-12 v.$space-md;
+
+  .search{
+    grid-area:search;
+    max-width:480px;
+  }
+
+  .sort{
+    position:relative;
+    grid-area:sort;
+    display:flex;
+    align-items:center;
+    color:v.$muted;
+
+    // The visible label is the selected option; this is for screen readers
+    span{
+      position:absolute;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      clip-path:inset(50%);
+    }
+
+    select{
+      min-height:48px;
+      padding:0px 44px 0px v.$space-md;
+      appearance:none;
+      background-color:v.$card;
+      border:0px;
+      border-radius:v.$radius-field;
+      box-shadow:inset 0px 0px 0px 1px v.$field-ring;
+      color:v.$text;
+      font-size:1.5rem;
+
+      &:focus-visible{
+        outline:none;
+        box-shadow:inset 0px 0px 0px 2px v.$accent;
+      }
+    }
+
+    // The caret
+    svg{
+      position:absolute;
+      right:v.$space-12;
+      width:1.8rem;
+      height:1.8rem;
+      pointer-events:none;
+    }
+  }
+
+  .controls{
+    grid-area:controls;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:v.$space-sm;
+  }
+
+  .badge{
+    min-width:2.4rem;
+    padding:v.$space-xs v.$space-sm;
+    background-color:v.$accent;
+    border-radius:v.$radius-pill;
+    color:v.$on-accent;
+    font-size:1.3rem;
+    font-weight:700;
+    line-height:1;
+    text-align:center;
+  }
+
+  .next{ margin:0px; }
+
+  .active{
+    grid-area:active;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:v.$space-sm;
+
+    // Removable filter chips: a small x after the label
+    > button{
+      display:inline-flex;
+      align-items:center;
+    }
+    svg{
+      width:1.6rem;
+      height:1.6rem;
+      margin:0px 0px 0px v.$space-sm;
+    }
+
+    .clear{
+      min-height:44px;
+      padding:0px v.$space-12;
+      color:v.$accent;
+      font:600 1.4rem/1 v.$font-body;
+
+      &:hover{ color:v.$accent-hover; }
+      &:focus-visible{
+        outline:none;
+        box-shadow:inset 0px 0px 0px 2px v.$accent;
+      }
+    }
+  }
+
+  .count{
+    grid-area:count;
+    color:v.$muted;
+    font-size:1.4rem;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'search search'
+      'controls sort'
+      'active active'
+      'count count';
+    grid-template-columns:minmax(0, 1fr) auto;
+
+    .search{ max-width:none; }
+    .controls{ flex-wrap:nowrap; }
+  }
+}

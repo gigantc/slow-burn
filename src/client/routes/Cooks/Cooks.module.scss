@@ -1,0 +1,36 @@
+//////////////////////////////////////
+// Cooks
+
+//imports
+@use 'scss/variables' as v;
+
+.cooks{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-32;
+
+  @include v.breakpoint(v.$bp-md){ gap:v.$space-20; }
+
+  > header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:v.$space-md;
+
+    // The sidebar has New cook on desktop; the header button is for phone
+    a{ display:none; }
+
+    @include v.breakpoint(v.$bp-md){ a{ display:inline-flex; } }
+  }
+
+  > p{ color:v.$muted; }
+
+  .none{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:v.$space-md;
+
+    p{ color:v.$muted; }
+  }
+}

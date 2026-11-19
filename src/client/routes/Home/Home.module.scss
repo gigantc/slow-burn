@@ -46,15 +46,6 @@
     > p{ color:v.$muted; }
   }
 
-  ul{
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
-    gap:v.$space-md;
-    margin:0px;
-    padding:0px;
-    list-style:none;
-  }
-
   @include v.breakpoint(v.$bp-md){
     gap:v.$space-lg;
 
@@ -69,14 +60,6 @@
       gap:v.$space-sm;
 
       > header a{ font-size:1.4rem; }
-    }
-
-    ul{
-      grid-template-columns:1fr;
-      gap:v.$space-sm;
-
-      // The phone list is the three most recent
-      li:nth-child(n+4){ display:none; }
     }
   }
 }

@@ -60,3 +60,18 @@
     }
   }
 }
+
+// Without the category tag (a list that is all one category)
+.entry.plain{
+  grid-template-areas:
+    '. stars'
+    'name name'
+    'meta meta';
+  grid-template-columns:1fr auto;
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'name stars'
+      'meta stars';
+  }
+}

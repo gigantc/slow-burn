@@ -16,23 +16,23 @@ export type Entry = {
 };
 
 /** A row on phone, a card on desktop. */
-const EntryLink = ({ entry }: { entry: Entry }) => (
+const EntryLink = ({ entry, hideTag = false }: { entry: Entry; hideTag?: boolean }) => (
   <Link
-    className={styles.entry}
+    className={hideTag ? `${styles.entry} ${styles.plain}` : styles.entry}
     to={entry.href}
   >
-    <CategoryTag
-      className={styles.tag}
-      category={entry.category}
-    />
-    <h3>{entry.name}</h3>
-    <small className={styles.meta}>{entry.meta}</small>
-    {entry.rating !== undefined && (
-      <Stars
-        className={styles.stars}
-        rating={entry.rating}
+    {!hideTag && (
+      <CategoryTag
+        className={styles.tag}
+        category={entry.category}
       />
     )}
+    <h3>{entry.name}</h3>
+    <small className={styles.meta}>{entry.meta}</small>
+    <Stars
+      className={styles.stars}
+      rating={entry.rating}
+    />
   </Link>
 );
 

@@ -1,0 +1,26 @@
+//////////////////////////////////////
+// Facet group
+
+//imports
+@use 'scss/variables' as v;
+
+.group{
+  min-width:0px;
+  margin:0px;
+  padding:0px;
+  border:0px;
+
+  legend{
+    @include v.eyebrow;
+    margin:0px 0px v.$space-12 0px;
+    padding:0px;
+    color:v.$muted;
+    font-size:1.3rem;
+  }
+
+  div{
+    display:flex;
+    flex-wrap:wrap;
+    gap:v.$space-sm;
+  }
+}

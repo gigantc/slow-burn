@@ -1,10 +1,10 @@
 import { Link } from 'react-router';
 import ActionTile from '@/components/ActionTile/ActionTile';
-import { cookToEntry } from '@/components/CookList/cookCard';
-import EntryLink from '@/components/EntryLink/EntryLink';
+import EntryList from '@/components/EntryList/EntryList';
 import LiveCookCard from '@/components/LiveCookCard/LiveCookCard';
 import { LATELY_COUNT } from '@/config';
 import { useActiveCook, useCooks } from '@/lib/cookHooks';
+import { cookToEntry } from '@/lib/cookInfo';
 import { greeting } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
 import styles from './Home.module.scss';
@@ -47,13 +47,10 @@ const Home = () => {
             <Link to="/cooks">See all</Link>
           </header>
           {entries.length > 0 ? (
-            <ul>
-              {entries.map((entry) => (
-                <li key={entry.id}>
-                  <EntryLink entry={entry} />
-                </li>
-              ))}
-            </ul>
+            <EntryList
+              entries={entries}
+              phoneThree
+            />
           ) : (
             <p>Nothing logged yet. Start a cook and it will show up here.</p>
           )}

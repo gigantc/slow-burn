@@ -4,11 +4,6 @@
 import { GREETING_PERIODS } from '@/config';
 
 const localDateFormat = new Intl.DateTimeFormat('en-CA');
-const dayFormat = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
 const weekdayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
 const timeFormat = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
 
@@ -17,26 +12,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
 /** UTC ISO timestamp to the local calendar date, YYYY-MM-DD. */
 export const localDate = (iso: string) => localDateFormat.format(new Date(iso));
 
-/** "Nov 27, 2025" from a YYYY-MM-DD date or a full ISO timestamp (shown in local time). */
-export const formatDay = (iso: string) =>
-  dayFormat.format(new Date(iso.length === 10 ? `${iso}T00:00:00` : iso));
-
-const dayShortFormat = new Intl.DateTimeFormat('en-US', {
-  weekday: 'short',
-  month: 'short',
-  day: 'numeric',
-});
-
-/** "Sat, Nov 21" from a YYYY-MM-DD date or an ISO timestamp (local time); adds the year if not this year. */
-export const formatDayShort = (iso: string) => {
-  const date = new Date(iso.length === 10 ? `${iso}T00:00:00` : iso);
-  const base = dayShortFormat.format(date);
-  return date.getFullYear() === new Date().getFullYear() ? base : `${base}, ${date.getFullYear()}`;
-};
-
 const monthDayFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
-/** "Nov 8" from a YYYY-MM-DD date or an ISO timestamp (local time); adds the year if not this year. */
+/** The one cook-date format: "Mar 29", or "Mar 29, 2025" when not this year. Takes a YYYY-MM-DD date or an ISO timestamp (local time). */
 export const formatMonthDay = (iso: string) => {
   const date = new Date(iso.length === 10 ? `${iso}T00:00:00` : iso);
   const base = monthDayFormat.format(date);
@@ -66,12 +44,6 @@ export const formatClock = (ms: number) => {
   const minutes = Math.max(0, Math.round(ms / 60_000));
   return `${Math.floor(minutes / 60)}:${pad(minutes % 60)}`;
 };
-
-/** "7:00 AM" for today, otherwise "Nov 27, 2025, 7:00 AM". */
-export const formatWhen = (iso: string, now = Date.now()) =>
-  localDate(iso) === localDate(new Date(now).toISOString())
-    ? clockTime(iso)
-    : `${formatDay(iso)}, ${clockTime(iso)}`;
 
 /** "just now", "42 min ago", "2h 5m ago". */
 export const timeAgo = (iso: string, now: number) => {
