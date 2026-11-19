@@ -98,3 +98,75 @@ $tag-column:68px;
       'meta stars';
   }
 }
+
+//////////////////////////////////////
+// With a photo
+// Card: the picture across the top at a fixed shape, so cards in a row stay level. Row: the
+// picture fills the tag column; the tag becomes a strip on its bottom edge (on a dark ground, so
+// it reads over any photo).
+
+.entry.withPhoto{
+  grid-template-areas:
+    'photo photo'
+    'tag stars'
+    'name name'
+    'meta meta';
+  overflow:hidden;
+
+  .photo{
+    grid-area:photo;
+    width:calc(100% + #{v.$space-20 * 2});
+    max-width:none;
+    margin:calc(-1 * #{v.$space-20}) calc(-1 * #{v.$space-20}) 0px calc(-1 * #{v.$space-20});
+    aspect-ratio:16 / 10;
+    height:auto;
+    object-fit:cover;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'tag name stars'
+      'tag meta stars';
+
+    .photo{
+      grid-area:tag;
+      grid-row:1 / 3;
+      align-self:center;
+      width:100%;
+      height:$tag-column - 4px;
+      margin:0px;
+      aspect-ratio:auto;
+      border-radius:v.$radius-md;
+    }
+
+    // The tag shares the photo's cell, as a strip along its bottom edge
+    .tag{
+      grid-row:1 / 3;
+      align-self:end;
+      height:auto;
+      padding:v.$space-xs;
+      background-color:v.$inverse;
+      border-radius:0px 0px v.$radius-md v.$radius-md;
+      color:v.$inverse-text;
+      font-size:1rem;
+      z-index:1;
+    }
+  }
+}
+
+.entry.plain.withPhoto{
+  grid-template-areas:
+    'photo photo'
+    '. stars'
+    'name name'
+    'meta meta';
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'photo name stars'
+      'photo meta stars';
+    grid-template-columns:$tag-column 1fr auto;
+
+    .photo{ grid-area:photo; }
+  }
+}

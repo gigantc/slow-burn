@@ -7,6 +7,7 @@
 @use 'scss/variables' as v;
 
 .detail{
+  position:relative;
   display:flex;
   flex-wrap:wrap;
   align-items:flex-start;
@@ -42,12 +43,56 @@
     }
   }
 
-  // The spec tiles come first on phone; the flex bases above are widths, not heights
+  // With a photo: it sits beside the tiles (the notes drop to a row below)
+  &.withHero{
+    .hero{
+      flex:3 1 520px;
+      order:1;
+    }
+    .stats{ order:2; }
+    .main{
+      flex:1 1 100%;
+      order:3;
+    }
+  }
+
+  // The "Add photos" button of an entry without any
+  .addPhotos{
+    display:flex;
+    align-items:center;
+    gap:v.$space-sm;
+    min-height:v.$button-md;
+    padding:0px v.$space-lg;
+    background-color:v.$raised;
+    border-radius:v.$radius-field;
+    color:v.$text;
+    font:600 1.5rem/1 v.$font-body;
+
+    svg{
+      width:2rem;
+      height:2rem;
+    }
+    &:hover{ background-color:color-mix(in srgb, v.$raised 85%, v.$text); }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$text;
+    }
+  }
+
+  // Phone: the photo first, then the tiles, then the rest. The flex bases above are widths, not
+  // heights, and `.withHero` is repeated so these beat its desktop rules.
   @include v.breakpoint(v.$bp-md){
     .stats,
-    .main{ flex:none; }
-    .stats{ order:1; }
-    .main{
+    .main,
+    .hero,
+    &.withHero .hero,
+    &.withHero .main{ flex:none; }
+    .hero,
+    &.withHero .hero{ order:-1; }
+    .stats,
+    &.withHero .stats{ order:1; }
+    .main,
+    &.withHero .main{
       order:2;
       align-items:stretch;
     }

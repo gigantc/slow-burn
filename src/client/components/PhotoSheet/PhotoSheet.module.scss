@@ -1,0 +1,54 @@
+//////////////////////////////////////
+// Photo sheet
+// Lives in the shared Sheet panel: the photo at the top, a strip of thumbnails when there are
+// several, then the caption and actions.
+
+//imports
+@use 'scss/variables' as v;
+
+.large{
+  display:block;
+  align-self:center;
+  width:auto;
+  max-width:100%;
+  height:auto;
+  max-height:50dvh;
+  border-radius:v.$radius-field;
+}
+
+.strip{
+  display:flex;
+  gap:v.$space-sm;
+  margin:0px;
+  padding:0px;
+  overflow-x:auto;
+  list-style:none;
+
+  li{ flex:none; }
+
+  button{
+    display:block;
+    width:56px;
+    height:56px;
+    padding:0px;
+    overflow:hidden;
+    border-radius:v.$radius-md;
+    opacity:0.6;
+
+    &[aria-current='true']{
+      opacity:1;
+      box-shadow:inset 0px 0px 0px 3px v.$cat;
+    }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$text;
+    }
+  }
+
+  img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+}

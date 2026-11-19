@@ -66,6 +66,13 @@
     margin:v.$space-lg 0px 0px 0px;
   }
 
+  // A full-width form (no right column): lead, fields and the bar span both columns
+  &.full{
+    .lead,
+    .fields,
+    .bar{ grid-column:1 / -1; }
+  }
+
   // Phone-only top bar parts
   .cancel,
   header small{ display:none; }

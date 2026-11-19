@@ -8,6 +8,7 @@
 @use 'scss/variables' as v;
 
 .detail{
+  position:relative;
   display:flex;
   flex-wrap:wrap;
   align-items:flex-start;
@@ -41,6 +42,8 @@
     .main,
     .aside{ display:contents; }
 
+    // The photo is the first thing on phone, above the header
+    .photos{ order:-1; }
     .stats{ order:1; }
     .next{ order:2; }
     .chart{ order:3; }

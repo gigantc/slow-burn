@@ -1,0 +1,90 @@
+//////////////////////////////////////
+// Photo mosaic
+// Desktop: the featured photo on the left (two rows tall), up to two small ones on the right.
+// Phone: only the featured photo, bleeding to the screen edges and the top of the page (a
+// negative margin that cancels the shell's phone padding: use it first on a detail screen).
+
+//imports
+@use 'scss/variables' as v;
+
+.mosaic{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  grid-template-rows:repeat(2, 150px);
+  gap:v.$space-12;
+
+  &[data-small='0']{
+    grid-template-columns:1fr;
+    grid-template-rows:minmax(240px, 380px);
+  }
+
+  button{
+    position:relative;
+    display:block;
+    min-width:0px;
+    padding:0px;
+    overflow:hidden;
+    background-color:v.$sunken;
+    border-radius:v.$radius-field;
+
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$cat;
+    }
+  }
+
+  img{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+
+  .main{
+    grid-row:1 / 3;
+    border-radius:v.$radius-lg;
+  }
+  &[data-small='0'] .main{ grid-row:1; }
+  // One small photo fills the column
+  &[data-small='1'] .small{ grid-row:1 / 3; }
+
+  .count,
+  .more{
+    position:absolute;
+    background-color:v.$inverse;
+    color:v.$inverse-text;
+    font:700 1.3rem/1 v.$font-body;
+  }
+
+  // The pill is for phone, where the small photos are hidden
+  .count{ display:none; }
+
+  .more{
+    inset:0px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background-color:color-mix(in srgb, v.$inverse 70%, transparent);
+    font-size:2.2rem;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    display:block;
+    margin:calc(-1 * #{v.$space-md}) calc(-1 * #{v.$space-20}) 0px calc(-1 * #{v.$space-20});
+
+    .main{
+      width:100%;
+      height:260px;
+      border-radius:0px;
+    }
+    .small{ display:none; }
+
+    .count{
+      display:block;
+      right:v.$space-md;
+      bottom:v.$space-md;
+      padding:v.$space-sm v.$space-12;
+      border-radius:v.$radius-pill;
+    }
+  }
+}

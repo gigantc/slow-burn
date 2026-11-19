@@ -15,7 +15,7 @@ export const AUTH_HINT_KEY = 'slowburn-authed';
 // Offline data and sync
 
 export const IDB_NAME = 'slowburn';
-export const IDB_VERSION = 3;
+export const IDB_VERSION = 5;
 export const UNDO_TOAST_MS = 8_000;
 export const SYNC_INTERVAL_MS = 30_000;
 export const SYNC_RETRY_BASE_MS = 2_000;

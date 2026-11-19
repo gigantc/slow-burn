@@ -13,6 +13,7 @@ import type {
   SyncResponse,
 } from '../../shared/types.js';
 import { db } from '../db/index.js';
+import { detachPhotos, removePhotoFiles } from '../photos/cascade.js';
 import { cookEvents, cooks, meats } from '../db/schema.js';
 import { HttpError } from '../errors.js';
 import {
@@ -24,6 +25,7 @@ import {
   meatParams,
   nextTimeQuery,
 } from './schemas.js';
+import { listPhotos } from './photos.js';
 import { listTastings } from './tastings.js';
 
 // `meat_id` is nullable in the table (it was added to existing rows); the API always sets it.
@@ -47,7 +49,12 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
       .all()
       .flatMap(toCook)
       .map((cook) => ({ ...cook, events: byCook.get(cook.id) ?? [] }));
-    return { cooks: rows, meats: db.select().from(meats).all(), tastings: listTastings() };
+    return {
+      cooks: rows,
+      meats: db.select().from(meats).all(),
+      tastings: listTastings(),
+      photos: listPhotos(),
+    };
   });
 
   //////////////////////////////////////
@@ -139,7 +146,13 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
   });
 
   app.delete('/cooks/:id', { schema: { params: cookParams } }, async (request, reply) => {
-    db.delete(cooks).where(eq(cooks.id, request.params.id)).run();
+    const { id } = request.params;
+    const photoIds = db.transaction((tx) => {
+      const ids = detachPhotos(tx, 'cook', id);
+      tx.delete(cooks).where(eq(cooks.id, id)).run();
+      return ids;
+    });
+    await removePhotoFiles(photoIds);
     return reply.status(204).send();
   });
 

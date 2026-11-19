@@ -85,7 +85,17 @@ Wine moved from purple to red-wine. The old `wine` / `wine-tint` values and all 
 
 **Tasting screens recolor by category.** Switching Whisky / Cigar / Wine swaps the screen's category accent; the rest of the palette stays. Elements that follow the category: Cancel link, category switch selected pill, photo button icon, note labels (Nose / Palate / Finish), lit rating stars (fill = soft, icon = accent), the Save button, and on desktop the active "Tastings" nav item and breadcrumb link. Suggested mechanism: `data-category="cigar"` on the tasting root sets `--cat`, `--cat-soft`, `--cat-on`; components use `v.$cat`, `v.$cat-soft`, `v.$cat-on`. In Dawn, solid fills use the Dawn ink with `on-accent` text.
 
-Category tags (Home "Lately" lists): pill or square with category tint background and category ink text, uppercase 11 to 12px, weight 700.
+Category tags (Home "Lately" lists): pill or square with category ink text, uppercase 11 to 12px, weight 700. On a washed card (below) the desktop pill keeps the tint fill, so it melts into the wash and reads as a colored label; the phone square uses `rgba(card, 0.7)` so its shape still shows.
+
+**Category wash (Lately cards and rows).** Every entry card or row in a mixed list (Home "Lately", Everything) carries its category so cook, whisky, cigar and wine tell apart at a glance:
+
+- **Background:** the category color fades in from the leading corner into `card`.
+  - Dawn desktop card: `linear-gradient(160deg, tint 0%, tint 25%, card 80%)`.
+  - Dawn phone row: `linear-gradient(100deg, tint 0%, tint 15%, card 65%)` (sideways, because the row is wide and short; the tint sits behind the tag).
+  - Dusk: `linear-gradient(160deg, rgba(accent, 0.32) 0%, rgba(accent, 0) 72%), card` (phone row: same at 100deg, fading out by 65%).
+- **Stars:** category color (Dawn ink, Dusk accent) instead of `accent`.
+- Text, card shadow and radius stay as they are. Make it one shared mixin or a `category` prop on the card component, driven by the same category map, so a new category gets its wash for free.
+- Explored options (current, full tint, top stripe, wash, full color) are on the canvas under "Explore: card color".
 
 ---
 
@@ -214,7 +224,7 @@ Build these once and reuse them. Names are suggestions; check `src/client/compon
 | **EventGrid** | Buttons generated from `src/shared/cookEventTypes.ts` (still data, not code). Icon (accent stroke) over label. "Off the pit" is the accent-filled terminal action: full-width row on phone, last grid cell on desktop. |
 | **Timeline** | `<ol>`, newest first. Columns: time (tabular, muted), dot (color by event kind on Live), label, value. 44 to 48px rows with a hairline. |
 | **TempChart** | Inline SVG, two polylines (pit = muted, meat = accent), dashed wrap marker, dashed target line on Live, start and end time labels, legend in the caption. `role="img"` with a written summary as `aria-label`. Fluid width. Data from `pit_temp` and `internal_temp` events. |
-| **RatingInput** | Five star buttons, `aria-pressed`, lit = tint fill + accent icon. Display-only stars elsewhere stay the `Stars` component (★ characters, accent color, `aria-label="4 of 5 stars"`). |
+| **RatingInput** | Five star buttons, `aria-pressed`, lit = tint fill + accent icon. Display-only stars elsewhere stay the `Stars` component (★ characters, accent color, `aria-label="4 of 5 stars"`); on washed Lately cards they take the category color. |
 | **CategorySwitch** | Segmented `radiogroup`, 3 equal pills; selected pill = category accent fill with `on` text. |
 | **CategoryTag** | See Category colors. |
 | **PhotoGrid / PhotoDrop** | Square tiles, `sunken` placeholders, an "add" tile with a dashed-feel ring (`inset 0 0 0 2px border`) and plus icon. Desktop: drag and drop hint text. |

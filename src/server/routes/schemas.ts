@@ -19,7 +19,9 @@ const calendarDate = () => Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' });
 
 const text = (maxLength: number) => nullable(Type.String({ maxLength }));
 
-export const idParam = Type.String({ pattern: '^[A-Za-z0-9_-]{1,64}$' });
+// Ids are also file names (photos), so only these characters.
+export const ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+export const idParam = Type.String({ pattern: ID_PATTERN.source });
 
 export const tastingParams = Type.Object({ id: idParam });
 export const cookParams = Type.Object({ id: idParam });
@@ -87,3 +89,22 @@ export const tastingBody = Type.Object({
 });
 
 export const tastingsQuery = Type.Object({ category: Type.Optional(tastingCategory()) });
+
+//////////////////////////////////////
+// Photos
+
+export const photoParams = Type.Object({ id: idParam });
+
+export const PHOTO_CAPTION_MAX = 500;
+
+export const photoPatchBody = Type.Object({
+  caption: Type.Optional(text(PHOTO_CAPTION_MAX)),
+  // Only true: some other photo being featured is what unsets one
+  featured: Type.Optional(Type.Literal(true)),
+  sort: Type.Optional(Type.Integer({ minimum: 0, maximum: 100000 })),
+  updatedAt: isoTimestamp(),
+});
+
+export const photoQuery = Type.Object({
+  size: Type.Optional(Type.Union([Type.Literal('display'), Type.Literal('thumb')])),
+});

@@ -30,6 +30,8 @@ type PageProps = {
   notes?: ReactNode;
   /** More context (past cooks): under `notes` on desktop, after the form on phone. */
   extra?: ReactNode;
+  /** Desktop: the form takes the whole width instead of leaving the right column for notes. */
+  full?: boolean;
   /** The rest of the form. */
   children: ReactNode;
 };
@@ -53,6 +55,7 @@ export const FormPage = ({
   lead,
   notes,
   extra,
+  full = false,
   children,
 }: PageProps) => {
   const back = useBack();
@@ -68,7 +71,7 @@ export const FormPage = ({
 
   return (
     <form
-      className={styles.page}
+      className={full ? `${styles.page} ${styles.full}` : styles.page}
       onSubmit={onSubmit}
     >
       <header>

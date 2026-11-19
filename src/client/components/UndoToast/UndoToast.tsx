@@ -6,7 +6,8 @@ export type Toast = { id: string; message: string };
 
 type Props = {
   toast: Toast | null;
-  onUndo: () => void;
+  /** Leave it out for a plain notice with no Undo. */
+  onUndo?: () => void;
   onClose: () => void;
 };
 
@@ -27,12 +28,14 @@ const UndoToast = ({ toast, onUndo, onClose }: Props) => {
       {toast && (
         <div>
           <span>{toast.message}</span>
-          <button
-            type="button"
-            onClick={onUndo}
-          >
-            Undo
-          </button>
+          {onUndo && (
+            <button
+              type="button"
+              onClick={onUndo}
+            >
+              Undo
+            </button>
+          )}
         </div>
       )}
     </div>

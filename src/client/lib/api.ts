@@ -24,8 +24,15 @@ export const api = async <T>(
     res = await fetch(`${API_BASE}${path}`, {
       method: init.method ?? 'GET',
       credentials: 'same-origin',
-      headers: init.body === undefined ? undefined : { 'Content-Type': 'application/json' },
-      body: init.body === undefined ? undefined : JSON.stringify(init.body),
+      // FormData sets its own multipart Content-Type (with the boundary)
+      headers:
+        init.body === undefined || init.body instanceof FormData
+          ? undefined
+          : { 'Content-Type': 'application/json' },
+      body:
+        init.body === undefined || init.body instanceof FormData
+          ? init.body
+          : JSON.stringify(init.body),
     });
   } catch {
     throw new ApiRequestError(0, 'network', 'No connection.');

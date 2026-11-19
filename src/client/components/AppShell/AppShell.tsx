@@ -1,9 +1,12 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect } from 'react';
 import { matchPath, Outlet, useLocation, useNavigationType } from 'react-router';
 import Brand from '@/components/Brand/Brand';
 import Nav from '@/components/Nav/Nav';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
+import UndoToast from '@/components/UndoToast/UndoToast';
 import { FORM_ROUTES, SKY_ROUTES } from '@/config';
+import { setNotice } from '@/lib/store';
+import { useNotice } from '@/lib/storeHooks';
 import { startSync, stopSync } from '@/lib/sync';
 import { SkyProvider, useSkyState } from '@/lib/sky';
 import { UnsavedProvider } from '@/lib/unsaved';
@@ -22,6 +25,8 @@ const Shell = () => {
   // Home-style screens: the sky and the phone brand header. Others ask for the sky alone (useSky).
   const brandSky = SKY_ROUTES.some((path) => matchPath({ path, end: true }, pathname));
   const asked = useSkyState();
+  const notice = useNotice();
+  const closeNotice = useCallback(() => setNotice(null), []);
   const sky = brandSky || asked;
 
   return (
@@ -38,6 +43,10 @@ const Shell = () => {
         )}
         <Outlet />
       </main>
+      <UndoToast
+        toast={notice}
+        onClose={closeNotice}
+      />
     </div>
   );
 };

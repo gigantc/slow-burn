@@ -98,4 +98,35 @@
   }
 }
 
+// Over a hero photo (phone): Back and Edit float at the top corners of the screen on a
+// translucent round ground, and the rest of the header starts below the photo.
+.floating{
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'eyebrow eyebrow'
+      'title title'
+      'rating rating'
+      'meta meta';
+    grid-template-columns:1fr;
+    margin:0px;
+
+    // z-index: the photo comes later in the page and would cover them
+    .back,
+    .edit{
+      position:absolute;
+      z-index:1;
+      top:v.$space-md;
+      width:44px;
+      min-height:44px;
+      background-color:color-mix(in srgb, v.$panel 90%, transparent);
+      border-radius:v.$radius-pill;
+    }
+    .back{ left:v.$space-12; }
+    .edit{ right:v.$space-12; }
+    h1,
+    .meta,
+    .eyebrow{ margin-right:0px; margin-left:0px; }
+  }
+}
+
 @include v.category-classes;

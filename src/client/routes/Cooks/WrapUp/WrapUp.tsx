@@ -5,12 +5,14 @@ import type { CookWithEvents } from 'shared/types';
 import Field from '@/components/Field/Field';
 import { FieldGrid, FormPage } from '@/components/FormPage/FormPage';
 import NextTime from '@/components/NextTime/NextTime';
+import PhotoSection from '@/components/PhotoSection/PhotoSection';
 import RatingInput from '@/components/RatingInput/RatingInput';
 import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
 import { saveCook } from '@/lib/cookActions';
 import { latestEvent } from '@/lib/cookEvents';
 import { useCook, useCooks, useMeatName } from '@/lib/cookHooks';
 import { formatDuration, fromLocalInput, toLocalInput } from '@/lib/format';
+import { useStoredPhotos } from '@/lib/photoHooks';
 import { useUnsaved } from '@/lib/unsaved';
 import { useBack } from '@/lib/useBack';
 import CookMissing from '../CookMissing/CookMissing';
@@ -35,6 +37,8 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   const [rating, setRating] = useState(cook.rating);
   const [notes, setNotes] = useState(cook.notes ?? '');
   const [nextTime, setNextTime] = useState(cook.nextTimeNote ?? '');
+  // Photos save as they are added, not with the form
+  const photos = useStoredPhotos('cook', cook.id);
 
   const endIso = past ? cook.endedAt : edited === null ? defaultEnd : fromLocalInput(edited);
   const endMs = endIso ? new Date(endIso).getTime() : null;
@@ -81,6 +85,14 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
       barCancel={false}
       crumb={{ to: `/cooks/${cook.id}`, label: meatName, current: 'Wrap up' }}
       meta={meatName}
+      extra={
+        <PhotoSection
+          ops={photos}
+          name={meatName}
+          title="Photos"
+          addLabel="Add photos"
+        />
+      }
     >
       {(total !== null || (rested !== null && rested >= 0)) && (
         <StatTiles>

@@ -1,0 +1,84 @@
+//////////////////////////////////////
+// Photo picker
+// `tile` and `zone` are dashed-ring drop targets in the category (or accent) color; `bare` takes
+// whatever its parent gives a button.
+
+//imports
+@use 'scss/variables' as v;
+
+.picker{
+  &.tile,
+  &.zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:v.$space-sm;
+    background:none;
+    border-radius:v.$radius-field;
+    box-shadow:inset 0px 0px 0px 2px v.$field-ring;
+    color:v.$cat;
+    font:600 1.4rem/1.3 v.$font-body;
+    text-align:center;
+    transition:background-color 0.15s;
+
+    &:hover{ background-color:v.$cat-soft; }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 2px v.$cat;
+    }
+    &:disabled{
+      cursor:progress;
+      opacity:0.6;
+    }
+    &.over{
+      background-color:v.$cat-soft;
+      box-shadow:inset 0px 0px 0px 2px v.$cat;
+    }
+
+    svg{
+      width:2.8rem;
+      height:2.8rem;
+    }
+    small{
+      color:v.$muted;
+      font-weight:400;
+    }
+  }
+
+  &.tile{
+    aspect-ratio:1;
+    width:100%;
+  }
+
+  // The big drop area: fills its column on desktop, a 104px square on phone
+  &.zone{
+    width:100%;
+    min-height:420px;
+    padding:v.$space-lg;
+    border-radius:v.$radius-xl;
+
+    svg{
+      width:3.6rem;
+      height:3.6rem;
+    }
+    .short{ display:none; }
+
+    @include v.breakpoint(v.$bp-md){
+      width:104px;
+      min-height:0px;
+      aspect-ratio:1;
+      padding:v.$space-sm;
+      border-radius:v.$radius-lg;
+      font-size:1.2rem;
+
+      svg{
+        width:2.6rem;
+        height:2.6rem;
+      }
+      .long,
+      small{ display:none; }
+      .short{ display:inline; }
+    }
+  }
+}

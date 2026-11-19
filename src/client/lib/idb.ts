@@ -1,11 +1,11 @@
 //////////////////////////////////////
 // IndexedDB
-// A thin promise wrapper over the stores: `cooks` (events embedded), `meats`, `tastings` and `outbox`.
+// A thin promise wrapper over the stores: `cooks` (events embedded), `meats`, `tastings`, `photos` (metadata only), `photoBlobs` (the JPEGs waiting to upload) and `outbox`.
 // If IndexedDB is unavailable (some private modes), it falls back to memory for the session.
 
 import { IDB_NAME, IDB_VERSION } from '@/config';
 
-export type StoreName = 'cooks' | 'meats' | 'tastings' | 'outbox';
+export type StoreName = 'cooks' | 'meats' | 'tastings' | 'photos' | 'photoBlobs' | 'outbox';
 
 export type WriteOp = { store: StoreName; put: object } | { store: StoreName; delete: IDBValidKey };
 
@@ -26,6 +26,10 @@ const openDb = () => {
           db.createObjectStore('meats', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('tastings'))
           db.createObjectStore('tastings', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('photos'))
+          db.createObjectStore('photos', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('photoBlobs'))
+          db.createObjectStore('photoBlobs', { keyPath: 'id' });
         if (!db.objectStoreNames.contains('outbox')) {
           db.createObjectStore('outbox', { keyPath: 'seq', autoIncrement: true });
         }
@@ -49,6 +53,8 @@ const memory: Record<StoreName, Map<IDBValidKey, object>> = {
   cooks: new Map(),
   meats: new Map(),
   tastings: new Map(),
+  photos: new Map(),
+  photoBlobs: new Map(),
   outbox: new Map(),
 };
 let memorySeq = 1;
@@ -70,6 +76,17 @@ export const dbGetAll = async <T>(store: StoreName): Promise<T[]> => {
   return new Promise((resolve, reject) => {
     const request = db.transaction(store).objectStore(store).getAll();
     request.onsuccess = () => resolve(request.result as T[]);
+    request.onerror = () => reject(request.error);
+  });
+};
+
+export const dbGet = async <T>(store: StoreName, key: IDBValidKey): Promise<T | undefined> => {
+  const db = await openDb();
+  if (!db) return memory[store].get(key) as T | undefined;
+
+  return new Promise((resolve, reject) => {
+    const request = db.transaction(store).objectStore(store).get(key);
+    request.onsuccess = () => resolve(request.result as T | undefined);
     request.onerror = () => reject(request.error);
   });
 };

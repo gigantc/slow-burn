@@ -1,5 +1,6 @@
 import type { CookEventTypeKey } from 'shared/cookEventTypes';
 import Icon from '@/components/Icon/Icon';
+import PhotoPicker from '@/components/PhotoPicker/PhotoPicker';
 import { eventIcons, eventTypeDefs } from '@/lib/cookEvents';
 import styles from './EventGrid.module.scss';
 
@@ -12,10 +13,12 @@ type Props = {
   onTap: (type: CookEventTypeKey) => void;
   /** The terminal action: log "Off the pit" and move on to the wrap-up. */
   onOff: () => void;
+  /** Photos picked with the Photo button. It isn't an event: it's a button among them. */
+  onPhoto: (files: File[]) => void;
 };
 
 /** One button per event type from the shared data, then the accent "Off the pit" action. */
-const EventGrid = ({ wrapped, onTap, onOff }: Props) => (
+const EventGrid = ({ wrapped, onTap, onOff, onPhoto }: Props) => (
   <div
     className={styles.grid}
     role="group"
@@ -33,6 +36,13 @@ const EventGrid = ({ wrapped, onTap, onOff }: Props) => (
           {def.label}
         </button>
       ))}
+    <PhotoPicker
+      variant="bare"
+      label="Add a photo"
+      onPick={onPhoto}
+    >
+      Photo
+    </PhotoPicker>
     <button
       className={styles.off}
       type="button"

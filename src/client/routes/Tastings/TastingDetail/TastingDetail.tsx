@@ -4,9 +4,14 @@ import { getTastingCategory } from 'shared/tastingCategories';
 import Button from '@/components/Button/Button';
 import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
 import DetailHeader from '@/components/DetailHeader/DetailHeader';
+import PhotoGrid from '@/components/PhotoGrid/PhotoGrid';
+import PhotoMosaic from '@/components/PhotoMosaic/PhotoMosaic';
+import PhotoPicker from '@/components/PhotoPicker/PhotoPicker';
+import PhotoSheet from '@/components/PhotoSheet/PhotoSheet';
 import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
 import UndoToast from '@/components/UndoToast/UndoToast';
 import { formatMonthDay } from '@/lib/format';
+import { useStoredPhotos } from '@/lib/photoHooks';
 import { deleteTasting, saveTasting } from '@/lib/tastingActions';
 import { useTasting, useTastings } from '@/lib/tastingHooks';
 import { formatDetail, tastingDate } from '@/lib/tastingInfo';
@@ -22,6 +27,8 @@ const TastingDetail = () => {
   const tasting = useTasting(id);
   const { ready } = useTastings();
   const [confirming, setConfirming] = useState(false);
+  const photos = useStoredPhotos('tasting', id ?? '');
+  const [openPhoto, setOpenPhoto] = useState<string | null>(null);
   const { toast, rate, undo, close } = useRating(tasting?.rating ?? null, (rating) =>
     saveTasting({ id, rating }),
   );
@@ -40,8 +47,11 @@ const TastingDetail = () => {
     return value === undefined ? [] : [{ label: field.label, value: String(value) }];
   });
 
+  const hasPhotos = photos.photos.length > 0;
+  const others = photos.photos.filter((photo) => !photo.featured);
+
   return (
-    <div className={styles.detail}>
+    <div className={hasPhotos ? `${styles.detail} ${styles.withHero}` : styles.detail}>
       <DetailHeader
         crumb={{ to: `/tastings?category=${tasting.category}`, label: 'Tastings', current: date }}
         editTo={`/tastings/${tasting.id}/edit`}
@@ -52,7 +62,17 @@ const TastingDetail = () => {
         rating={tasting.rating}
         onRate={rate}
         meta={tasting.maker ?? undefined}
+        overHero={hasPhotos}
       />
+      {hasPhotos && (
+        <PhotoMosaic
+          className={styles.hero}
+          photos={photos.photos}
+          name={tasting.name}
+          onOpen={setOpenPhoto}
+          single
+        />
+      )}
       <div className={styles.main}>
         {notes.length > 0 && (
           <dl className={styles.notes}>
@@ -69,6 +89,28 @@ const TastingDetail = () => {
             <h2>Notes</h2>
             <p>{tasting.notes}</p>
           </section>
+        )}
+        {hasPhotos ? (
+          <PhotoGrid
+            photos={others}
+            name={tasting.name}
+            onOpen={setOpenPhoto}
+            add={
+              <PhotoPicker
+                label="Add photos"
+                onPick={photos.add}
+              />
+            }
+          />
+        ) : (
+          <PhotoPicker
+            className={styles.addPhotos}
+            variant="bare"
+            label="Add photos"
+            onPick={photos.add}
+          >
+            Add photos
+          </PhotoPicker>
         )}
         <Button
           className={styles.delete}
@@ -89,6 +131,12 @@ const TastingDetail = () => {
           ))}
         </StatTiles>
       )}
+      <PhotoSheet
+        ops={photos}
+        name={tasting.name}
+        openId={openPhoto}
+        onOpen={setOpenPhoto}
+      />
       <UndoToast
         toast={toast}
         onUndo={undo}

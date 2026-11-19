@@ -67,7 +67,21 @@ export default defineConfig(({ mode }) => {
           navigateFallback: '/index.html',
           // API calls always go to the network; never serve them from the app shell.
           navigateFallbackDenylist: [/^\/api\//],
-          runtimeCaching: [{ urlPattern: /^\/api\//, handler: 'NetworkOnly' }],
+          runtimeCaching: [
+            // A photo's bytes never change (a new photo is a new id, and the server sends them
+            // `immutable`), so once seen they are served from the cache: photos still show offline.
+            // Matched on the full URL, so no `^`. Everything else in /api stays network-only.
+            {
+              urlPattern: /\/api\/photos\/[^/?]+/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'photos',
+                expiration: { maxEntries: 400 },
+                cacheableResponse: { statuses: [200] },
+              },
+            },
+            { urlPattern: /^\/api\//, handler: 'NetworkOnly' },
+          ],
         },
       }),
     ],

@@ -29,6 +29,8 @@ const PATHS = {
   chevronDown: 'M6 9l6 6 6-6',
   chevron: 'M9 6l6 6-6 6',
   close: 'M6 6l12 12 M18 6L6 18',
+  camera: 'M4 8h3l2-3h6l2 3h3v11H4z M12 10a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z',
+  upload: 'M12 16V4 M7 9l5-5 5 5 M4 20h16',
 } as const;
 
 export type IconName = keyof typeof PATHS;

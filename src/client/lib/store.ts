@@ -1,23 +1,38 @@
 //////////////////////////////////////
-// Store (cooks, meats, tastings)
+// Store (cooks, meats, tastings, photo metadata)
 // In-memory state (what the UI reads) mirrored to IndexedDB. Every mutation updates memory
 // synchronously, then persists the change and its outbox ops in one transaction.
 
-import type { CookWithEvents, Meat, SyncResponse, Tasting } from 'shared/types';
+import type { CookWithEvents, Meat, Photo, SyncResponse, Tasting } from 'shared/types';
 import { compareCooks } from '@/lib/cookInfo';
+import { comparePhotos } from '@/lib/photoInfo';
 import { compareTastings } from '@/lib/tastingInfo';
 import { dbGetAll, dbWrite } from '@/lib/idb';
 import type { WriteOp } from '@/lib/idb';
 import type { NewOutboxOp, OutboxOp, SyncState } from '@/lib/types';
+
+/** A photo waiting to upload: its resized JPEG, kept until the server has it. */
+export type PhotoBlob = { id: string; blob: Blob };
 
 type StoreState = {
   ready: boolean;
   cooks: readonly CookWithEvents[];
   meats: readonly Meat[];
   tastings: readonly Tasting[];
+  photos: readonly Photo[];
+  /** Photos not uploaded yet, by id (also in IndexedDB). They show from here. */
+  pendingBlobs: ReadonlyMap<string, Blob>;
 };
 
-let storeState: StoreState = { ready: false, cooks: [], meats: [], tastings: [] };
+let storeState: StoreState = {
+  ready: false,
+  cooks: [],
+  meats: [],
+  tastings: [],
+  photos: [],
+  pendingBlobs: new Map(),
+};
+let notice: Notice | null = null;
 let syncState: SyncState = {
   pending: 0,
   online: typeof navigator === 'undefined' ? true : navigator.onLine,
@@ -25,6 +40,9 @@ let syncState: SyncState = {
   lastSynced: null,
 };
 let version = 0;
+
+/** A message for the person that no screen owns (a photo that couldn't upload). */
+export type Notice = { id: string; message: string };
 
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((listener) => listener());
@@ -36,6 +54,12 @@ export const subscribe = (listener: () => void) => {
 
 export const getStoreState = () => storeState;
 export const getSyncState = () => syncState;
+export const getNotice = () => notice;
+
+export const setNotice = (message: string | null) => {
+  notice = message ? { id: crypto.randomUUID(), message } : null;
+  emit();
+};
 
 /** Bumps on every local mutation; sync uses it to detect writes that raced a pull. */
 export const getMutationVersion = () => version;
@@ -45,6 +69,7 @@ export const getMutationVersion = () => version;
 
 const sorted = (cooks: Iterable<CookWithEvents>) => [...cooks].sort(compareCooks);
 const sortedTastings = (tastings: Iterable<Tasting>) => [...tastings].sort(compareTastings);
+const sortedPhotos = (photos: Iterable<Photo>) => [...photos].sort(comparePhotos);
 
 export const setSyncState = (patch: Partial<SyncState>) => {
   syncState = { ...syncState, ...patch };
@@ -60,10 +85,12 @@ export const countPending = async () => {
 // Load
 
 export const loadStore = async () => {
-  const [cooks, meats, tastings] = await Promise.all([
+  const [cooks, meats, tastings, photos, blobs] = await Promise.all([
     dbGetAll<CookWithEvents>('cooks'),
     dbGetAll<Meat>('meats'),
     dbGetAll<Tasting>('tastings'),
+    dbGetAll<Photo>('photos'),
+    dbGetAll<PhotoBlob>('photoBlobs'),
   ]);
   // Cooks saved before meats existed have no meatId; the next pull replaces them.
   storeState = {
@@ -71,6 +98,8 @@ export const loadStore = async () => {
     cooks: sorted(cooks.filter((cook) => cook.meatId)),
     meats,
     tastings: sortedTastings(tastings),
+    photos: sortedPhotos(photos),
+    pendingBlobs: new Map(blobs.map((entry) => [entry.id, entry.blob])),
   };
   emit();
   await countPending();
@@ -83,6 +112,14 @@ type Mutation = {
   upserts?: CookWithEvents[];
   meatUpserts?: Meat[];
   tastingUpserts?: Tasting[];
+  photoUpserts?: Photo[];
+  photoRemovals?: string[];
+  /** Photo files waiting to upload: stored with the metadata, dropped when it's uploaded or gone. */
+  blobUpserts?: PhotoBlob[];
+  blobRemovals?: string[];
+  /** Outbox ops to cancel (by `seq`): a photo deleted before its upload went out. */
+  outboxRemovals?: number[];
+  /** Removing a cook or tasting removes its photos' metadata too. */
   removals?: string[];
   tastingRemovals?: string[];
   ops?: NewOutboxOp[];
@@ -92,6 +129,11 @@ export const mutate = ({
   upserts = [],
   meatUpserts = [],
   tastingUpserts = [],
+  photoUpserts = [],
+  photoRemovals = [],
+  blobUpserts = [],
+  blobRemovals = [],
+  outboxRemovals = [],
   removals = [],
   tastingRemovals = [],
   ops = [],
@@ -106,11 +148,28 @@ export const mutate = ({
   const tastingsById = new Map(storeState.tastings.map((tasting) => [tasting.id, tasting]));
   tastingUpserts.forEach((tasting) => tastingsById.set(tasting.id, tasting));
   tastingRemovals.forEach((id) => tastingsById.delete(id));
+  const photosById = new Map(storeState.photos.map((photo) => [photo.id, photo]));
+  photoUpserts.forEach((photo) => photosById.set(photo.id, photo));
+  photoRemovals.forEach((id) => photosById.delete(id));
+  const goneOwners = new Set([
+    ...removals.map((id) => `cook:${id}`),
+    ...tastingRemovals.map((id) => `tasting:${id}`),
+  ]);
+  const orphaned = [...photosById.values()].filter((photo) =>
+    goneOwners.has(`${photo.ownerType}:${photo.ownerId}`),
+  );
+  orphaned.forEach((photo) => photosById.delete(photo.id));
+  const goneBlobs = [...blobRemovals, ...photoRemovals, ...orphaned.map((photo) => photo.id)];
+  const blobsById = new Map(storeState.pendingBlobs);
+  blobUpserts.forEach((entry) => blobsById.set(entry.id, entry.blob));
+  goneBlobs.forEach((id) => blobsById.delete(id));
   storeState = {
     ready: true,
     cooks: sorted(byId.values()),
     meats: [...meatsById.values()],
     tastings: sortedTastings(tastingsById.values()),
+    photos: sortedPhotos(photosById.values()),
+    pendingBlobs: blobsById,
   };
   syncState = { ...syncState, pending: syncState.pending + ops.length };
   emit();
@@ -120,6 +179,14 @@ export const mutate = ({
     ...upserts.map((cook) => ({ store: 'cooks' as const, put: cook })),
     ...meatUpserts.map((meat) => ({ store: 'meats' as const, put: meat })),
     ...tastingUpserts.map((tasting) => ({ store: 'tastings' as const, put: tasting })),
+    ...photoUpserts.map((photo) => ({ store: 'photos' as const, put: photo })),
+    ...[...photoRemovals, ...orphaned.map((photo) => photo.id)].map((id) => ({
+      store: 'photos' as const,
+      delete: id,
+    })),
+    ...blobUpserts.map((entry) => ({ store: 'photoBlobs' as const, put: entry })),
+    ...goneBlobs.map((id) => ({ store: 'photoBlobs' as const, delete: id })),
+    ...outboxRemovals.map((seq) => ({ store: 'outbox' as const, delete: seq })),
     ...removals.map((id) => ({ store: 'cooks' as const, delete: id })),
     ...tastingRemovals.map((id) => ({ store: 'tastings' as const, delete: id })),
     ...ops.map((op) => ({
@@ -138,7 +205,7 @@ export const mutate = ({
 
 const COOK_PATH = /^\/cooks\/([^/]+)/;
 
-/** Ids of one collection (`cooks`, `meats`, `tastings`) that still have unsent ops. */
+/** Ids of one collection (`cooks`, `meats`, `tastings`, `photos`) that still have unsent ops. */
 const pendingIds = (ops: OutboxOp[], collection: string) => {
   const path = new RegExp(`^/${collection}/([^/]+)`);
   return new Set(ops.flatMap((op) => path.exec(op.path)?.[1] ?? []));
@@ -150,7 +217,7 @@ const pendingIds = (ops: OutboxOp[], collection: string) => {
  * writes onto `writes`.
  */
 const mergePulled = <T extends { id: string }>(
-  store: 'cooks' | 'meats' | 'tastings',
+  store: 'cooks' | 'meats' | 'tastings' | 'photos',
   local: readonly T[],
   server: readonly T[],
   pending: Set<string>,
@@ -194,6 +261,10 @@ export const applyPull = (server: SyncResponse, ops: OutboxOp[], readVersion: nu
         writes,
       ),
     ),
+    photos: sortedPhotos(
+      mergePulled('photos', storeState.photos, server.photos, pendingIds(ops, 'photos'), writes),
+    ),
+    pendingBlobs: storeState.pendingBlobs,
   };
   emit();
   dbWrite(writes).catch((err) => console.error('Could not save to IndexedDB', err));

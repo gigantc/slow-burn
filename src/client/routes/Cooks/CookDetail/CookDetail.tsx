@@ -4,6 +4,8 @@ import type { CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
 import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
 import DetailHeader from '@/components/DetailHeader/DetailHeader';
+import PhotoMosaic from '@/components/PhotoMosaic/PhotoMosaic';
+import PhotoSheet from '@/components/PhotoSheet/PhotoSheet';
 import NextTime from '@/components/NextTime/NextTime';
 import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
 import TempChart, { hasTrend } from '@/components/TempChart/TempChart';
@@ -14,6 +16,7 @@ import { useMeatName } from '@/lib/cookHooks';
 import { cookDate, cookDetails, cookTargets } from '@/lib/cookInfo';
 import { formatDuration, formatMonthDay } from '@/lib/format';
 import { averagePit, restedMs } from '@/lib/liveStats';
+import { useStoredPhotos } from '@/lib/photoHooks';
 import { useRating } from '@/lib/useRating';
 import { TimelineCard } from '../Timeline/Timeline';
 import styles from './CookDetail.module.scss';
@@ -28,6 +31,8 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
   const meatName = useMeatName(cook.meatId);
   const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
+  const photos = useStoredPhotos('cook', cook.id);
+  const [openPhoto, setOpenPhoto] = useState<string | null>(null);
 
   const date = formatMonthDay(cookDate(cook));
   const meta = [...cookDetails(cook), cookTargets(cook)].flatMap((part) => (part ? [part] : []));
@@ -69,8 +74,17 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
         rating={cook.rating}
         onRate={rate}
         meta={meta.length > 0 ? meta.join(' · ') : undefined}
+        overHero={photos.photos.length > 0}
       />
       <div className={styles.main}>
+        {photos.photos.length > 0 && (
+          <PhotoMosaic
+            className={styles.photos}
+            photos={photos.photos}
+            name={meatName}
+            onOpen={setOpenPhoto}
+          />
+        )}
         {charted && cook.startedAt && cook.endedAt && (
           <TempChart
             className={styles.chart}
@@ -128,6 +142,12 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
           events={cook.events}
         />
       </div>
+      <PhotoSheet
+        ops={photos}
+        name={meatName}
+        openId={openPhoto}
+        onOpen={setOpenPhoto}
+      />
       <UndoToast
         toast={toast}
         onUndo={undo}

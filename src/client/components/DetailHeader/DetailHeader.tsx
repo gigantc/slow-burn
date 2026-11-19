@@ -20,6 +20,8 @@ type Props = {
   onRate: (rating: number | null) => void;
   /** One quiet line under the stars. */
   meta?: string;
+  /** A photo fills the top of the screen on phone: Back and Edit float over it. */
+  overHero?: boolean;
 };
 
 /** The top of a Cook or Tasting detail: where you are, the title, an inline rating and Edit. */
@@ -33,11 +35,12 @@ const DetailHeader = ({
   rating,
   onRate,
   meta,
+  overHero = false,
 }: Props) => {
   const back = useBack();
 
   return (
-    <header className={styles.header}>
+    <header className={overHero ? `${styles.header} ${styles.floating}` : styles.header}>
       <button
         className={styles.back}
         type="button"

@@ -1,0 +1,12 @@
+//////////////////////////////////////
+// Photo section
+
+//imports
+@use 'scss/variables' as v;
+
+.section{
+  display:flex;
+  flex-direction:column;
+
+  h2{ @include v.group-legend; }
+}

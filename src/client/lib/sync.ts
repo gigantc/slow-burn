@@ -13,6 +13,7 @@ import {
   setSyncState,
 } from '@/lib/store';
 import { dbGetAll, dbWrite } from '@/lib/idb';
+import { settleUpload } from '@/lib/photoUploads';
 import { classify, pullAll, sendOp } from '@/lib/transport';
 import type { Meat } from 'shared/types';
 import type { OutboxOp } from '@/lib/types';
@@ -46,9 +47,12 @@ const drain = async (): Promise<Result> => {
     const [op] = await readOutbox();
     if (!op) return 'ok';
 
-    const { outcome, data } = await sendOp(op);
+    const { outcome, data, error } = await sendOp(op);
     if (outcome === 'auth') return 'auth';
     if (outcome === 'retry') return 'retry';
+
+    // An upload either landed (swap in the server's row, clear the blob) or was refused for good
+    if (op.method === 'POST') await settleUpload(op, outcome, data, error?.status);
 
     // A meat PUT may come back as an existing meat with another id: remap before moving on.
     const returned = data as Meat | null | undefined;

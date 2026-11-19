@@ -12,6 +12,7 @@ import { config } from './config.js';
 import { errorBody, errorHandler } from './errors.js';
 import { cookRoutes } from './routes/cooks.js';
 import { healthRoutes } from './routes/health.js';
+import { photoRoutes } from './routes/photos.js';
 import { tastingRoutes } from './routes/tastings.js';
 
 export const buildApp = async () => {
@@ -47,6 +48,7 @@ export const buildApp = async () => {
         await guarded.register(guardedAuthRoutes);
         await guarded.register(cookRoutes);
         await guarded.register(tastingRoutes);
+        await guarded.register(photoRoutes);
       });
     },
     { prefix: '/api' },

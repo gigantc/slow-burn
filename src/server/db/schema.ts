@@ -5,6 +5,7 @@
 import { sql } from 'drizzle-orm';
 import { index, uniqueIndex, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import type { CookEventTypeKey } from '../../shared/cookEventTypes.js';
+import type { PhotoOwnerType } from '../../shared/types.js';
 import type { TastingCategoryKey } from '../../shared/tastingCategories.js';
 
 const now = sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`;
@@ -112,4 +113,28 @@ export const tastings = sqliteTable(
     updatedAt: text('updated_at').notNull().default(now),
   },
   (t) => [index('tastings_category_idx').on(t.category)],
+);
+
+//////////////////////////////////////
+// Photos
+// Metadata only; the files live behind server/photos/storage.ts. A photo belongs to a cook or a
+// tasting (no foreign key: the owner is one of two tables, so deleting an owner removes its
+// photos in code). One photo per owner is `featured`. `id` is client-generated, so a retried
+// upload is idempotent. `width` and `height` are the display size.
+
+export const photos = sqliteTable(
+  'photos',
+  {
+    id: text('id').primaryKey(),
+    ownerType: text('owner_type').$type<PhotoOwnerType>().notNull(),
+    ownerId: text('owner_id').notNull(),
+    featured: integer('featured', { mode: 'boolean' }).notNull().default(false),
+    sort: integer('sort').notNull().default(0),
+    caption: text('caption'),
+    width: integer('width').notNull(),
+    height: integer('height').notNull(),
+    createdAt: text('created_at').notNull().default(now),
+    updatedAt: text('updated_at').notNull().default(now),
+  },
+  (t) => [index('photos_owner_idx').on(t.ownerType, t.ownerId)],
 );

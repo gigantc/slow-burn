@@ -18,6 +18,7 @@ const EditTasting = () => {
       title="Edit tasting"
       submitLabel="Save changes"
       initial={tasting}
+      ownerId={tasting.id}
       category={tasting.category}
       onSave={(fields) => {
         saveTasting({ id: tasting.id, ...fields });

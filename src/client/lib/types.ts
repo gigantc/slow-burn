@@ -5,7 +5,8 @@ export type OutboxOp = {
   /** IndexedDB auto-increment key; defines send order. */
   seq: number;
   id: string;
-  method: 'PUT' | 'DELETE';
+  /** POST is a photo upload: the file is the blob stored under the same photo id. */
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   path: string;
   body?: unknown;
   createdAt: string;

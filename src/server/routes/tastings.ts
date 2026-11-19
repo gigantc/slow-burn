@@ -8,6 +8,7 @@ import { cleanDetails } from '../../shared/tastingCategories.js';
 import type { TastingCategoryKey } from '../../shared/tastingCategories.js';
 import type { Tasting } from '../../shared/types.js';
 import { db } from '../db/index.js';
+import { detachPhotos, removePhotoFiles } from '../photos/cascade.js';
 import { tastings } from '../db/schema.js';
 import { HttpError } from '../errors.js';
 import { tastingBody, tastingParams, tastingsQuery } from './schemas.js';
@@ -66,7 +67,13 @@ export const tastingRoutes: FastifyPluginAsyncTypebox = async (app) => {
   );
 
   app.delete('/tastings/:id', { schema: { params: tastingParams } }, async (request, reply) => {
-    db.delete(tastings).where(eq(tastings.id, request.params.id)).run();
+    const { id } = request.params;
+    const photoIds = db.transaction((tx) => {
+      const ids = detachPhotos(tx, 'tasting', id);
+      tx.delete(tastings).where(eq(tastings.id, id)).run();
+      return ids;
+    });
+    await removePhotoFiles(photoIds);
     return reply.status(204).send();
   });
 };

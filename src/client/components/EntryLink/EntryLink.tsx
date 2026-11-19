@@ -1,5 +1,7 @@
 import { Link } from 'react-router';
+import type { Photo } from 'shared/types';
 import CategoryTag from '@/components/CategoryTag/CategoryTag';
+import PhotoImage from '@/components/PhotoImage/PhotoImage';
 import Stars from '@/components/Stars/Stars';
 import type { EntryType } from '@/config';
 import styles from './EntryLink.module.scss';
@@ -15,12 +17,33 @@ export type Entry = {
   href: string;
 };
 
-/** A row on phone, a card on desktop. */
-const EntryLink = ({ entry, hideTag = false }: { entry: Entry; hideTag?: boolean }) => (
+/**
+ * A row on phone, a card on desktop. With a photo it shows the thumbnail: across the top of the
+ * card, or filling the tag column of the row (the tag moves onto its bottom edge).
+ */
+const EntryLink = ({
+  entry,
+  hideTag = false,
+  photo,
+}: {
+  entry: Entry;
+  hideTag?: boolean;
+  photo?: Photo;
+}) => (
   <Link
-    className={hideTag ? `${styles.entry} ${styles.plain}` : styles.entry}
+    className={[styles.entry, hideTag && styles.plain, photo && styles.withPhoto]
+      .filter(Boolean)
+      .join(' ')}
     to={entry.href}
   >
+    {/* Decorative: the link's own text already says what it is */}
+    {photo && (
+      <PhotoImage
+        className={styles.photo}
+        photo={photo}
+        alt=""
+      />
+    )}
     {!hideTag && (
       <CategoryTag
         className={styles.tag}

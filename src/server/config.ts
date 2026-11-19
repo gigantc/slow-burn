@@ -12,6 +12,8 @@ export const config = {
   port: Number(env.PORT ?? 3100),
   host: env.HOST ?? '127.0.0.1',
   dbPath: resolve(env.DB_PATH ?? './data/slowburn.db'),
+  // Photo files (see server/photos/storage.ts). Relative paths resolve from the working directory.
+  photosDir: resolve(env.PHOTOS_DIR ?? './data/photos'),
   sessionKey: env.SESSION_KEY ?? '',
   passwordHash: env.APP_PASSWORD_HASH ?? '',
   sessionCookie: 'slowburn_session',

@@ -79,7 +79,38 @@ export type Tasting = {
 /** Body of PUT /api/tastings/:id (the id comes from the path). */
 export type TastingUpsert = Omit<Tasting, 'id' | 'createdAt'> & { createdAt?: string };
 
-export type SyncResponse = { cooks: CookWithEvents[]; meats: Meat[]; tastings: Tasting[] };
+export type PhotoOwnerType = 'cook' | 'tasting';
+
+/** Photo metadata; the image files are at GET /api/photos/:id?size=thumb|display. */
+export type Photo = {
+  id: string;
+  ownerType: PhotoOwnerType;
+  ownerId: string;
+  /** One photo per owner is featured: the one shown on cards and at the top of the detail. */
+  featured: boolean;
+  sort: number;
+  caption: string | null;
+  /** Of the display size (1600px long edge at most). */
+  width: number;
+  height: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+/** Body of PATCH /api/photos/:id. Only `featured: true` is accepted; another photo being featured unsets it. */
+export type PhotoPatch = {
+  caption?: string | null;
+  featured?: true;
+  sort?: number;
+  updatedAt: string;
+};
+
+export type SyncResponse = {
+  cooks: CookWithEvents[];
+  meats: Meat[];
+  tastings: Tasting[];
+  photos: Photo[];
+};
 
 export type NextTimeNote = {
   cookId: string;

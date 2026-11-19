@@ -23,6 +23,8 @@ import { useNextTimeNote } from '@/lib/nextTime';
 import { useSky } from '@/lib/sky';
 import { useNow } from '@/lib/useNow';
 import { useWakeLock } from '@/lib/useWakeLock';
+import { addPhotos } from '@/lib/photoActions';
+import { setNotice } from '@/lib/store';
 import EventGrid from '../EventGrid/EventGrid';
 import EventSheet from '../EventSheet/EventSheet';
 import type { EventTarget } from '../EventSheet/EventSheet';
@@ -149,6 +151,11 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
           wrapped={isWrapped(cook.events)}
           onTap={tap}
           onOff={off}
+          onPhoto={(files) =>
+            void addPhotos('cook', cook.id, files).then((added) => {
+              if (added > 0) setNotice(added === 1 ? 'Photo added' : `${added} photos added`);
+            })
+          }
         />
       </div>
       {cook.events.length > 0 && (
