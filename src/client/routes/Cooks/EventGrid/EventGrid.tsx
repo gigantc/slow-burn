@@ -7,20 +7,22 @@ import styles from './EventGrid.module.scss';
 const HIDDEN: readonly CookEventTypeKey[] = ['on_pit', 'off_pit'];
 
 type Props = {
+  /** While wrapped the Wrap slot reads Unwrap, and the other way round. */
+  wrapped: boolean;
   onTap: (type: CookEventTypeKey) => void;
   /** The terminal action: log "Off the pit" and move on to the wrap-up. */
   onOff: () => void;
 };
 
 /** One button per event type from the shared data, then the accent "Off the pit" action. */
-const EventGrid = ({ onTap, onOff }: Props) => (
+const EventGrid = ({ wrapped, onTap, onOff }: Props) => (
   <div
     className={styles.grid}
     role="group"
     aria-label="Log an event"
   >
     {eventTypeDefs
-      .filter((def) => !HIDDEN.includes(def.key))
+      .filter((def) => !HIDDEN.includes(def.key) && def.key !== (wrapped ? 'wrap' : 'unwrap'))
       .map((def) => (
         <button
           key={def.key}

@@ -17,6 +17,7 @@ export const cookEventTypes = [
   { key: 'internal_temp', label: 'Meat temp', value: { unit: '°F' } },
   { key: 'spritz', label: 'Spritz' },
   { key: 'wrap', label: 'Wrap' },
+  { key: 'unwrap', label: 'Unwrap' },
   { key: 'add_wood', label: 'Add wood' },
   { key: 'off_pit', label: 'Off the pit' },
   { key: 'rest', label: 'Rest' },

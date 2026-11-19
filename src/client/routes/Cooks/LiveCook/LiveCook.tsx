@@ -13,8 +13,8 @@ import TempChart from '@/components/TempChart/TempChart';
 import TempTile from '@/components/TempTile/TempTile';
 import UndoToast from '@/components/UndoToast/UndoToast';
 import type { Toast } from '@/components/UndoToast/UndoToast';
-import { addEvent, deleteEvent, markOffPit } from '@/lib/cookActions';
-import { eventDef, latestEvent, readings } from '@/lib/cookEvents';
+import { addEvent, deleteCook, deleteEvent, markOffPit } from '@/lib/cookActions';
+import { eventDef, isWrapped, latestEvent, readings, wrapSpans } from '@/lib/cookEvents';
 import { useMeatName } from '@/lib/cookHooks';
 import { clockTime, formatClock } from '@/lib/format';
 import { meatProgress, pitProgress } from '@/lib/liveStats';
@@ -38,6 +38,7 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
   const [target, setTarget] = useState<EventTarget | null>(null);
   const [deleting, setDeleting] = useState<CookEvent | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deletingCook, setDeletingCook] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
 
   const started = cook.startedAt ? new Date(cook.startedAt).getTime() : now;
@@ -70,7 +71,6 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
     at: new Date(e.at).getTime(),
     value: e.value ?? 0,
   }));
-  const wrap = latestEvent(cook.events, 'wrap');
   const pitNow = latestEvent(cook.events, 'pit_temp')?.value ?? null;
   const meatNow = latestEvent(cook.events, 'internal_temp')?.value ?? null;
   const targets = [
@@ -146,12 +146,13 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
               start={started}
               end={Math.max(now, ...pit.map((r) => r.at), ...meat.map((r) => r.at))}
               targetMeat={cook.targetInternalTempF}
-              wrapAt={wrap ? new Date(wrap.at).getTime() : null}
+              wraps={wrapSpans(cook.events)}
             />
           </div>
         )}
         {nextTime && <NextTime variant="strip">{nextTime.nextTimeNote}</NextTime>}
         <EventGrid
+          wrapped={isWrapped(cook.events)}
           onTap={tap}
           onOff={off}
         />
@@ -178,7 +179,29 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
         >
           Edit setup
         </Button>
+        <Button
+          variant="danger"
+          size="lg"
+          onClick={() => {
+            setMenuOpen(false);
+            setDeletingCook(true);
+          }}
+        >
+          Delete cook
+        </Button>
       </Sheet>
+      <ConfirmSheet
+        open={deletingCook}
+        title="Delete this cook?"
+        message="This removes the cook and its timeline. It can't be undone."
+        confirmLabel="Delete cook"
+        cancelLabel="Keep cooking"
+        onClose={() => setDeletingCook(false)}
+        onConfirm={() => {
+          deleteCook(cook.id);
+          navigate('/', { replace: true });
+        }}
+      />
       <EventSheet
         cook={cook}
         target={target}

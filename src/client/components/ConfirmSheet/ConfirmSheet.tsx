@@ -7,11 +7,21 @@ type Props = {
   title: string;
   message: string;
   confirmLabel: string;
+  /** Wording of the dismiss button; defaults to Cancel. */
+  cancelLabel?: string;
   onConfirm: () => void;
   onClose: () => void;
 };
 
-const ConfirmSheet = ({ open, title, message, confirmLabel, onConfirm, onClose }: Props) => (
+const ConfirmSheet = ({
+  open,
+  title,
+  message,
+  confirmLabel,
+  cancelLabel = 'Cancel',
+  onConfirm,
+  onClose,
+}: Props) => (
   <Sheet
     open={open}
     onClose={onClose}
@@ -32,7 +42,7 @@ const ConfirmSheet = ({ open, title, message, confirmLabel, onConfirm, onClose }
       onClick={onClose}
       data-autofocus
     >
-      Cancel
+      {cancelLabel}
     </Button>
   </Sheet>
 );

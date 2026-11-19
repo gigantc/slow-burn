@@ -18,6 +18,7 @@ const PATHS = {
   thermometer: 'M14 14.76V4a2 2 0 0 0-4 0v10.76a4 4 0 1 0 4 0z M12 9v6',
   drop: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z',
   box: 'M3 8l9-5 9 5v8l-9 5-9-5z M3 8l9 5 9-5 M12 13v8',
+  boxOpen: 'M3 11v5l9 5 9-5v-5 M3 11l9 5 9-5 M3 11l4-5 5 3 5-3 4 5',
   wood: 'M3 17l14-10 M7 21l14-10 M3 17l4 4 M17 7l4 4',
   pencil: 'M4 20h4L19 9l-4-4L4 16z M13 7l4 4',
   pause: 'M8 5v14 M16 5v14',

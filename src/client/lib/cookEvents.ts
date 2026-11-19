@@ -33,6 +33,7 @@ export const eventIcons: Record<CookEventTypeKey, IconName> = {
   internal_temp: 'thermometer',
   spritz: 'drop',
   wrap: 'box',
+  unwrap: 'boxOpen',
   add_wood: 'wood',
   off_pit: 'check',
   rest: 'pause',
@@ -54,3 +55,27 @@ export const readings = (events: readonly CookEvent[], type: 'pit_temp' | 'inter
   events
     .filter((event) => event.type === type && event.value !== null)
     .sort((a, b) => a.at.localeCompare(b.at));
+
+/** A stretch of the cook spent wrapped: `end` is null while it's still wrapped. */
+export type WrapSpan = { start: number; end: number | null };
+
+/** Wrap and unwrap events paired into spans, in order. Handles any number of wrap cycles; a wrap
+ * while already wrapped, or an unwrap while not, is ignored. */
+export const wrapSpans = (events: readonly CookEvent[]): WrapSpan[] => {
+  const spans: WrapSpan[] = [];
+  const marks = events
+    .filter((event) => event.type === 'wrap' || event.type === 'unwrap')
+    .sort((a, b) => a.at.localeCompare(b.at));
+  for (const event of marks) {
+    const at = new Date(event.at).getTime();
+    const last = spans[spans.length - 1];
+    const open = last?.end === null;
+    if (event.type === 'wrap' && !open) spans.push({ start: at, end: null });
+    else if (event.type === 'unwrap' && open) last.end = at;
+  }
+  return spans;
+};
+
+/** True while the meat is wrapped: the latest wrap or unwrap event was a wrap. */
+export const isWrapped = (events: readonly CookEvent[]) =>
+  wrapSpans(events).some((span) => span.end === null);

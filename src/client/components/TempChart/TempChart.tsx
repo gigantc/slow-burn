@@ -1,3 +1,4 @@
+import type { WrapSpan } from '@/lib/cookEvents';
 import { clockTime } from '@/lib/format';
 import styles from './TempChart.module.scss';
 
@@ -13,8 +14,8 @@ type Props = {
   end: number;
   /** Dashed horizontal line at the meat's target temperature. */
   targetMeat?: number | null;
-  /** Dashed vertical line where the meat was wrapped (epoch ms). */
-  wrapAt?: number | null;
+  /** Stretches spent wrapped: a shaded band, with a dashed line where each wrap began. */
+  wraps?: readonly WrapSpan[];
 };
 
 const WIDTH = 600;
@@ -22,7 +23,12 @@ const HEIGHT = 170;
 const PAD = 12;
 const MIN_SPAN = 60;
 
-const summary = (pit: readonly Reading[], meat: readonly Reading[], target?: number | null) => {
+const summary = (
+  pit: readonly Reading[],
+  meat: readonly Reading[],
+  target: number | null | undefined,
+  wraps: readonly WrapSpan[],
+) => {
   const parts: string[] = [];
   if (pit.length > 0) {
     const values = pit.map((r) => r.value);
@@ -35,11 +41,15 @@ const summary = (pit: readonly Reading[], meat: readonly Reading[], target?: num
     const last = meat[meat.length - 1]?.value;
     parts.push(`Meat from ${first} to ${last} degrees${target ? `, target ${target}` : ''}.`);
   }
+  if (wraps.length > 0)
+    parts.push(
+      `Wrapped ${wraps.length === 1 ? 'once' : `${wraps.length} times`}${wraps.some((w) => w.end === null) ? ', still wrapped' : ''}.`,
+    );
   return parts.join(' ');
 };
 
 /** Pit and meat temperatures over the cook: a fluid inline SVG with no chart library. */
-const TempChart = ({ title = 'So far', pit, meat, start, end, targetMeat, wrapAt }: Props) => {
+const TempChart = ({ title = 'So far', pit, meat, start, end, targetMeat, wraps = [] }: Props) => {
   const values = [...pit, ...meat].map((r) => r.value);
   if (targetMeat) values.push(targetMeat);
   // Breathing room above and below, and never a span under MIN_SPAN degrees so a couple of
@@ -67,7 +77,7 @@ const TempChart = ({ title = 'So far', pit, meat, start, end, targetMeat, wrapAt
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         preserveAspectRatio="none"
         role="img"
-        aria-label={summary(pit, meat, targetMeat)}
+        aria-label={summary(pit, meat, targetMeat, wraps)}
       >
         {targetMeat ? (
           <line
@@ -78,15 +88,24 @@ const TempChart = ({ title = 'So far', pit, meat, start, end, targetMeat, wrapAt
             y2={y(targetMeat)}
           />
         ) : null}
-        {wrapAt ? (
-          <line
-            className={styles.wrap}
-            x1={x(wrapAt)}
-            x2={x(wrapAt)}
-            y1={0}
-            y2={HEIGHT}
-          />
-        ) : null}
+        {wraps.map((span) => (
+          <g key={span.start}>
+            <rect
+              className={styles.band}
+              x={x(span.start)}
+              y={0}
+              width={Math.max(0, x(span.end ?? end) - x(span.start))}
+              height={HEIGHT}
+            />
+            <line
+              className={styles.wrap}
+              x1={x(span.start)}
+              x2={x(span.start)}
+              y1={0}
+              y2={HEIGHT}
+            />
+          </g>
+        ))}
         {pit.length > 1 && (
           <polyline
             className={styles.pitLine}
