@@ -12,7 +12,7 @@
   @include v.field-height;
   padding:0px v.$space-lg;
   border:2px solid transparent;
-  border-radius:v.$radius-md;
+  border-radius:v.$radius-field;
   font:600 1.5rem/1 v.$font-body;
   text-decoration:none;
   transition:background-color 0.15s, border-color 0.15s;
@@ -31,26 +31,36 @@
   background-color:v.$accent;
   color:v.$on-accent;
 
-  &:hover:not(:disabled){ background-color:color-mix(in srgb, v.$accent 85%, v.$text); }
+  &:hover:not(:disabled){
+    background-color:color-mix(in srgb, v.$accent 85%, v.$text);
+    color:v.$on-accent;
+  }
 }
 
 .secondary{
-  border-color:v.$border;
+  background-color:v.$raised;
   color:v.$text;
 
-  &:hover:not(:disabled){ border-color:v.$muted; }
+  &:hover:not(:disabled){
+    background-color:color-mix(in srgb, v.$raised 85%, v.$text);
+    color:v.$text;
+  }
 }
 
 .danger{
   background-color:v.$danger;
   color:v.$on-accent;
 
-  &:hover:not(:disabled){ background-color:color-mix(in srgb, v.$danger 85%, v.$text); }
+  &:hover:not(:disabled){
+    background-color:color-mix(in srgb, v.$danger 85%, v.$text);
+    color:v.$on-accent;
+  }
 }
 
 // Greasy-hands size: sheets, the live screen, anything tapped mid-cook
 .large{
   min-height:v.$tap-target;
+  border-radius:v.$radius-button;
   font:600 1.6rem/1 v.$font-body;
 }
 

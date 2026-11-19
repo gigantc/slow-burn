@@ -8,9 +8,9 @@ import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
 import styles from './Menu.module.scss';
 
-// Rendered as a fragment so the trigger is a direct child of <nav> and takes its tab/sidebar
-// styling there; the popover is positioned relative to the nav.
-const Menu = () => {
+// Phone only (the sidebar carries these controls on desktop). Rendered as a fragment so the
+// trigger is a direct child of <nav> and takes the tab styling from there.
+const Menu = ({ triggerClassName }: { triggerClassName?: string }) => {
   const [open, setOpen] = useState(false);
   const { logout } = useAuth();
   const { theme, toggle } = useTheme();
@@ -25,6 +25,7 @@ const Menu = () => {
     <>
       <button
         ref={triggerRef}
+        className={triggerClassName}
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
@@ -37,7 +38,6 @@ const Menu = () => {
         open={open}
         onClose={() => setOpen(false)}
         label="Menu"
-        placement="popover"
         returnFocusRef={triggerRef}
       >
         <button

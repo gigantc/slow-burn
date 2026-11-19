@@ -207,6 +207,15 @@ Shared: name, maker, date, photo, rating. Category fields (as data, with the cat
 
 ---
 
+## Decisions (2026-11-19)
+
+- **Typography and token scale follow this doc and the canvas.** The old base styles were a wireframe; h1 is Fraunces now.
+- **Greeting line** ("Thursday evening") is computed from local time. Best-guess boundaries, tune later: morning 5:00 to 11:59, afternoon 12:00 to 16:59, evening 17:00 to 20:59, night 21:00 to 4:59. Boundaries live in client config.
+- **Desktop search on Home:** left out for now.
+- **"Log a tasting"** links to the existing Tastings placeholder route until tastings are built. Whether whisky, cigar and wine stay under one Tastings item or become separate nav items is undecided.
+- **Phone Menu sheet** is not designed: restyle the existing menu with the new tokens. Expect it to change.
+- **Undesigned states** (no live cook, empty Lately, loading, sync pending/offline/error) are designed on the fly from these tokens and components, built to be easy to change.
+
 ## Copy
 
 - UI copy in the canvas is final unless dFree changes it. Use it verbatim.

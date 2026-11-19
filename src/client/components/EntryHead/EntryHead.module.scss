@@ -11,14 +11,12 @@
   flex-direction:column;
   gap:v.$space-sm;
   padding:v.$space-md v.$space-md v.$space-lg v.$space-md;
-  background:
-    radial-gradient(circle at 100% 0%, var(--type-tint), transparent 60%),
-    linear-gradient(135deg, var(--type-grad-a), var(--type-grad-b));
+  background-color:v.$type-soft;
   border-radius:v.$radius-md;
   color:v.$text;
 
   .label{
-    color:color-mix(in srgb, var(--type) 60%, v.$text);
+    color:v.$type;
     font:700 1.1rem/1 v.$font-body;
     letter-spacing:0.08em;
     text-transform:uppercase;
@@ -38,19 +36,11 @@
 
   li{
     padding:6px 12px;
-    background-color:var(--type-tint-strong);
+    background-color:v.$raised;
     border-radius:999px;
     color:v.$text;
     font:600 1.3rem/1 v.$font-body;
   }
 }
 
-@each $name in v.$entry-types{
-  .#{$name}{
-    --type:var(--#{$name});
-    --type-tint:var(--#{$name}-tint);
-    --type-tint-strong:var(--#{$name}-tint-strong);
-    --type-grad-a:var(--#{$name}-grad-a);
-    --type-grad-b:var(--#{$name}-grad-b);
-  }
-}
+@include v.category-classes;

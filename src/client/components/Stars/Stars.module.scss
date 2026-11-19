@@ -1,0 +1,12 @@
+//////////////////////////////////////
+// Stars
+
+//imports
+@use 'scss/variables' as v;
+
+.stars{
+  color:v.$accent;
+  font-size:1.4rem;
+  letter-spacing:1px;
+  white-space:nowrap;
+}

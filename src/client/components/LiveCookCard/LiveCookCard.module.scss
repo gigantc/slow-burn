@@ -1,0 +1,160 @@
+//////////////////////////////////////
+// Live cook card
+// Phone: eyebrow and elapsed time on top, meat name, then the pit and meat tiles.
+// Desktop: one wide row, name block at the left, three tiles, "Open cook" at the right.
+
+//imports
+@use 'scss/variables' as v;
+
+.card{
+  display:grid;
+  grid-template-areas:
+    'eyebrow elapsed pit meat open'
+    'name elapsed pit meat open'
+    'meta elapsed pit meat open';
+  grid-template-columns:minmax(140px, 1fr) repeat(3, auto) auto;
+  align-items:center;
+  gap:v.$space-xs v.$space-12;
+  padding:v.$space-32;
+  background-color:v.$inverse;
+  border-radius:v.$radius-xl;
+  box-shadow:v.$shadow-inverse;
+  color:v.$inverse-text;
+  text-decoration:none;
+
+  &:hover{ color:v.$inverse-text; }
+  &:focus-visible{
+    outline:none;
+    box-shadow:inset 0px 0px 0px 3px v.$inverse-accent;
+  }
+
+  small{ color:v.$inverse-muted; }
+
+  // Eyebrow with the pulsing dot
+  .eyebrow{
+    @include v.eyebrow;
+    grid-area:eyebrow;
+    display:flex;
+    align-items:center;
+    gap:v.$space-sm;
+    color:v.$inverse-accent-text;
+
+    &::before{
+      content:'';
+      width:8px;
+      height:8px;
+      background-color:v.$inverse-accent;
+      border-radius:v.$radius-pill;
+      animation:pulse 1.6s ease-in-out infinite;
+    }
+  }
+
+  h3{
+    grid-area:name;
+    font-size:3.2rem;
+    line-height:1.1;
+  }
+
+  .meta{ grid-area:meta; }
+
+  // Elapsed, pit and meat tiles
+  p{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:120px;
+    padding:v.$space-12 v.$space-md;
+    background-color:v.$glass;
+    border-radius:v.$radius-field;
+  }
+  .elapsed{ grid-area:elapsed; }
+  .pit{ grid-area:pit; }
+  .meat{ grid-area:meat; }
+
+  // Longhands on purpose: data gets tabular-nums from _base.scss, and the `font` shorthand
+  // would reset it (the minifier also reorders it ahead of the shorthand).
+  data{
+    font-size:2.8rem;
+    font-weight:600;
+    line-height:1.1;
+  }
+
+  .open{
+    grid-area:open;
+    display:flex;
+    align-items:center;
+    gap:v.$space-xs;
+    margin:0px 0px 0px v.$space-md;
+    color:v.$inverse-accent-text;
+    font-weight:600;
+
+    svg{
+      width:1.8rem;
+      height:1.8rem;
+    }
+  }
+
+  // Too narrow for one row: the name block on top, the three tiles below
+  @include v.breakpoint(v.$bp-lg){
+    grid-template-areas:
+      'eyebrow eyebrow open'
+      'name name name'
+      'meta meta meta'
+      'elapsed pit meat';
+    grid-template-columns:repeat(3, 1fr);
+    gap:v.$space-sm v.$space-12;
+    padding:v.$space-lg;
+
+    p{ min-width:0px; }
+
+    .open{ margin:0px; }
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'eyebrow elapsed'
+      'name name'
+      'pit meat';
+    grid-template-columns:1fr 1fr;
+    gap:v.$space-12;
+    padding:v.$space-20;
+    border-radius:v.$radius-xl;
+
+    .eyebrow{ align-self:center; }
+
+    h3{ font-size:2.6rem; }
+
+    // The elapsed time is plain text up here, not a tile; the meta line and link are desktop only
+    .elapsed{
+      justify-self:end;
+      min-width:0px;
+      padding:0px;
+      background:none;
+      color:v.$inverse-muted;
+
+      small{ display:none; }
+      data{
+        font-size:1.4rem;
+        font-weight:400;
+        line-height:1.2;
+      }
+    }
+    .meta,
+    .open{ display:none; }
+
+    p{
+      min-width:0px;
+      padding:v.$space-12;
+      border-radius:v.$radius-md;
+    }
+    data{ font-size:2.2rem; }
+  }
+}
+
+@keyframes pulse{
+  50%{ opacity:0.35; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .card .eyebrow::before{ animation:none; }
+}

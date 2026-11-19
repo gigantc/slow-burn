@@ -1,0 +1,82 @@
+//////////////////////////////////////
+// Home
+
+//imports
+@use 'scss/variables' as v;
+
+.home{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-32;
+
+  > header{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-xs;
+
+    p{
+      color:v.$muted;
+      font-size:1.5rem;
+    }
+  }
+
+  // Phone only: the sidebar's New cook button and nav cover this on desktop
+  .tiles{
+    display:none;
+    grid-template-columns:1fr 1fr;
+    gap:v.$space-12;
+  }
+
+  section{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-12;
+
+    > header{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+    }
+
+    > header a{
+      font:600 1.5rem/1.2 v.$font-body;
+      text-decoration:none;
+    }
+
+    > p{ color:v.$muted; }
+  }
+
+  ul{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:v.$space-md;
+    margin:0px;
+    padding:0px;
+    list-style:none;
+  }
+
+  @include v.breakpoint(v.$bp-md){
+    gap:v.$space-lg;
+
+    > header p{
+      color:v.$muted-sky;
+      font-size:1.4rem;
+    }
+
+    .tiles{ display:grid; }
+
+    section{
+      gap:v.$space-sm;
+
+      > header a{ font-size:1.4rem; }
+    }
+
+    ul{
+      grid-template-columns:1fr;
+      gap:v.$space-sm;
+
+      // The phone list is the three most recent
+      li:nth-child(n+4){ display:none; }
+    }
+  }
+}

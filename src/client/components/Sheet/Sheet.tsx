@@ -7,7 +7,6 @@ type Props = {
   onClose: () => void;
   /** Accessible name of the dialog. */
   label: string;
-  placement?: 'sheet' | 'popover';
   /** Where focus goes on close; defaults to whatever had it when the sheet opened. */
   returnFocusRef?: RefObject<HTMLElement | null>;
   children: ReactNode;
@@ -17,7 +16,7 @@ const FOCUSABLE = 'button, input, textarea, select, a[href]';
 
 // Escape and scrim tap close it. Focus moves in on open (to [data-autofocus] if present),
 // is trapped while open, and returns on close.
-const Sheet = ({ open, onClose, label, placement = 'sheet', returnFocusRef, children }: Props) => {
+const Sheet = ({ open, onClose, label, returnFocusRef, children }: Props) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
 
@@ -68,18 +67,16 @@ const Sheet = ({ open, onClose, label, placement = 'sheet', returnFocusRef, chil
 
   if (!open) return null;
 
-  const popover = placement === 'popover';
-
   return (
     <>
       <div
-        className={popover ? `${styles.scrim} ${styles.clear}` : styles.scrim}
+        className={styles.scrim}
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         ref={panelRef}
-        className={popover ? `${styles.panel} ${styles.popover}` : styles.panel}
+        className={styles.panel}
         role="dialog"
         aria-modal="true"
         aria-label={label}

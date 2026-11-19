@@ -28,9 +28,9 @@ export const THEME_LABELS = {
   dark: 'Dusk',
 } as const satisfies Record<'light' | 'dark', string>;
 
-// Cook screens that hide the sidebar nav on desktop and show a Close button (react-router
-// patterns). `sidebar` marks form pages whose action sidebar sits on the backdrop, right of the
-// panel: the shell reserves that column and FormPage positions its sidebar into it.
+// Cook screens that hide the sidebar nav on desktop (react-router patterns). `sidebar` marks
+// form pages whose action sidebar sits in a column on the right: the shell reserves that column
+// and FormPage positions its sidebar into it.
 export const FOCUS_ROUTES: readonly { path: string; sidebar?: boolean }[] = [
   { path: '/cooks/new', sidebar: true },
   { path: '/cooks/:id' },
@@ -38,13 +38,28 @@ export const FOCUS_ROUTES: readonly { path: string; sidebar?: boolean }[] = [
   { path: '/cooks/:id/wrap-up', sidebar: true },
 ];
 
+// Screens that get the phone sky as their page background (react-router patterns).
+export const SKY_ROUTES: readonly string[] = ['/'];
+
+// Time-of-day line on Home ("Thursday evening"). Each period starts at `from` (local hour) and
+// runs until the next one starts; hours before the first `from` belong to the last period.
+export const GREETING_PERIODS: readonly { name: string; from: number }[] = [
+  { name: 'morning', from: 5 },
+  { name: 'afternoon', from: 12 },
+  { name: 'evening', from: 17 },
+  { name: 'night', from: 21 },
+];
+
+// Entries shown in Home's "Lately" (desktop grid; the phone list trims it in CSS).
+export const LATELY_COUNT = 6;
+
 export const NAV_ITEMS: readonly { label: string; path: string; icon: IconName }[] = [
   { label: 'Home', path: '/', icon: 'home' },
   { label: 'Cooks', path: '/cooks', icon: 'flame' },
   { label: 'Tastings', path: '/tastings', icon: 'glass' },
 ];
 
-// Keep keys in sync with $entry-types in scss/_variables.scss.
+// Keep keys in sync with $categories in scss/_variables.scss.
 export const ENTRY_TYPES = {
   cook: { label: 'Cook' },
   whisky: { label: 'Whisky' },

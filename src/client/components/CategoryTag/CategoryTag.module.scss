@@ -1,0 +1,22 @@
+//////////////////////////////////////
+// Category tag
+// Pill by default; the parent sets shape and size.
+
+//imports
+@use 'scss/variables' as v;
+
+.tag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:v.$space-xs v.$space-12;
+  background-color:v.$type-soft;
+  border-radius:v.$radius-pill;
+  color:v.$type;
+  font:700 1.1rem/1 v.$font-body;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+
+}
+
+@include v.category-classes;

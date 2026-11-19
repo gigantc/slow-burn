@@ -4,15 +4,26 @@
 // data-theme on <html> (set before first paint by the inline script in index.html).
 
 //imports
+@use 'sass:map';
 @use 'scss/variables' as v;
+
+// Each category becomes --{key} (ink) and --{key}-soft for the given theme.
+@mixin categories($theme){
+  @each $key, $themes in v.$categories{
+    --#{$key}:#{map.get($themes, $theme, ink)};
+    --#{$key}-soft:#{map.get($themes, $theme, soft)};
+  }
+}
 
 :root,
 [data-theme='light']{
   color-scheme:light;
   @each $key, $value in v.$theme-light{ --#{$key}:#{$value}; }
+  @include categories(light);
 }
 
 [data-theme='dark']{
   color-scheme:dark;
   @each $key, $value in v.$theme-dark{ --#{$key}:#{$value}; }
+  @include categories(dark);
 }

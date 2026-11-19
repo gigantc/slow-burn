@@ -1,50 +1,53 @@
 //////////////////////////////////////
 // Nav
+// Desktop: the sidebar, on the sky. Phone: the bottom tab bar.
 
 //imports
 @use 'scss/variables' as v;
 
 .nav{
   position:sticky;
-  top:v.$space-md;
+  top:0px;
   display:flex;
   flex-direction:column;
+  flex:1 1 v.$sidebar-basis;
   gap:v.$space-xs;
-  align-self:start;
-  height:calc(100dvh - #{v.$space-md * 2});
-  padding:v.$space-lg v.$space-sm;
+  align-self:flex-start;
+  height:100dvh;
+  padding:v.$space-lg v.$space-20;
+  background:v.$sky-sidebar;
 
-  strong{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin:0px 0px v.$space-lg 0px;
-    padding:0px v.$space-md;
-    color:v.$text;
-    font:600 2.2rem/1.1 v.$font-display;
+  // Brand and New cook sit a section apart from the links
+  .brand{
+    margin:0px 0px v.$space-20 0px;
+    padding:0px v.$space-sm;
   }
-  // Separate selector on purpose: the minifier merges identical selectors and reorders them,
-  // which would put the axes before the font shorthand that resets them.
-  > strong{ @include v.display-axes; }
+  .new{ margin:0px 0px v.$space-20 0px; }
 
-  > a, > button{
+  .item{
     display:flex;
     align-items:center;
-    gap:12px;
-    min-height:v.$tap-target;
-    padding:0px v.$space-md;
+    gap:v.$space-12;
+    min-height:44px;
+    padding:0px v.$space-12;
     border-radius:v.$radius-md;
     color:v.$text;
-    text-align:left;
+    font:600 1.6rem/1 v.$font-body;
     text-decoration:none;
-    font:600 1.5rem/1 v.$font-body;
     transition:background-color 0.15s;
 
-    &:hover{ background-color:v.$hover; }
+    svg{
+      width:2rem;
+      height:2rem;
+    }
+
+    &:hover{
+      background-color:v.$hover;
+      color:v.$text;
+    }
     &[aria-current='page']{
-      background-color:v.$panel;
-      color:v.$accent;
-      box-shadow:v.$shadow-card;
+      background-color:v.$sidebar-active;
+      color:v.$sidebar-active-text;
     }
     &:focus-visible{
       outline:none;
@@ -52,8 +55,39 @@
     }
   }
 
-  // Menu trigger sits at the bottom of the sidebar
-  > button{ margin-top:auto; }
+  // The Menu tab only exists on phone
+  .tab{ display:none; }
+
+  // Status, theme and sign out, pinned to the bottom
+  .bottom{
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-sm;
+    margin:auto 0px 0px 0px;
+    padding:0px v.$space-sm;
+    color:v.$text;
+
+    button{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      min-height:44px;
+      color:v.$muted-sky;
+      font:500 1.4rem/1 v.$font-body;
+      text-align:left;
+
+      &:hover{ color:v.$text; }
+      &:focus-visible{
+        outline:none;
+        box-shadow:inset 0px 0px 0px 2px v.$accent;
+      }
+    }
+    .theme{
+      color:v.$text;
+
+      span{ color:v.$muted-sky; }
+    }
+  }
 
   @include v.breakpoint(v.$bp-md){
     position:fixed;
@@ -63,31 +97,45 @@
     left:0px;
     z-index:10;
     flex-direction:row;
+    flex:none;
     gap:0px;
     height:auto;
-    padding:v.$space-xs v.$space-xs calc(#{v.$space-xs} + env(safe-area-inset-bottom)) v.$space-xs;
-    background-color:v.$panel;
-    border-top:1px solid v.$border;
+    padding:0px v.$space-sm env(safe-area-inset-bottom) v.$space-sm;
+    background:v.$card;
+    box-shadow:inset 0px 1px 0px v.$border;
 
-    strong{ display:none; }
+    // Desktop-only parts
+    .brand,
+    .new,
+    .bottom{ display:none; }
 
-    > a, > button{
+    .tab{ display:flex; }
+
+    .item{
       flex:1;
       flex-direction:column;
       justify-content:center;
-      gap:4px;
+      gap:v.$space-xs;
       min-width:0px;
+      min-height:v.$tabbar-height;
       padding:0px;
-      text-align:center;
-      font:600 1.1rem/1 v.$font-body;
+      border-radius:0px;
+      color:v.$muted;
+      font:600 1.2rem/1 v.$font-body;
 
-      &[aria-current='page']{
-        background-color:v.$sunken;
-        box-shadow:none;
+      svg{
+        width:2.4rem;
+        height:2.4rem;
       }
-      &:focus-visible{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
-    }
 
-    > button{ margin-top:0px; }
+      &:hover{
+        background:none;
+        color:v.$muted;
+      }
+      &[aria-current='page']{
+        background:none;
+        color:v.$accent;
+      }
+    }
   }
 }

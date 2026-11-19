@@ -1,119 +1,186 @@
 //////////////////////////////////////
 // Variables
 // Single source of truth for every token. Colors come from the two theme palettes below;
-// components only use the semantic tokens (v.$surface etc.) and never mention themes.
+// components only use the semantic tokens (v.$card etc.) and never mention themes.
+// Spec: docs/design-system.md
+
+//imports
+@use 'sass:map';
 
 //////////////////////////////////////
 // Theme palettes
 // Keep both maps on identical keys. _themes.scss emits them as CSS custom properties.
 
-// Dawn (light): Sonoran sunset
+// Dawn (light): Sonoran sunrise
 $theme-light:(
-  backdrop:linear-gradient(135deg, #f8d3a8 0%, #f1b09a 55%, #dcb0c4 100%),
+  // Grounds and surfaces
   chrome:#f8d3a8,
   panel:#f4ecdc,
   card:#fbf6ec,
+  raised:#ebe0cb,
   sunken:#ebe0cb,
+  panel-alt:#fbf6ec,
   border:#e0d3ba,
   hover:rgba(255, 250, 240, 0.5),
+  // Text
   text:#2e2340,
   muted:#6b5f7a,
+  muted-sky:#4f4360,
+  // Accent
   accent:#b83c16,
+  accent-hover:#8a2a0e,
+  accent-soft:#fde3d8,
   on-accent:#fffaf0,
+  success:#4a6e1e,
   danger:#b3261e,
+  // Inverse surface (Home "On the pit" card). The two accent keys are the same in both themes.
+  inverse:#2e2340,
+  inverse-text:#fbf6ec,
+  inverse-muted:#c9bccb,
+  inverse-accent:#ff8a4c,
+  inverse-accent-text:#ffb38a,
+  glass:rgba(255, 255, 255, 0.07),
+  // Sidebar nav on the sky
+  sidebar-active:rgba(255, 250, 240, 0.6),
+  sidebar-active-text:#8a2a0e,
+  // Next time callout
+  next-time-bg:#fde3d8,
+  next-time-ring:(inset 0px 0px 0px 2px #ec8a73),
+  next-time-label:#a52c10,
+  next-time-text:#5c1a08,
+  next-time-source:#8a3b22,
+  // The Sonoran sky
+  sky-sidebar:linear-gradient(135deg, #f8d3a8 0%, #f1b09a 55%, #dcb0c4 100%),
+  sky-phone:linear-gradient(180deg, #f8d3a8 0px, #f1b09a 150px, #e8c3c6 240px, #f4ecdc 360px),
   logo-a:#d54d24,
   logo-b:#f5a623,
-  cook:#a52c10,
-  cook-tint:#fde3d8,
-  cook-tint-strong:#ec8a73,
-  cook-grad-a:#f3a08c,
-  cook-grad-b:#f9c7b3,
-  whisky:#8f6200,
-  whisky-tint:#fff3c4,
-  whisky-tint-strong:#f1c244,
-  whisky-grad-a:#f8d56b,
-  whisky-grad-b:#fbe7a0,
-  cigar:#4a6e1e,
-  cigar-tint:#ecf3d4,
-  cigar-tint-strong:#a2bf6e,
-  cigar-grad-a:#b9d08a,
-  cigar-grad-b:#d6e2b0,
-  wine:#7a3a8a,
-  wine-tint:#f4ddea,
-  wine-tint-strong:#b98fc9,
-  wine-grad-a:#c9a8d6,
-  wine-grad-b:#e6bfd0,
   shadow:(0px 0px 0px 6px rgba(255, 250, 240, 0.35), 0px 24px 60px rgba(90, 40, 60, 0.18)),
-  shadow-card:(0px 6px 20px rgba(90, 40, 60, 0.12)),
+  shadow-card:(0px 6px 20px rgba(90, 40, 60, 0.08)),
+  shadow-inverse:(0px 10px 30px rgba(46, 35, 64, 0.25)),
 );
 
-// Dusk (dark): Sonoran twilight (rough pass)
+// Dusk (dark): Sonoran sunset. Plum grounds; the navy lives in the sky.
 $theme-dark:(
-  backdrop:linear-gradient(180deg, #232c47 0%, #2c3555 38%, #4d3d54 70%, #7a4538 100%),
   chrome:#232c47,
-  panel:#1f2230,
-  card:#272a3a,
-  sunken:#191b27,
-  border:#363b52,
+  panel:#1c1520,
+  card:#2a1f2e,
+  raised:#352839,
+  sunken:#43344a,
+  panel-alt:#241b28,
+  border:#352839,
   hover:rgba(255, 245, 225, 0.07),
-  text:#f5ecdc,
-  muted:#b3aa9c,
-  accent:#ff8a66,
-  on-accent:#1f2230,
+  text:#f6ead9,
+  muted:#b9a9b8,
+  muted-sky:#e6d9cc,
+  accent:#ff8a4c,
+  accent-hover:#ffc09a,
+  accent-soft:#ffb38a,
+  on-accent:#1c1520,
+  success:#a2bf6e,
   danger:#ff8a80,
+  inverse:#2a1f2e,
+  inverse-text:#f6ead9,
+  inverse-muted:#b9a9b8,
+  inverse-accent:#ff8a4c,
+  inverse-accent-text:#ffb38a,
+  glass:rgba(255, 255, 255, 0.07),
+  sidebar-active:rgba(255, 245, 225, 0.12),
+  sidebar-active-text:#ff8a4c,
+  next-time-bg:rgba(255, 138, 76, 0.1),
+  next-time-ring:(inset 0px 0px 0px 1px rgba(255, 138, 76, 0.28)),
+  next-time-label:#ffb38a,
+  next-time-text:#f1dccb,
+  next-time-source:#b9a9b8,
+  sky-sidebar:linear-gradient(180deg, #232c47 0%, #2c3555 38%, #4d3d54 70%, #7a4538 100%),
+  sky-phone:linear-gradient(180deg, #232c47 0px, #2c3555 120px, #4d3d54 230px, #7a4538 330px, #1c1520 520px),
   logo-a:#ff7a4d,
   logo-b:#ffc15e,
-  cook:#ff8a70,
-  cook-tint:#7d3434,
-  cook-tint-strong:#8f4040,
-  cook-grad-a:#6b2a2f,
-  cook-grad-b:#4a2a45,
-  whisky:#f6c453,
-  whisky-tint:#7d6118,
-  whisky-tint-strong:#7a6118,
-  whisky-grad-a:#6b5314,
-  whisky-grad-b:#4a3d28,
-  cigar:#a9cf7a,
-  cigar-tint:#4a6e2a,
-  cigar-tint-strong:#4d7230,
-  cigar-grad-a:#3a5a22,
-  cigar-grad-b:#2f4030,
-  wine:#d4a4e8,
-  wine-tint:#6e3a8f,
-  wine-tint-strong:#7f4aa3,
-  wine-grad-a:#5a2d78,
-  wine-grad-b:#4a2a5e,
   shadow:(0px 0px 0px 6px rgba(255, 245, 225, 0.07), 0px 24px 60px rgba(0, 0, 0, 0.5)),
-  shadow-card:(0px 6px 20px rgba(0, 0, 0, 0.4)),
+  shadow-card:none,
+  shadow-inverse:none,
 );
+
+//////////////////////////////////////
+// Entry categories
+// One map, keyed by category key. Each theme gives `ink` (the strong color: Dawn ink, Dusk accent)
+// and `soft` (its tint). _themes.scss emits them as --{key} and --{key}-soft. A new category is a
+// new row here plus a row in ENTRY_TYPES (client config.ts).
+
+$categories:(
+  cook:(
+    light:(ink:#a52c10, soft:#fde3d8),
+    dark:(ink:#ff8a4c, soft:rgba(255, 138, 76, 0.14)),
+  ),
+  whisky:(
+    light:(ink:#8f6200, soft:#fff3c4),
+    dark:(ink:#f1c244, soft:rgba(241, 194, 68, 0.16)),
+  ),
+  cigar:(
+    light:(ink:#4a6e1e, soft:#ecf3d4),
+    dark:(ink:#a9cf7a, soft:rgba(169, 207, 122, 0.16)),
+  ),
+  wine:(
+    light:(ink:#8a1f4a, soft:#f6dde6),
+    dark:(ink:#d8638a, soft:rgba(216, 99, 138, 0.16)),
+  ),
+);
+
+$entry-types:map.keys($categories);
 
 //////////////////////////////////////
 // Semantic color tokens (resolve to the active theme)
 
-$backdrop:var(--backdrop);
 $chrome:var(--chrome);
 $panel:var(--panel);
 $card:var(--card);
+$raised:var(--raised);
 $sunken:var(--sunken);
+$panel-alt:var(--panel-alt);
 $border:var(--border);
 $hover:var(--hover);
 $text:var(--text);
 $muted:var(--muted);
+$muted-sky:var(--muted-sky);
 $accent:var(--accent);
+$accent-hover:var(--accent-hover);
+$accent-soft:var(--accent-soft);
 $on-accent:var(--on-accent);
+$success:var(--success);
 $danger:var(--danger);
+$inverse:var(--inverse);
+$inverse-text:var(--inverse-text);
+$inverse-muted:var(--inverse-muted);
+$inverse-accent:var(--inverse-accent);
+$inverse-accent-text:var(--inverse-accent-text);
+$glass:var(--glass);
+$sidebar-active:var(--sidebar-active);
+$sidebar-active-text:var(--sidebar-active-text);
+$next-time-bg:var(--next-time-bg);
+$next-time-ring:var(--next-time-ring);
+$next-time-label:var(--next-time-label);
+$next-time-text:var(--next-time-text);
+$next-time-source:var(--next-time-source);
+$sky-sidebar:var(--sky-sidebar);
+$sky-phone:var(--sky-phone);
 $logo-a:var(--logo-a);
 $logo-b:var(--logo-b);
 $shadow:var(--shadow);
 $shadow-card:var(--shadow-card);
+$shadow-inverse:var(--shadow-inverse);
 
-//////////////////////////////////////
-// Entry types
-// Each type has the keys {type}, {type}-tint, {type}-tint-strong, {type}-grad-a and
-// {type}-grad-b in both theme maps. Card generates one class per type from this list.
-// Keep in sync with ENTRY_TYPES in client config.ts.
+// The current entry's category, set by the category-classes mixin on a component root.
+$type:var(--type);
+$type-soft:var(--type-soft);
 
-$entry-types:(cook, whisky, cigar, wine);
+// Gives a component one class per category (.cook, .whisky ...) that sets $type and $type-soft.
+@mixin category-classes{
+  @each $name in $entry-types{
+    .#{$name}{
+      --type:var(--#{$name});
+      --type-soft:var(--#{$name}-soft);
+    }
+  }
+}
 
 //////////////////////////////////////
 // Fonts (self-hosted, see scss/_fonts.scss)
@@ -122,30 +189,39 @@ $font-display:'Fraunces', Georgia, 'Times New Roman', serif;
 $font-body:'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
 //////////////////////////////////////
-// Spacing
+// Spacing scale: 4, 8, 12, 16, 20, 24, 32, 40, 48 (snap design values to the nearest step).
+// The first five keep their original names; the rest are named by value.
 
 $space-xs:4px;
 $space-sm:8px;
+$space-12:12px;
 $space-md:16px;
+$space-20:20px;
 $space-lg:24px;
+$space-32:32px;
 $space-xl:40px;
-$space-2xl:64px;
+$space-48:48px;
 
 //////////////////////////////////////
 // Radii
 
 $radius-sm:6px;
-$radius-md:12px;
-$radius-lg:20px;
-$radius-xl:28px;
+$radius-md:12px; // nav items, chips, segment pills
+$radius-field:16px; // fields, stat tiles, desktop buttons, list rows
+$radius-button:18px; // phone primary buttons, event buttons
+$radius-lg:20px; // cards, action tiles
+$radius-xl:24px; // callouts, the live card, sheets
+$radius-pill:999px;
 
 //////////////////////////////////////
 // Sizes
 
 // "Greasy hands": every tap target is at least this tall.
 $tap-target:56px;
+$tabbar-height:64px;
 $container-width:720px;
-$sidebar-width:240px;
+$content-width:1100px;
+$sidebar-basis:220px;
 $form-sidebar-width:320px;
 
 // Compact form controls. Greasy-hands controls (live screen, sheets) use $tap-target instead.
@@ -168,6 +244,13 @@ $bp-sm:480px;
 @mixin display-axes{
   font-optical-sizing:auto;
   font-variation-settings:'SOFT' 100, 'WONK' 0;
+}
+
+// Small uppercase label: "NEXT TIME", "ON THE PIT", "RATING"
+@mixin eyebrow{
+  font:700 1.2rem/1 $font-body;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
 }
 
 @mixin field-height{

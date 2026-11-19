@@ -12,21 +12,36 @@ html{
 
 body{
   min-height:100dvh;
-  background:v.$backdrop;
-  background-attachment:fixed;
+  background-color:v.$panel;
   color:v.$text;
-  font:400 1.6rem/1.5 v.$font-body;
+  font:400 1.6rem/1.6 v.$font-body;
+
+  @include v.breakpoint(v.$bp-md){ line-height:1.5; }
 }
 
-// Page titles (h1) are DM Sans bold. Card and entry titles (h2, h3) are Fraunces.
-h1{ font:700 3.6rem/1.1 v.$font-body; }
-h2{ font:600 2.8rem/1.15 v.$font-display; }
-h3{ font:600 2.2rem/1.2 v.$font-display; }
+// Desktop sizes are the base; phone sizes come in at $bp-md. The breakpoint rules only set
+// font-size and line-height, because the `font` shorthand would reset the Fraunces axes.
+// Display (h1), section (h2) and card title (h3) are Fraunces; h4 and below are DM Sans.
+h1{
+  font:600 4.4rem/1.05 v.$font-display;
+  letter-spacing:-0.02em;
+
+  @include v.breakpoint(v.$bp-md){
+    font-size:3.4rem;
+    line-height:1.1;
+  }
+}
+h2{
+  font:600 2.4rem/1.15 v.$font-display;
+
+  @include v.breakpoint(v.$bp-md){ font-size:2rem; }
+}
+h3{ font:600 2rem/1.2 v.$font-display; }
 h4{ font:700 1.8rem/1.15 v.$font-body; }
 h5{ font:700 1.6rem/1.15 v.$font-body; }
 h6{ font:700 1.4rem/1.15 v.$font-body; }
 
-h2, h3{ @include v.display-axes; }
+h1, h2, h3{ @include v.display-axes; }
 
 time, data{ font-variant-numeric:tabular-nums; }
 
@@ -34,10 +49,20 @@ p{
   font-size:1.6rem;
 }
 
+// Meta text: dates, weights, wood
+small{
+  color:v.$muted;
+  font:400 1.5rem/1.4 v.$font-body;
+
+  @include v.breakpoint(v.$bp-md){ font-size:1.4rem; }
+}
+
 a{
   color:v.$accent;
   text-decoration:underline;
   text-underline-offset:3px;
+
+  &:hover{ color:v.$accent-hover; }
 
   &:focus-visible{
     outline:none;
@@ -51,8 +76,8 @@ ol{
 }
 
 label{
-  font-size:v.$label-text;
-  font-weight:600;
+  color:v.$muted;
+  font:400 #{v.$label-text}/1.3 v.$font-body;
 }
 
 input,

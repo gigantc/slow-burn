@@ -1,51 +1,62 @@
 //////////////////////////////////////
 // App shell
+// Flat panel ground. Desktop: sidebar (Nav) and content side by side; the row wraps, so a narrow
+// window stacks the sidebar on top. Phone: content with the tab bar (Nav) fixed to the bottom.
+// `sky` screens get the phone sky gradient as their page background.
 
 //imports
 @use 'scss/variables' as v;
 
 .shell{
-  display:grid;
-  grid-template-columns:v.$sidebar-width 1fr;
-  gap:v.$space-md;
+  display:flex;
+  flex-wrap:wrap;
   min-height:100dvh;
-  padding:v.$space-md;
 
   main{
     position:relative;
+    flex:999 1 560px;
     min-width:0px;
-    padding:v.$space-xl;
-    background-color:v.$panel;
-    border:1px solid v.$border;
-    border-radius:v.$radius-xl;
-    box-shadow:v.$shadow;
+    padding:v.$space-xl v.$space-48 v.$space-48 v.$space-48;
+
+    // The phone header (brand and sync status) only shows on sky screens, on phone
+    > header{ display:none; }
+
+    > :not(header){
+      width:100%;
+      max-width:v.$content-width;
+      margin:0px auto;
+    }
   }
 
-  // Cook screens: no sidebar nav on desktop.
+  // Cook screens: no sidebar on desktop.
   &.focus{
-    grid-template-columns:1fr;
-
     > nav{ display:none; }
 
-    // Form pages: an empty column on the right where FormPage's sidebar sits on the backdrop
-    &.withSidebar{ grid-template-columns:1fr v.$form-sidebar-width; }
+    // Form pages: an empty column on the right where FormPage's sidebar sits
+    &.withSidebar main{ padding-right:calc(#{v.$form-sidebar-width} + #{v.$space-48}); }
   }
 
   @include v.breakpoint(v.$bp-md){
-    grid-template-columns:1fr;
+    display:block;
+    padding:env(safe-area-inset-top) 0px 0px 0px;
 
     // The tab bar stays on phone
     &.focus > nav{ display:flex; }
-    &.focus.withSidebar{ grid-template-columns:1fr; }
+    &.focus.withSidebar main{ padding-right:v.$space-20; }
 
-    gap:0px;
-    padding:env(safe-area-inset-top) 0px 0px 0px;
+    &.sky{ background:v.$sky-phone, v.$panel; }
 
     main{
-      padding:v.$space-lg v.$space-md calc(#{v.$tap-target} + #{v.$space-xl} + env(safe-area-inset-bottom)) v.$space-md;
-      border-width:1px 0px 0px 0px;
-      border-radius:v.$radius-xl v.$radius-xl 0px 0px;
-      box-shadow:none;
+      padding:v.$space-md v.$space-20 calc(#{v.$tabbar-height} + #{v.$space-xl} + env(safe-area-inset-bottom)) v.$space-20;
+
+      > header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        max-width:none;
+        margin:0px 0px v.$space-md 0px;
+        color:v.$success;
+      }
     }
   }
 }

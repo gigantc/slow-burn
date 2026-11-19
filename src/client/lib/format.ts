@@ -1,12 +1,15 @@
 //////////////////////////////////////
 // Formatting helpers
 
+import { GREETING_PERIODS } from '@/config';
+
 const localDateFormat = new Intl.DateTimeFormat('en-CA');
 const dayFormat = new Intl.DateTimeFormat('en-US', {
   month: 'short',
   day: 'numeric',
   year: 'numeric',
 });
+const weekdayFormat = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
 const timeFormat = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -29,6 +32,23 @@ export const formatDayShort = (iso: string) => {
   const date = new Date(iso.length === 10 ? `${iso}T00:00:00` : iso);
   const base = dayShortFormat.format(date);
   return date.getFullYear() === new Date().getFullYear() ? base : `${base}, ${date.getFullYear()}`;
+};
+
+const monthDayFormat = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+
+/** "Nov 8" from a YYYY-MM-DD date or an ISO timestamp (local time); adds the year if not this year. */
+export const formatMonthDay = (iso: string) => {
+  const date = new Date(iso.length === 10 ? `${iso}T00:00:00` : iso);
+  const base = monthDayFormat.format(date);
+  return date.getFullYear() === new Date().getFullYear() ? base : `${base}, ${date.getFullYear()}`;
+};
+
+/** "Thursday evening": the weekday plus the part of the day from GREETING_PERIODS. */
+export const greeting = (date: Date) => {
+  const hour = date.getHours();
+  const periods = [...GREETING_PERIODS].sort((a, b) => a.from - b.from);
+  const period = periods.findLast((p) => hour >= p.from) ?? periods[periods.length - 1];
+  return `${weekdayFormat.format(date)} ${period?.name ?? ''}`.trim();
 };
 
 /** "2:15 PM" from epoch ms or an ISO timestamp. */

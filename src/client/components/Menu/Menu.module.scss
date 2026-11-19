@@ -1,6 +1,6 @@
 //////////////////////////////////////
 // Menu
-// Panel placement lives in Sheet; this is just the theme switch.
+// Phone menu sheet. Panel placement lives in Sheet; this is just the theme switch.
 
 //imports
 @use 'scss/variables' as v;
@@ -10,9 +10,8 @@
   grid-template-columns:1fr 1fr;
   min-height:v.$tap-target;
   padding:v.$space-xs;
-  background-color:v.$sunken;
-  border:1px solid v.$border;
-  border-radius:999px;
+  background-color:v.$raised;
+  border-radius:v.$radius-pill;
   color:v.$muted;
 
   &:focus-visible{
@@ -25,12 +24,12 @@
     align-items:center;
     justify-content:center;
     gap:v.$space-sm;
-    border-radius:999px;
+    border-radius:v.$radius-pill;
     font:600 1.4rem/1 v.$font-body;
   }
 
   span[data-active='true']{
-    background-color:v.$panel;
+    background-color:v.$card;
     box-shadow:v.$shadow-card;
     color:v.$text;
   }
