@@ -1,5 +1,5 @@
-import type { KeyboardEvent } from 'react';
 import { RATING_MAX } from 'shared/constants';
+import Icon from '@/components/Icon/Icon';
 import styles from './RatingInput.module.scss';
 
 type Props = {
@@ -9,38 +9,30 @@ type Props = {
 
 const STARS = Array.from({ length: RATING_MAX }, (_, i) => i + 1);
 
-// Radio-group semantics: one tab stop, arrows move, tapping the chosen star clears it.
-const RatingInput = ({ value, onChange }: Props) => {
-  const onKeyDown = (e: KeyboardEvent) => {
-    const step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[e.key];
-    if (!step) return;
-    e.preventDefault();
-    onChange(Math.min(RATING_MAX, Math.max(1, (value ?? 0) + step)));
-  };
-
-  return (
-    <div
-      className={styles.stars}
-      role="radiogroup"
-      aria-label="Rating"
-      onKeyDown={onKeyDown}
-    >
-      {STARS.map((n) => (
-        <button
-          key={n}
-          type="button"
-          role="radio"
-          aria-checked={value === n}
-          aria-label={`${n} ${n === 1 ? 'star' : 'stars'}`}
-          data-filled={value !== null && n <= value}
-          tabIndex={value === n || (value === null && n === 1) ? 0 : -1}
-          onClick={() => onChange(value === n ? null : n)}
-        >
-          {value !== null && n <= value ? '★' : '☆'}
-        </button>
-      ))}
+// Five toggle buttons: every star up to the rating is pressed. Tapping the chosen star clears it.
+const RatingInput = ({ value, onChange }: Props) => (
+  <fieldset className={styles.rating}>
+    <legend>Rating</legend>
+    <div>
+      {STARS.map((n) => {
+        const lit = value !== null && n <= value;
+        return (
+          <button
+            key={n}
+            type="button"
+            aria-pressed={lit}
+            aria-label={`${n} ${n === 1 ? 'star' : 'stars'}`}
+            onClick={() => onChange(value === n ? null : n)}
+          >
+            <Icon
+              name="star"
+              filled={lit}
+            />
+          </button>
+        );
+      })}
     </div>
-  );
-};
+  </fieldset>
+);
 
 export default RatingInput;

@@ -53,3 +53,27 @@
     }
   }
 }
+
+// Editable version: ringed, with the note typed straight into the card
+.field{
+  box-shadow:v.$next-time-ring;
+
+  &:focus-within{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+
+  textarea{
+    min-height:calc(1.35em * 3);
+    padding:0px;
+    background:none;
+    border:0px;
+    border-radius:0px;
+    color:v.$next-time-text;
+    font:500 1.9rem/1.35 v.$font-display;
+    resize:vertical;
+
+    &:focus-visible{ outline:none; }
+
+    @include v.breakpoint(v.$bp-md){ font-size:1.8rem; }
+  }
+  // Separate selector from the font shorthand above (the minifier reorders same-rule declarations)
+  > textarea{ @include v.display-axes; }
+}

@@ -2,15 +2,15 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import type { CookWithEvents } from 'shared/types';
-import Button from '@/components/Button/Button';
 import Field from '@/components/Field/Field';
-import { FormPage, FormSection } from '@/components/FormPage/FormPage';
+import { FieldGrid, FormPage } from '@/components/FormPage/FormPage';
+import NextTime from '@/components/NextTime/NextTime';
 import RatingInput from '@/components/RatingInput/RatingInput';
-import Summary from '@/components/Summary/Summary';
+import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
 import { saveCook } from '@/lib/cookActions';
 import { latestEvent } from '@/lib/cookEvents';
 import { useCook, useCooks, useMeatName } from '@/lib/cookHooks';
-import { formatDuration, formatWhen, fromLocalInput, toLocalInput } from '@/lib/format';
+import { formatDuration, fromLocalInput, toLocalInput } from '@/lib/format';
 import { useUnsaved } from '@/lib/unsaved';
 import { useBack } from '@/lib/useBack';
 import CookMissing from '../CookMissing/CookMissing';
@@ -35,10 +35,14 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   const [nextTime, setNextTime] = useState(cook.nextTimeNote ?? '');
 
   const endIso = edited === null ? defaultEnd : fromLocalInput(edited);
-  const total = cook.startedAt
-    ? new Date(endIso).getTime() - new Date(cook.startedAt).getTime()
-    : null;
+  const endMs = new Date(endIso).getTime();
+  const total = cook.startedAt ? endMs - new Date(cook.startedAt).getTime() : null;
   const invalid = total !== null && total < 0;
+  // Rested runs from the logged Rest event to the end; no Rest event, no stat.
+  const restEvent = latestEvent(cook.events, 'rest');
+  const rested = restEvent ? endMs - new Date(restEvent.at).getTime() : null;
+  const temp = Number(finalTemp);
+  const hasTemp = finalTemp.trim() !== '' && !Number.isNaN(temp);
 
   useUnsaved(
     edited !== null ||
@@ -51,11 +55,10 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (invalid) return;
-    const temp = Number(finalTemp);
     saveCook({
       id: cook.id,
       endedAt: endIso,
-      finalInternalTempF: finalTemp.trim() === '' || Number.isNaN(temp) ? null : temp,
+      finalInternalTempF: hasTemp ? temp : null,
       rating,
       notes: notes.trim() || null,
       nextTimeNote: nextTime.trim() || null,
@@ -64,33 +67,33 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
     else navigate(`/cooks/${cook.id}`, { replace: true });
   };
 
-  const rows: [string, string][] = [];
-  if (cook.startedAt) rows.push(['Started', formatWhen(cook.startedAt)]);
-  rows.push([
-    'Total time',
-    total === null ? 'Not started' : invalid ? 'Check end time' : formatDuration(total),
-  ]);
-
   return (
     <FormPage
-      title="Wrap-up"
+      title="How'd it go?"
       onSubmit={submit}
-      submitLabel="Save"
+      submitLabel="Save cook"
       submitDisabled={invalid}
       cancelFallback={`/cooks/${cook.id}`}
-      notes={
-        <Summary
-          title={meatName}
-          rows={rows}
-        />
-      }
+      cancelLabel="Back to cook"
+      barCancel={false}
+      crumb={{ to: `/cooks/${cook.id}`, label: meatName, current: 'Wrap up' }}
+      meta={meatName}
     >
-      <FormSection
-        number={1}
-        title="Finish"
-      >
+      <StatTiles>
+        <StatTile
+          label="Total time"
+          value={total === null ? '--' : invalid ? 'Check end' : formatDuration(total)}
+        />
+        {rested !== null && rested >= 0 && (
+          <StatTile
+            label="Rested"
+            value={formatDuration(rested)}
+          />
+        )}
+      </StatTiles>
+      <FieldGrid wide>
         <Field
-          label="Ended"
+          label="End time"
           type="datetime-local"
           value={edited ?? toLocalInput(defaultEnd)}
           onChange={(e) => setEdited(e.target.value)}
@@ -98,47 +101,30 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
           required
         />
         <Field
-          label="Final internal temp (°F)"
+          label="Final temp"
+          unit="°F"
           inputMode="decimal"
           value={finalTemp}
           onChange={(e) => setFinalTemp(e.target.value)}
         />
-      </FormSection>
-      <FormSection
-        number={2}
-        title="Rating"
-      >
-        <RatingInput
-          value={rating}
-          onChange={setRating}
-        />
-      </FormSection>
-      <FormSection
-        number={3}
-        title="Note to future you"
-        highlight
-      >
-        <Field
-          wide
-          multiline
-          label="Note"
-          hint="Shown first the next time you cook this protein."
-          value={nextTime}
-          onChange={(e) => setNextTime(e.target.value)}
-        />
-      </FormSection>
-      <FormSection
-        number={4}
-        title="Notes"
-      >
-        <Field
-          wide
-          multiline
-          label="Notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
-      </FormSection>
+      </FieldGrid>
+      <RatingInput
+        value={rating}
+        onChange={setRating}
+      />
+      <Field
+        multiline
+        label="Notes"
+        rows={3}
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
+      <NextTime
+        variant="field"
+        hint={`Shown first when you start your next ${meatName.toLowerCase()}.`}
+        value={nextTime}
+        onChange={(e) => setNextTime(e.target.value)}
+      />
     </FormPage>
   );
 };

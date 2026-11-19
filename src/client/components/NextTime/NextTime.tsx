@@ -1,35 +1,62 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, TextareaHTMLAttributes } from 'react';
 import Icon from '@/components/Icon/Icon';
 import Stars from '@/components/Stars/Stars';
 import styles from './NextTime.module.scss';
 
-/** The note from the last cook of this meat. `source` is the small "From your ..." line. */
-const NextTime = ({
-  source,
-  rating,
-  children,
-}: {
+type CardProps = {
+  variant?: 'card';
+  /** The small "From your ..." line. */
   source: ReactNode;
   /** That cook's rating; shown after the source on phone only. */
   rating?: number;
   children: ReactNode;
-}) => (
-  <aside className={styles.card}>
-    <strong>
-      <Icon name="arrow" />
-      Next time
-    </strong>
-    <p>{children}</p>
-    <small>
-      {source}
-      {rating !== undefined && (
-        <span>
-          {' · '}
-          <Stars rating={rating} />
-        </span>
-      )}
-    </small>
-  </aside>
+};
+
+type FieldProps = {
+  variant: 'field';
+  /** Under the eyebrow, e.g. "Shown first when you start your next pork shoulder." */
+  hint: string;
+} & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'children'>;
+
+const Eyebrow = () => (
+  <strong>
+    <Icon name="arrow" />
+    Next time
+  </strong>
 );
+
+/** The note to future you: read-only `card` (New cook, Detail) or editable `field` (Wrap-up). */
+const NextTime = (props: CardProps | FieldProps) => {
+  if (props.variant === 'field') {
+    const { variant: _variant, hint, ...rest } = props;
+    return (
+      <label className={`${styles.card} ${styles.field}`}>
+        <Eyebrow />
+        <small>{hint}</small>
+        <textarea
+          rows={3}
+          {...rest}
+        />
+      </label>
+    );
+  }
+
+  const { source, rating, children } = props;
+  return (
+    <aside className={styles.card}>
+      <Eyebrow />
+      <p>{children}</p>
+      <small>
+        {source}
+        {rating !== undefined && (
+          <span>
+            {' · '}
+            <Stars rating={rating} />
+          </span>
+        )}
+      </small>
+    </aside>
+  );
+};
 
 export default NextTime;

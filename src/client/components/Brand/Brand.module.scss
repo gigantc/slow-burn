@@ -7,19 +7,10 @@
 .brand{
   display:flex;
   align-items:center;
-  gap:v.$space-12;
-  color:v.$text;
-  font:600 2.2rem/1 v.$font-display;
-  letter-spacing:-0.01em;
   text-decoration:none;
 
-  &:hover{ color:v.$text; }
   &:focus-visible{
     outline:none;
     box-shadow:inset 0px 0px 0px 2px v.$accent;
   }
 }
-
-// Separate rule on purpose: the minifier merges identical selectors and reorders them,
-// which would put the axes before the font shorthand that resets them.
-a.brand{ @include v.display-axes; }

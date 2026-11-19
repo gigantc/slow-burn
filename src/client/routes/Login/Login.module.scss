@@ -1,5 +1,6 @@
 //////////////////////////////////////
 // Login
+// The whole page is the sky; the badge, a password field and the button sit straight on it.
 
 //imports
 @use 'scss/variables' as v;
@@ -9,24 +10,33 @@
   align-items:center;
   justify-content:center;
   min-height:100dvh;
-  padding:v.$space-md;
+  padding:v.$space-lg v.$space-32;
+  background:v.$sky-sidebar;
 
   form{
     display:flex;
     flex-direction:column;
-    gap:v.$space-md;
+    gap:v.$space-12;
     width:100%;
-    max-width:420px;
-    padding:v.$space-xl v.$space-lg;
-    background-color:v.$panel;
-    border:1px solid v.$border;
-    border-radius:v.$radius-xl;
-    box-shadow:v.$shadow;
+    max-width:360px;
   }
 
-  h1{ color:v.$accent; }
+  h1{
+    display:flex;
+    justify-content:center;
+    margin:0px 0px v.$space-20 0px;
+  }
 
-  p{ color:v.$muted; }
+  // The field sits on the sky: translucent ground, no ring, sky-safe label color
+  .field{
+    background-color:v.$sky-field;
+    box-shadow:none;
+
+    &:focus-within{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+
+    label,
+    button{ color:v.$muted-sky; }
+  }
 
   .error{ color:v.$danger; }
 }

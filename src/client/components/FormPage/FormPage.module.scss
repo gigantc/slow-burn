@@ -123,6 +123,9 @@
 
       // Cancel keeps its width; the primary action takes the rest
       button:last-child{ flex:1; }
+
+      // A solo bar: just the primary action, full width
+      &.solo .back{ display:none; }
     }
   }
 }
@@ -138,35 +141,4 @@
   @include v.breakpoint(v.$bp-md){ grid-template-columns:repeat(2, minmax(0, 1fr)); }
 
   &.wide{ grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
-}
-
-//////////////////////////////////////
-// Numbered section cards (Wrap-up, until it is redesigned)
-
-.card{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:v.$space-md;
-  padding:v.$space-lg;
-  background-color:v.$card;
-  border-radius:v.$radius-lg;
-  box-shadow:v.$shadow-card;
-
-  h2{
-    grid-column:1 / -1;
-    font:700 1.8rem/1.2 v.$font-body;
-
-    span{ color:v.$accent; }
-  }
-
-  @include v.breakpoint(v.$bp-md){
-    grid-template-columns:1fr;
-    padding:v.$space-md;
-  }
-}
-
-// The one section that must stand out (the note to future you)
-.highlight{
-  background-color:v.$next-time-bg;
-  color:v.$next-time-text;
 }

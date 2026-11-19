@@ -14,8 +14,12 @@ type PageProps = {
   submitDisabled?: boolean;
   /** Where Cancel goes when there is no in-app history to go back to. */
   cancelFallback: string;
-  /** Desktop breadcrumb parent; defaults to the Cooks list. */
-  crumb?: { to: string; label: string };
+  /** Desktop breadcrumb: the parent link, and the current page's name (defaults to `title`). */
+  crumb?: { to: string; label: string; current?: string };
+  /** Cancel's wording, on the top link and the bar button. */
+  cancelLabel?: string;
+  /** Show the bar's Cancel button on phone too (the top link is always there). */
+  barCancel?: boolean;
   /** Small text at the top right on phone (e.g. the date and time). */
   meta?: string;
   /** The first block of the form (on New cook, the meat picker). */
@@ -40,6 +44,8 @@ export const FormPage = ({
   submitDisabled = false,
   cancelFallback,
   crumb = { to: '/cooks', label: 'Cooks' },
+  cancelLabel = 'Cancel',
+  barCancel = true,
   meta,
   lead,
   notes,
@@ -68,13 +74,13 @@ export const FormPage = ({
           type="button"
           onClick={cancel}
         >
-          Cancel
+          {cancelLabel}
         </button>
         {meta && <small>{meta}</small>}
         <Breadcrumb
           to={crumb.to}
           label={crumb.label}
-          current={title}
+          current={crumb.current ?? title}
         />
       </header>
       <h1>{title}</h1>
@@ -86,14 +92,15 @@ export const FormPage = ({
         </div>
       )}
       <div className={styles.fields}>{children}</div>
-      <div className={styles.bar}>
+      <div className={barCancel ? styles.bar : `${styles.bar} ${styles.solo}`}>
         <Button
+          className={styles.back}
           type="button"
           variant="secondary"
           size="lg"
           onClick={cancel}
         >
-          Cancel
+          {cancelLabel}
         </Button>
         <Button
           type="submit"
@@ -124,20 +131,3 @@ export const FieldGrid = ({
   wide?: boolean;
   children: ReactNode;
 }) => <div className={wide ? `${styles.grid} ${styles.wide}` : styles.grid}>{children}</div>;
-
-type SectionProps = {
-  /** Shown as "01", "02", ... in the accent color. */
-  number: number;
-  title: string;
-  highlight?: boolean;
-  children: ReactNode;
-};
-
-export const FormSection = ({ number, title, highlight = false, children }: SectionProps) => (
-  <section className={highlight ? `${styles.card} ${styles.highlight}` : styles.card}>
-    <h2>
-      <span>{String(number).padStart(2, '0')}</span> {title}
-    </h2>
-    {children}
-  </section>
-);

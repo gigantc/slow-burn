@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Navigate } from 'react-router';
 import Button from '@/components/Button/Button';
-import Field from '@/components/Field/Field';
-import { APP_NAME } from '@/config';
+import PasswordField from '@/components/PasswordField/PasswordField';
+import Logo from '@/components/Logo/Logo';
 import { useAuth } from '@/lib/auth';
 import styles from './Login.module.scss';
 
@@ -36,11 +36,12 @@ const Login = () => {
   return (
     <main className={styles.login}>
       <form onSubmit={onSubmit}>
-        <h1>{APP_NAME}</h1>
-        <p>Smoke, sip, savor, repeat.</p>
-        <Field
+        <h1>
+          <Logo variant="badge" />
+        </h1>
+        <PasswordField
+          className={styles.field}
           label="Password"
-          type="password"
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

@@ -1,15 +1,54 @@
 //////////////////////////////////////
 // Logo
+// Lockups in em: the font-size on .horizontal / .badge scales the whole mark. Min sizes: name 13px
+// or larger (horizontal), badge 200px wide with the tagline.
 
 //imports
 @use 'scss/variables' as v;
 
 .logo{
-  flex:none;
-  width:auto;
-  height:3.4rem;
+  display:flex;
+  align-items:center;
+  color:v.$text;
+  font:700 1em/1 v.$font-body;
+  letter-spacing:0.24em;
+
+  svg{ flex:none; }
 }
 
 .base{ stop-color:v.$logo-a; }
 
 .tip{ stop-color:v.$logo-b; }
+
+// Flame vertically centered on the name, not on the baseline
+.horizontal{
+  gap:0.7em;
+  font-size:1.6rem;
+
+  svg{
+    width:1.39em;
+    height:2.41em;
+  }
+}
+
+// The trailing letter-spacing of each line is pulled back so the lines center on the flame
+.badge{
+  flex-direction:column;
+  gap:0.3em;
+  font-size:3rem;
+
+  svg{
+    width:1.42em;
+    height:2.47em;
+  }
+
+  .name{ margin:0px -0.24em 0px 0px; }
+
+  .tagline{
+    margin:0px -0.3em 0px 0px;
+    color:v.$logo-tagline;
+    font-size:0.3em;
+    font-weight:600;
+    letter-spacing:0.3em;
+  }
+}

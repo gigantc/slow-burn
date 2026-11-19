@@ -11,10 +11,12 @@ type Common = {
   wide?: boolean;
 };
 
-type InputProps = Common & {
+export type InputProps = Common & {
   multiline?: false;
   /** Makes it a number field: a big tabular value with this unit after it (lb, °F). */
   unit?: string;
+  /** A control shown inside the card after the input (e.g. a show/hide button). */
+  action?: ReactNode;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 type TextareaProps = Common & { multiline: true } & TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -69,6 +71,7 @@ const Field = (props: InputProps | TextareaProps) => {
       wide: _wide,
       multiline: _multiline,
       unit,
+      action,
       ...rest
     } = props;
     control = (
@@ -78,6 +81,7 @@ const Field = (props: InputProps | TextareaProps) => {
           {...rest}
         />
         {unit && <span>{unit}</span>}
+        {action}
       </span>
     );
   }

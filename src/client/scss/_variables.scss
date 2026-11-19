@@ -55,6 +55,9 @@ $theme-light:(
   sky-phone:linear-gradient(180deg, #f8d3a8 0px, #f1b09a 150px, #e8c3c6 240px, #f4ecdc 360px),
   logo-a:#d54d24,
   logo-b:#f5a623,
+  logo-tagline:#a52c10,
+  // Translucent ground for fields sitting on the sky (sign-in)
+  sky-field:rgba(255, 250, 240, 0.6),
   shadow:(0px 0px 0px 6px rgba(255, 250, 240, 0.35), 0px 24px 60px rgba(90, 40, 60, 0.18)),
   shadow-card:(0px 6px 20px rgba(90, 40, 60, 0.08)),
   shadow-inverse:(0px 10px 30px rgba(46, 35, 64, 0.25)),
@@ -97,6 +100,8 @@ $theme-dark:(
   sky-phone:linear-gradient(180deg, #232c47 0px, #2c3555 120px, #4d3d54 230px, #7a4538 330px, #1c1520 520px),
   logo-a:#ff7a4d,
   logo-b:#ffc15e,
+  logo-tagline:#ffb38a,
+  sky-field:rgba(28, 21, 32, 0.6),
   shadow:(0px 0px 0px 6px rgba(255, 245, 225, 0.07), 0px 24px 60px rgba(0, 0, 0, 0.5)),
   shadow-card:none,
   shadow-inverse:(inset 0px 0px 0px 1px rgba(255, 255, 255, 0.08)),
@@ -167,6 +172,8 @@ $sky-sidebar:var(--sky-sidebar);
 $sky-phone:var(--sky-phone);
 $logo-a:var(--logo-a);
 $logo-b:var(--logo-b);
+$logo-tagline:var(--logo-tagline);
+$sky-field:var(--sky-field);
 $shadow:var(--shadow);
 $shadow-card:var(--shadow-card);
 $shadow-inverse:var(--shadow-inverse);
@@ -174,6 +181,11 @@ $shadow-inverse:var(--shadow-inverse);
 // The current entry's category, set by the category-classes mixin on a component root.
 $type:var(--type);
 $type-soft:var(--type-soft);
+
+// The category accent of a tasting screen (--cat, --cat-soft set on its root); cook screens fall
+// back to the accent and the cook tint.
+$cat:var(--cat, var(--accent));
+$cat-soft:var(--cat-soft, var(--cook-soft));
 
 // Gives a component one class per category (.cook, .whisky ...) that sets $type and $type-soft.
 @mixin category-classes{

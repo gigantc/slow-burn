@@ -1,26 +1,66 @@
 //////////////////////////////////////
 // Rating input
+// Five separate buttons: full width and 60px tall on phone, 64 x 56 on desktop.
 
 //imports
 @use 'scss/variables' as v;
 
-.stars{
-  display:flex;
-  grid-column:1 / -1;
-  gap:v.$space-sm;
+.rating{
+  min-width:0px;
+  margin:0px;
+  padding:0px;
+  border:0px;
+
+  legend{
+    @include v.eyebrow;
+    margin:0px 0px v.$space-12 0px;
+    padding:0px;
+    color:v.$muted;
+    font-size:1.3rem;
+  }
+
+  div{
+    display:flex;
+    gap:v.$space-sm;
+
+    @include v.breakpoint(v.$bp-md){ display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); }
+  }
 
   button{
-    flex:1;
-    min-width:v.$tap-target;
-    min-height:v.$tap-target;
-    border-radius:v.$radius-md;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:64px;
+    height:56px;
+    background-color:v.$card;
+    border-radius:v.$radius-field;
+    box-shadow:inset 0px 0px 0px 1px v.$field-ring;
     color:v.$muted;
-    font:400 3.2rem/1 v.$font-body;
+    transition:background-color 0.15s;
 
-    &[aria-checked='true'], &[data-filled='true']{ color:v.$accent; }
+    svg{
+      width:2.8rem;
+      height:2.8rem;
+    }
+
+    &[aria-pressed='true']{
+      background-color:v.$cat-soft;
+      box-shadow:none;
+      color:v.$cat;
+    }
     &:focus-visible{
       outline:none;
-      box-shadow:inset 0px 0px 0px 3px v.$accent;
+      box-shadow:inset 0px 0px 0px 2px v.$accent;
+    }
+
+    @include v.breakpoint(v.$bp-md){
+      width:auto;
+      height:60px;
+
+      svg{
+        width:3rem;
+        height:3rem;
+      }
     }
   }
 }
