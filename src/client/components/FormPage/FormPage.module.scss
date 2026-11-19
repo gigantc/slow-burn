@@ -1,85 +1,147 @@
 //////////////////////////////////////
 // Form page
-// Desktop: numbered section cards in the panel; the sidebar is fixed on the backdrop to the
-// right of it, in the column AppShell reserves for form pages.
-// The action bar sticks to the bottom of the panel (above the tab bar on phone).
+// A grid so one DOM serves both layouts. Desktop: header and title across the top, `lead` and
+// `fields` stacked at the left with the actions inline under them, the aside in the right column.
+// Phone: header, title, lead, aside, fields, then a sticky action bar. The shell drops the tab bar
+// and pads the page by $form-bar-height so the bar never covers the last field.
 
 //imports
 @use 'scss/variables' as v;
 
 .page{
   display:grid;
-  gap:v.$space-lg;
+  grid-template-areas:
+    'header header'
+    'title title'
+    'lead aside'
+    'fields aside'
+    'bar aside';
+  grid-template-columns:minmax(0, 2fr) minmax(260px, 1fr);
+  grid-template-rows:repeat(5, auto);
+  column-gap:v.$space-32;
   align-items:start;
 
-  .main{
+  > header{
+    grid-area:header;
+    margin:0px 0px v.$space-12 0px;
+  }
+  > h1{
+    grid-area:title;
+    margin:0px 0px v.$space-lg 0px;
+  }
+
+  .lead{
+    grid-area:lead;
+    margin:0px 0px v.$space-lg 0px;
+  }
+
+  .side{
+    grid-area:aside;
     display:flex;
     flex-direction:column;
-    gap:v.$space-lg;
+    gap:v.$space-md;
     min-width:0px;
   }
 
-  // Same edge spacing as the app Nav on the left of the backdrop
-  .side{
-    position:fixed;
-    top:v.$space-md;
-    right:v.$space-md;
+  .fields{
+    grid-area:fields;
     display:flex;
     flex-direction:column;
-    gap:v.$space-md;
-    width:v.$form-sidebar-width;
-    max-height:calc(100dvh - #{v.$space-md * 2});
-    padding:v.$space-lg v.$space-sm;
-    overflow:auto;
+    gap:v.$space-20;
+    min-width:0px;
   }
 
   .bar{
-    position:sticky;
-    bottom:v.$space-md;
-    z-index:9;
+    grid-area:bar;
     display:flex;
-    align-items:center;
-    gap:v.$space-md;
-    padding:v.$space-sm v.$space-md;
-    background-color:v.$card;
-    border:1px solid v.$border;
-    border-radius:v.$radius-lg;
-    box-shadow:v.$shadow;
-
-    // Sync status on the left, actions on the right
-    p{ margin:0px auto 0px 0px; }
+    justify-content:flex-end;
+    gap:v.$space-12;
+    margin:v.$space-lg 0px 0px 0px;
   }
 
-  @include v.breakpoint(v.$bp-md){
-    padding:0px 0px calc(#{v.$field-height-md} + #{v.$space-xl}) 0px;
+  // Phone-only top bar parts
+  .cancel,
+  header small{ display:none; }
 
-    // The sidebar's context moves above the sections
-    .side{
-      position:static;
-      width:auto;
-      max-height:none;
-      padding:0px;
-      order:1;
+  @include v.breakpoint(v.$bp-md){
+    grid-template-areas:
+      'header'
+      'title'
+      'lead'
+      'notes'
+      'fields'
+      'extra'
+      'bar';
+    grid-template-columns:minmax(0, 1fr);
+    grid-template-rows:none;
+
+    > header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin:0px 0px v.$space-xs 0px;
+
+      // The breadcrumb is the desktop version of the Cancel link
+      nav{ display:none; }
     }
-    .main{ order:2; }
+    > h1{ margin:0px 0px v.$space-20 0px; }
+
+    .lead,
+    .notes{ margin:0px 0px v.$space-20 0px; }
+    .extra{ margin:v.$space-20 0px 0px 0px; }
+
+    // The wrapper only groups notes and extra for desktop; on phone they are grid items
+    .side{ display:contents; }
+    .notes{ grid-area:notes; }
+    .extra{ grid-area:extra; }
+
+    .cancel,
+    header small{ display:inline-flex; }
+
+    .cancel{
+      align-items:center;
+      min-height:v.$field-height;
+      color:v.$text;
+      font:600 1.6rem/1 v.$font-body;
+
+      &:focus-visible{
+        outline:none;
+        box-shadow:inset 0px 0px 0px 2px v.$accent;
+      }
+    }
 
     .bar{
       position:fixed;
       right:0px;
-      bottom:calc(#{v.$tap-target} + #{v.$space-sm} + env(safe-area-inset-bottom));
+      bottom:0px;
       left:0px;
-      border-width:1px 0px 0px 0px;
-      border-radius:0px;
-      box-shadow:none;
+      z-index:9;
+      margin:0px;
+      padding:v.$space-md v.$space-20 calc(#{v.$space-md} + env(safe-area-inset-bottom)) v.$space-20;
       background-color:v.$panel;
+      box-shadow:inset 0px 1px 0px v.$border;
+
+      // Cancel keeps its width; the primary action takes the rest
+      button:last-child{ flex:1; }
     }
   }
-
-  @include v.breakpoint(v.$bp-sm){
-    .bar p{ display:none; }
-    .bar button:last-child{ flex:1; }
-  }
 }
+
+//////////////////////////////////////
+// Field grid
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:v.$space-12;
+
+  @include v.breakpoint(v.$bp-md){ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+
+  &.wide{ grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+}
+
+//////////////////////////////////////
+// Numbered section cards (Wrap-up, until it is redesigned)
 
 .card{
   display:grid;
@@ -87,7 +149,6 @@
   gap:v.$space-md;
   padding:v.$space-lg;
   background-color:v.$card;
-  border:1px solid v.$border;
   border-radius:v.$radius-lg;
   box-shadow:v.$shadow-card;
 
@@ -106,6 +167,6 @@
 
 // The one section that must stand out (the note to future you)
 .highlight{
-  background-color:color-mix(in srgb, v.$accent 12%, v.$panel);
-  border-left:4px solid v.$accent;
+  background-color:v.$next-time-bg;
+  color:v.$next-time-text;
 }

@@ -10,6 +10,8 @@ const PATHS = {
   logout: 'M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4 M16 8l4 4-4 4 M20 12H9',
   plus: 'M12 5v14 M5 12h14',
   menu: 'M4 7h16 M4 12h16 M4 17h16',
+  arrow: 'M5 12h14 M13 6l6 6-6 6',
+  chevronDown: 'M6 9l6 6 6-6',
   chevron: 'M9 6l6 6-6 6',
   close: 'M6 6l12 12 M18 6L6 18',
 } as const;

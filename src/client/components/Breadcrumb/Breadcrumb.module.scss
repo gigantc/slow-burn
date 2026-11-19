@@ -5,14 +5,25 @@
 @use 'scss/variables' as v;
 
 .crumb{
+  color:v.$muted;
+  font:400 1.4rem/1.4 v.$font-body;
+
   a{
     display:inline-flex;
     align-items:center;
     min-height:v.$field-height;
     color:v.$muted;
-    font:600 1.4rem/1 v.$font-body;
+    font-weight:600;
     text-decoration:none;
 
     &:hover{ color:v.$accent; }
+  }
+
+  // In a trail the parent link is the accent one, and doesn't need the tap-target height
+  &.trail a{
+    min-height:0px;
+    color:v.$accent;
+
+    &:hover{ color:v.$accent-hover; }
   }
 }

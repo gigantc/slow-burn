@@ -1,17 +1,19 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
-import Callout from '@/components/Callout/Callout';
 import Field from '@/components/Field/Field';
-import { FormPage, FormSection } from '@/components/FormPage/FormPage';
+import { FieldGrid, FormPage } from '@/components/FormPage/FormPage';
 import MeatPicker from '@/components/MeatPicker/MeatPicker';
+import NextTime from '@/components/NextTime/NextTime';
+import { PAST_COOKS_COUNT } from '@/config';
 import type { CookFields } from '@/lib/cookActions';
-import { useCooks } from '@/lib/cookHooks';
-import { formatDay, fromLocalInput } from '@/lib/format';
-import { findLastCook, useNextTimeNote } from '@/lib/nextTime';
+import { useCooks, useMeatName } from '@/lib/cookHooks';
+import { clockTime, formatMonthDay, fromLocalInput } from '@/lib/format';
+import { findPastCooks, useNextTimeNote } from '@/lib/nextTime';
 import { useUnsaved } from '@/lib/unsaved';
-import LastCookSummary from '../LastCookSummary/LastCookSummary';
+import { useNow } from '@/lib/useNow';
+import PastCooks from '../PastCooks/PastCooks';
 
 export type Setup = Pick<
   CookFields,
@@ -46,9 +48,8 @@ const woodSuggestions = (cooks: readonly CookWithEvents[]) => {
 };
 
 const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
-  const { cooks, ready } = useCooks();
+  const { cooks } = useCooks();
   const listId = useId();
-  const defaulted = useRef(Boolean(initial));
 
   const initialValues = {
     meatId: initial?.meatId ?? '',
@@ -59,26 +60,20 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
     prep: initial?.prep ?? '',
   };
   const [values, setValues] = useState(initialValues);
-  const [baseline, setBaseline] = useState(initialValues);
+  const [baseline] = useState(initialValues);
   const [past, setPast] = useState(false);
   const [dates, setDates] = useState({ startedAt: '', endedAt: '' });
   const [triedSubmit, setTriedSubmit] = useState(false);
 
   const woods = useMemo(() => woodSuggestions(cooks), [cooks]);
+  const initialMeatName = useMeatName(initial?.meatId);
   const nextTime = useNextTimeNote(values.meatId, initial?.id);
-  const lastCook = useMemo(
-    () => findLastCook(cooks, values.meatId, initial?.id),
+  const pastCooks = useMemo(
+    () => findPastCooks(cooks, values.meatId, initial?.id),
     [cooks, values.meatId, initial?.id],
   );
-
-  // New cooks start with the last cook's wood (once the cache has loaded).
-  useEffect(() => {
-    if (defaulted.current || !ready) return;
-    defaulted.current = true;
-    const fill = (v: typeof values) => ({ ...v, wood: v.wood || woods[0] || '' });
-    setValues(fill);
-    setBaseline(fill);
-  }, [ready, woods]);
+  const meatName = useMeatName(values.meatId);
+  const now = useNow(60_000);
 
   const set = (key: keyof typeof values) => (e: { target: { value: string } }) =>
     setValues((v) => ({ ...v, [key]: e.target.value }));
@@ -108,8 +103,6 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
     );
   };
 
-  let section = 0;
-
   return (
     <FormPage
       title={title}
@@ -117,84 +110,78 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
       submitLabel={initial ? submitLabel : past ? 'Continue to wrap-up' : submitLabel}
       submitDisabled={badRange}
       cancelFallback={initial ? `/cooks/${initial.id}` : '/'}
-      notes={
-        (nextTime || lastCook) && (
-          <>
-            {nextTime && (
-              <Callout title="Next time">
-                {`From your last ${nextTime.meatName.toLowerCase()}, ${formatDay(nextTime.endedAt)}: ${nextTime.nextTimeNote}`}
-              </Callout>
-            )}
-            {lastCook && <LastCookSummary cook={lastCook} />}
-          </>
-        )
+      crumb={initial ? { to: `/cooks/${initial.id}`, label: initialMeatName } : undefined}
+      meta={
+        initial ? undefined : `${formatMonthDay(new Date(now).toISOString())} · ${clockTime(now)}`
       }
-    >
-      <FormSection
-        number={++section}
-        title="The cook"
-      >
+      lead={
         <MeatPicker
-          wide
           label="Meat"
           value={values.meatId}
           onChange={(meatId) => setValues((v) => ({ ...v, meatId }))}
           error={triedSubmit && !values.meatId ? 'Choose a meat.' : undefined}
         />
-        <Field
-          label="Weight (lb)"
-          inputMode="decimal"
-          value={values.weight}
-          onChange={set('weight')}
-        />
-        <Field
-          label="Target meat temp (°F)"
-          inputMode="numeric"
-          placeholder="200"
-          value={values.targetInternal}
-          onChange={set('targetInternal')}
-        />
-        {!initial && (
-          <Button
-            wide
-            type="button"
-            variant="secondary"
-            onClick={() => setPast((value) => !value)}
+      }
+      notes={
+        nextTime && (
+          <NextTime
+            source={`From your ${nextTime.meatName.toLowerCase()} on ${formatMonthDay(nextTime.endedAt)}`}
+            rating={cooks.find((cook) => cook.id === nextTime.cookId)?.rating ?? undefined}
           >
-            {past ? 'Start a live cook instead' : 'Log a past cook'}
-          </Button>
-        )}
-      </FormSection>
+            {nextTime.nextTimeNote}
+          </NextTime>
+        )
+      }
+      extra={
+        pastCooks.length > 0 && (
+          <PastCooks
+            meatName={meatName}
+            cooks={pastCooks.slice(0, PAST_COOKS_COUNT)}
+          />
+        )
+      }
+    >
       {past && (
-        <FormSection
-          number={++section}
-          title="When"
-        >
+        <FieldGrid wide>
           <Field
-            label="Started"
+            label="Start time"
             type="datetime-local"
             value={dates.startedAt}
             onChange={(e) => setDates((d) => ({ ...d, startedAt: e.target.value }))}
             required
           />
           <Field
-            label="Ended"
+            label="End time"
             type="datetime-local"
             value={dates.endedAt}
             onChange={(e) => setDates((d) => ({ ...d, endedAt: e.target.value }))}
             error={badRange ? 'End time is before the start time.' : undefined}
             required
           />
-        </FormSection>
+        </FieldGrid>
       )}
-      <FormSection
-        number={++section}
-        title="Pit"
-      >
+      <FieldGrid>
         <Field
-          label="Target pit temp (°F)"
+          label="Weight"
+          unit="lb"
+          inputMode="decimal"
+          placeholder="0"
+          value={values.weight}
+          onChange={set('weight')}
+        />
+        <Field
+          label="Target meat"
+          unit="°F"
           inputMode="numeric"
-          placeholder="275"
+          placeholder="0"
+          value={values.targetInternal}
+          onChange={set('targetInternal')}
+        />
+        <Field
+          label="Target pit"
+          unit="°F"
+          inputMode="numeric"
+          placeholder="0"
           value={values.targetPit}
           onChange={set('targetPit')}
         />
@@ -204,20 +191,24 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
           value={values.wood}
           onChange={set('wood')}
         />
-      </FormSection>
-      <FormSection
-        number={++section}
-        title="Prep"
-      >
-        <Field
-          wide
-          multiline
-          label="Prep"
-          hint="Brine, injection, rub."
-          value={values.prep}
-          onChange={set('prep')}
-        />
-      </FormSection>
+      </FieldGrid>
+      <Field
+        multiline
+        label="Prep"
+        rows={3}
+        placeholder="Rub, injection, trim, overnight dry brine..."
+        value={values.prep}
+        onChange={set('prep')}
+      />
+      {!initial && (
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => setPast((value) => !value)}
+        >
+          {past ? 'Start a live cook instead' : 'Log a past cook'}
+        </Button>
+      )}
       <datalist id={`${listId}-wood`}>
         {woods.map((value) => (
           <option

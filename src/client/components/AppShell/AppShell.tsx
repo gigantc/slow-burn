@@ -3,7 +3,7 @@ import { matchPath, Outlet, useLocation, useNavigationType } from 'react-router'
 import Brand from '@/components/Brand/Brand';
 import Nav from '@/components/Nav/Nav';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
-import { FOCUS_ROUTES, SKY_ROUTES } from '@/config';
+import { FORM_ROUTES, SKY_ROUTES } from '@/config';
 import { startSync, stopSync } from '@/lib/sync';
 import { UnsavedProvider } from '@/lib/unsaved';
 import styles from './AppShell.module.scss';
@@ -17,19 +17,12 @@ const Shell = () => {
   useLayoutEffect(() => {
     if (navigationType !== 'POP') window.scrollTo(0, 0);
   }, [pathname, navigationType]);
-  const focusRoute = FOCUS_ROUTES.find(({ path }) => matchPath({ path, end: true }, pathname));
+  const form = FORM_ROUTES.some((path) => matchPath({ path, end: true }, pathname));
   const sky = SKY_ROUTES.some((path) => matchPath({ path, end: true }, pathname));
 
   return (
     <div
-      className={[
-        styles.shell,
-        sky && styles.sky,
-        focusRoute && styles.focus,
-        focusRoute?.sidebar && styles.withSidebar,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={[styles.shell, sky && styles.sky, form && styles.form].filter(Boolean).join(' ')}
     >
       <Nav />
       <main>

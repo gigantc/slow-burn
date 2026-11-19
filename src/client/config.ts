@@ -28,14 +28,11 @@ export const THEME_LABELS = {
   dark: 'Dusk',
 } as const satisfies Record<'light' | 'dark', string>;
 
-// Cook screens that hide the sidebar nav on desktop (react-router patterns). `sidebar` marks
-// form pages whose action sidebar sits in a column on the right: the shell reserves that column
-// and FormPage positions its sidebar into it.
-export const FOCUS_ROUTES: readonly { path: string; sidebar?: boolean }[] = [
-  { path: '/cooks/new', sidebar: true },
-  { path: '/cooks/:id' },
-  { path: '/cooks/:id/edit', sidebar: true },
-  { path: '/cooks/:id/wrap-up', sidebar: true },
+// Form screens (react-router patterns). On phone they swap the tab bar for a sticky action bar.
+export const FORM_ROUTES: readonly string[] = [
+  '/cooks/new',
+  '/cooks/:id/edit',
+  '/cooks/:id/wrap-up',
 ];
 
 // Screens that get the phone sky as their page background (react-router patterns).
@@ -52,6 +49,12 @@ export const GREETING_PERIODS: readonly { name: string; from: number }[] = [
 
 // Entries shown in Home's "Lately" (desktop grid; the phone list trims it in CSS).
 export const LATELY_COUNT = 6;
+
+// Staple-meat chips under the meat picker (the selected meat is not repeated).
+export const MEAT_CHIP_COUNT = 4;
+
+// Past cooks of the chosen meat listed beside the New cook form.
+export const PAST_COOKS_COUNT = 5;
 
 export const NAV_ITEMS: readonly { label: string; path: string; icon: IconName }[] = [
   { label: 'Home', path: '/', icon: 'home' },

@@ -1,13 +1,77 @@
 //////////////////////////////////////
 // Meat picker
+// The meat is the star of the form: a big Fraunces combobox with an accent ring, recent meats
+// as chips below, and "+ New meat" last.
 
 //imports
 @use 'scss/variables' as v;
 
 .picker{
-  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-12;
 
   &.wide{ grid-column:1 / -1; }
+
+  label{
+    @include v.eyebrow;
+    color:v.$muted;
+    font-size:1.3rem;
+  }
+
+  p{
+    color:v.$danger;
+    font-size:1.3rem;
+  }
+
+  .control{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:v.$space-sm;
+    min-height:64px;
+    padding:0px v.$space-20;
+    background-color:v.$card;
+    border-radius:v.$radius-button;
+    box-shadow:inset 0px 0px 0px 2px v.$accent;
+
+    &:has([aria-invalid='true']){ box-shadow:inset 0px 0px 0px 2px v.$danger; }
+
+    svg{
+      flex:none;
+      width:2.2rem;
+      height:2.2rem;
+      color:v.$muted;
+    }
+  }
+
+  input{
+    flex:1;
+    min-width:0px;
+    min-height:0px;
+    padding:0px;
+    background:none;
+    border:0px;
+    border-radius:0px;
+    color:v.$text;
+    font:600 2.6rem/1.2 v.$font-display;
+
+    &:focus-visible{ outline:none; }
+    &::placeholder{
+      color:v.$muted;
+      font-weight:400;
+    }
+
+    @include v.breakpoint(v.$bp-md){ font-size:2.4rem; }
+  }
+  // Separate selector from the font shorthand above (the minifier reorders same-rule declarations)
+  .control input[role='combobox']{ @include v.display-axes; }
+
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:v.$space-sm;
+  }
 
   ul{
     position:absolute;
@@ -19,9 +83,8 @@
     margin:0px;
     padding:v.$space-xs;
     overflow:auto;
-    background-color:v.$panel;
-    border:1px solid v.$border;
-    border-radius:v.$radius-md;
+    background-color:v.$card;
+    border-radius:v.$radius-field;
     box-shadow:v.$shadow;
     list-style:none;
   }
@@ -30,16 +93,11 @@
     display:flex;
     align-items:center;
     padding:0px v.$space-md;
-    border-radius:v.$radius-sm;
+    border-radius:v.$radius-md;
     cursor:pointer;
     @include v.field-height;
 
-    &[aria-selected='true']{
-      background-color:v.$sunken;
-      box-shadow:inset 0px 0px 0px 2px v.$accent;
-    }
-
-    &:hover{ background-color:v.$hover; }
+    &[aria-selected='true']{ background-color:v.$raised; }
   }
 
   .add{

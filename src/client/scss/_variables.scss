@@ -21,6 +21,7 @@ $theme-light:(
   sunken:#ebe0cb,
   panel-alt:#fbf6ec,
   border:#e0d3ba,
+  field-ring:#e0d3ba,
   hover:rgba(255, 250, 240, 0.5),
   // Text
   text:#2e2340,
@@ -68,6 +69,7 @@ $theme-dark:(
   sunken:#43344a,
   panel-alt:#241b28,
   border:#352839,
+  field-ring:#43344a,
   hover:rgba(255, 245, 225, 0.07),
   text:#f6ead9,
   muted:#b9a9b8,
@@ -97,7 +99,7 @@ $theme-dark:(
   logo-b:#ffc15e,
   shadow:(0px 0px 0px 6px rgba(255, 245, 225, 0.07), 0px 24px 60px rgba(0, 0, 0, 0.5)),
   shadow-card:none,
-  shadow-inverse:none,
+  shadow-inverse:(inset 0px 0px 0px 1px rgba(255, 255, 255, 0.08)),
 );
 
 //////////////////////////////////////
@@ -137,6 +139,7 @@ $raised:var(--raised);
 $sunken:var(--sunken);
 $panel-alt:var(--panel-alt);
 $border:var(--border);
+$field-ring:var(--field-ring);
 $hover:var(--hover);
 $text:var(--text);
 $muted:var(--muted);
@@ -219,12 +222,18 @@ $radius-pill:999px;
 // "Greasy hands": every tap target is at least this tall.
 $tap-target:56px;
 $tabbar-height:64px;
+// Phone form action bar: a large button plus 16px above and below.
+$form-bar-height:92px;
 $container-width:720px;
 $content-width:1100px;
 $sidebar-basis:220px;
-$form-sidebar-width:320px;
 
 // Compact form controls. Greasy-hands controls (live screen, sheets) use $tap-target instead.
+// Buttons: md for secondary and compact actions, lg for primary actions (taller on phone).
+$button-md:48px;
+$button-lg:52px;
+$button-lg-phone:60px;
+
 $field-height:44px;
 $field-height-md:48px;
 $field-text:1.5rem;

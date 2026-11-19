@@ -4,8 +4,8 @@ import styles from './Button.module.scss';
 
 type Common = {
   variant?: 'primary' | 'secondary' | 'danger';
-  /** `large` keeps the full tap target; the default is compact for forms. */
-  size?: 'default' | 'large';
+  /** `lg` is the primary-action size (60px on phone, 52px on desktop). */
+  size?: 'md' | 'lg';
   /** Spans both columns inside a form section grid. */
   wide?: boolean;
 };
@@ -15,11 +15,11 @@ type LinkProps = Common & { to: string; className?: string; children: React.Reac
 
 /** A button, or a router link styled as one when `to` is given. */
 const Button = (props: ButtonProps | LinkProps) => {
-  const { variant = 'primary', size = 'default', wide = false, className, ...rest } = props;
+  const { variant = 'primary', size = 'md', wide = false, className, ...rest } = props;
   const classes = [
     styles.button,
     styles[variant],
-    size === 'large' && styles.large,
+    size === 'lg' && styles.lg,
     wide && styles.wide,
     className,
   ]

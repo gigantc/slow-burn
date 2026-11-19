@@ -58,7 +58,7 @@ const Menu = ({ triggerClassName }: { triggerClassName?: string }) => {
           </span>
         </button>
         <Button
-          size="large"
+          size="lg"
           variant="secondary"
           onClick={signOut}
         >

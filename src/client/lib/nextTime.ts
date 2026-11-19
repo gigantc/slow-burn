@@ -25,6 +25,16 @@ export const findLastCook = (
     null,
   );
 
+/** Finished cooks of this meat, newest first. */
+export const findPastCooks = (
+  cooks: readonly CookWithEvents[],
+  meatId: string,
+  excludeId?: string,
+): CookWithEvents[] =>
+  cooks
+    .filter((cook) => cook.id !== excludeId && cook.endedAt && cook.meatId === meatId)
+    .sort((a, b) => (b.endedAt ?? '').localeCompare(a.endedAt ?? ''));
+
 export const findNextTimeNote = (
   cooks: readonly CookWithEvents[],
   meats: readonly Meat[],

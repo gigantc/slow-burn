@@ -55,7 +55,7 @@ const Login = () => {
           </p>
         )}
         <Button
-          size="large"
+          size="lg"
           type="submit"
           disabled={busy}
         >

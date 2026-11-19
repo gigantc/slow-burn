@@ -1,0 +1,35 @@
+//////////////////////////////////////
+// Past cooks
+
+//imports
+@use 'scss/variables' as v;
+
+.past{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-12;
+  padding:v.$space-20;
+  background-color:v.$card;
+  border-radius:v.$radius-lg;
+  box-shadow:v.$shadow-card;
+
+  ul{
+    display:flex;
+    flex-direction:column;
+    margin:0px;
+    padding:0px;
+    list-style:none;
+  }
+
+  li{
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) auto;
+    gap:v.$space-xs v.$space-12;
+    padding:v.$space-12 0px;
+    box-shadow:inset 0px -1px 0px v.$border;
+
+    &:last-child{ box-shadow:none; }
+
+    small{ grid-column:1 / -1; }
+  }
+}

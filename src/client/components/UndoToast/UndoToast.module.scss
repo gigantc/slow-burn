@@ -16,7 +16,7 @@
   pointer-events:none;
 
   @include v.breakpoint(v.$bp-md){
-    bottom:calc(#{v.$tap-target} + #{v.$space-xl} + env(safe-area-inset-bottom));
+    bottom:calc(#{v.$tabbar-height} + #{v.$space-md} + env(safe-area-inset-bottom));
   }
 
   div{

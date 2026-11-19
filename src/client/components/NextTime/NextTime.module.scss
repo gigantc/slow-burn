@@ -1,0 +1,55 @@
+//////////////////////////////////////
+// Next time
+// The hero feature: always the strongest treatment on the screen.
+
+//imports
+@use 'scss/variables' as v;
+
+.card{
+  display:flex;
+  flex-direction:column;
+  gap:v.$space-12;
+  padding:v.$space-lg;
+  background-color:v.$next-time-bg;
+  border-radius:v.$radius-xl;
+  color:v.$next-time-text;
+
+  @include v.breakpoint(v.$bp-md){
+    gap:v.$space-sm;
+    padding:v.$space-20;
+    border-radius:v.$radius-lg;
+  }
+
+  strong{
+    @include v.eyebrow;
+    display:flex;
+    align-items:center;
+    gap:v.$space-sm;
+    color:v.$next-time-label;
+
+    svg{
+      width:1.8rem;
+      height:1.8rem;
+    }
+  }
+
+  p{
+    font:500 2.1rem/1.35 v.$font-display;
+    white-space:pre-wrap;
+
+    @include v.breakpoint(v.$bp-md){ font-size:1.9rem; }
+  }
+  // Separate selector from the font shorthand above (the minifier reorders same-rule declarations)
+  > p{ @include v.display-axes; }
+
+  small{
+    color:v.$next-time-source;
+
+    // Stars live in the past-cooks list on desktop
+    span{
+      display:none;
+
+      @include v.breakpoint(v.$bp-md){ display:inline; }
+    }
+  }
+}

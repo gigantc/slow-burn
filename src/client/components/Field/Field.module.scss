@@ -1,5 +1,7 @@
 //////////////////////////////////////
 // Field
+// A card with an inset ring: label above, a borderless control inside. The ring turns accent
+// while focused and danger when invalid. Number fields get a big tabular value and a unit.
 
 //imports
 @use 'scss/variables' as v;
@@ -7,36 +9,68 @@
 .field{
   display:flex;
   flex-direction:column;
-  gap:v.$space-xs;
+  gap:6px;
+  min-width:0px;
+  padding:v.$space-12 v.$space-md;
+  background-color:v.$card;
+  border-radius:v.$radius-field;
+  box-shadow:inset 0px 0px 0px 1px v.$field-ring;
 
-  label{
-    color:v.$muted;
-  }
+  &:focus-within{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+  &.invalid{ box-shadow:inset 0px 0px 0px 2px v.$danger; }
+  &.wide{ grid-column:1 / -1; }
+
+  @include v.breakpoint(v.$bp-md){ padding:v.$space-12 14px; }
 
   p{
     color:v.$muted;
     font:400 1.2rem/1.4 v.$font-body;
   }
-
-  &.wide{ grid-column:1 / -1; }
-
   .error{ color:v.$danger; }
 
-  input[aria-invalid='true'], textarea[aria-invalid='true']{ border-color:v.$danger; }
-
+  // Borderless controls: the card is the field. Beats the base input styles on specificity.
+  input,
   textarea{
-    width:100%;
-    min-height:calc(#{v.$field-height} * 2);
-    padding:v.$space-sm v.$space-md;
-    font-size:v.$field-text;
-    background-color:v.$card;
-    border:2px solid v.$border;
-    border-radius:v.$radius-md;
-    resize:vertical;
+    min-width:0px;
+    min-height:0px;
+    padding:0px;
+    background:none;
+    border:0px;
+    border-radius:0px;
+    color:v.$text;
 
-    &:focus-visible{
-      outline:none;
-      border-color:v.$accent;
-    }
+    &:focus-visible{ outline:none; }
   }
+
+  // No browser dropdown arrow on inputs with datalist suggestions; they still show while typing
+  input[list]::-webkit-calendar-picker-indicator{ display:none; }
+
+  .control{
+    display:flex;
+    align-items:baseline;
+    gap:v.$space-xs;
+
+    span{ color:v.$muted; }
+  }
+}
+
+.text input{ font:500 1.8rem/1.4 v.$font-body; }
+
+// Separate from the font shorthand: the minifier reorders same-rule declarations
+.number{
+  input{
+    font-size:2.8rem;
+    font-weight:600;
+    line-height:1.2;
+    font-variant-numeric:tabular-nums;
+
+    @include v.breakpoint(v.$bp-md){ font-size:2.6rem; }
+  }
+  .control span{ font-size:1.5rem; }
+}
+
+.textarea textarea{
+  min-height:calc(1.5em * 3);
+  font:400 1.6rem/1.5 v.$font-body;
+  resize:vertical;
 }

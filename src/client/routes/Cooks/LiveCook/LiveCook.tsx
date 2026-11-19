@@ -93,7 +93,7 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
       )}
       <div className={styles.finish}>
         <Button
-          size="large"
+          size="lg"
           variant="secondary"
           onClick={() => navigate(`/cooks/${cook.id}/wrap-up`, { replace: true })}
         >

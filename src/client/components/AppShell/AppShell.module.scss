@@ -2,7 +2,8 @@
 // App shell
 // Flat panel ground. Desktop: sidebar (Nav) and content side by side; the row wraps, so a narrow
 // window stacks the sidebar on top. Phone: content with the tab bar (Nav) fixed to the bottom.
-// `sky` screens get the phone sky gradient as their page background.
+// `form` screens drop the tab bar on phone. `sky` screens get the phone sky gradient as their
+// page background.
 
 //imports
 @use 'scss/variables' as v;
@@ -28,21 +29,13 @@
     }
   }
 
-  // Cook screens: no sidebar on desktop.
-  &.focus{
-    > nav{ display:none; }
-
-    // Form pages: an empty column on the right where FormPage's sidebar sits
-    &.withSidebar main{ padding-right:calc(#{v.$form-sidebar-width} + #{v.$space-48}); }
-  }
-
   @include v.breakpoint(v.$bp-md){
     display:block;
     padding:env(safe-area-inset-top) 0px 0px 0px;
 
-    // The tab bar stays on phone
-    &.focus > nav{ display:flex; }
-    &.focus.withSidebar main{ padding-right:v.$space-20; }
+    // Form screens swap the tab bar for their own sticky action bar
+    &.form > nav{ display:none; }
+    &.form main{ padding-bottom:calc(#{v.$form-bar-height} + #{v.$space-lg} + env(safe-area-inset-bottom)); }
 
     &.sky{ background:v.$sky-phone, v.$panel; }
 

@@ -1,0 +1,24 @@
+//////////////////////////////////////
+// Chip
+
+//imports
+@use 'scss/variables' as v;
+
+.chip{
+  min-height:40px;
+  padding:0px v.$space-md;
+  background-color:v.$raised;
+  border-radius:v.$radius-pill;
+  color:v.$text;
+  font:500 1.5rem/1 v.$font-body;
+  transition:background-color 0.15s;
+
+  &:hover{ background-color:color-mix(in srgb, v.$raised 85%, v.$text); }
+  &[aria-pressed='true']{ box-shadow:inset 0px 0px 0px 2px v.$accent; }
+  &:focus-visible{
+    outline:none;
+    box-shadow:inset 0px 0px 0px 2px v.$accent;
+  }
+
+  @include v.breakpoint(v.$bp-md){ min-height:44px; }
+}

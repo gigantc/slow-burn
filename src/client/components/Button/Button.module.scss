@@ -9,7 +9,7 @@
   align-items:center;
   justify-content:center;
   gap:v.$space-sm;
-  @include v.field-height;
+  min-height:v.$button-md;
   padding:0px v.$space-lg;
   border:2px solid transparent;
   border-radius:v.$radius-field;
@@ -57,11 +57,16 @@
   }
 }
 
-// Greasy-hands size: sheets, the live screen, anything tapped mid-cook
-.large{
-  min-height:v.$tap-target;
-  border-radius:v.$radius-button;
+// Primary actions: forms, sheets, anything tapped mid-cook
+.lg{
+  min-height:v.$button-lg;
   font:600 1.6rem/1 v.$font-body;
+
+  @include v.breakpoint(v.$bp-md){
+    min-height:v.$button-lg-phone;
+    border-radius:v.$radius-button;
+    font-size:1.7rem;
+  }
 }
 
 .wide{ grid-column:1 / -1; }

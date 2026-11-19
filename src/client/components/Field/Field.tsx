@@ -7,30 +7,83 @@ type Common = {
   hint?: string;
   error?: string;
   className?: string;
-  /** Spans both columns when inside a form section grid. */
+  /** Spans both columns when inside a form grid. */
   wide?: boolean;
 };
 
-type Props =
-  | (Common & { multiline?: false } & InputHTMLAttributes<HTMLInputElement>)
-  | (Common & { multiline: true } & TextareaHTMLAttributes<HTMLTextAreaElement>);
+type InputProps = Common & {
+  multiline?: false;
+  /** Makes it a number field: a big tabular value with this unit after it (lb, °F). */
+  unit?: string;
+} & InputHTMLAttributes<HTMLInputElement>;
 
-const Field = (props: Props) => {
+type TextareaProps = Common & { multiline: true } & TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+// A card with the label above and a borderless control inside. Three looks: number (with a
+// unit), text (the default) and textarea (multiline).
+const Field = (props: InputProps | TextareaProps) => {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
+  const { label, hint, error, className, wide } = props;
 
-  const extra = (wide?: boolean, className?: string) =>
-    [wide && styles.wide, className].filter(Boolean).join(' ') || undefined;
+  const classes = [
+    styles.field,
+    props.multiline ? styles.textarea : props.unit ? styles.number : styles.text,
+    wide && styles.wide,
+    error && styles.invalid,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
-  const wrap = (
-    label: string,
-    hint: string | undefined,
-    className: string | undefined,
-    control: ReactNode,
-    error?: string,
-  ) => (
-    <div className={className ? `${styles.field} ${className}` : styles.field}>
+  const shared = {
+    id,
+    'aria-describedby': [hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined,
+    'aria-invalid': error ? true : undefined,
+  } as const;
+
+  let control: ReactNode;
+  if (props.multiline) {
+    const {
+      label: _label,
+      hint: _hint,
+      error: _error,
+      className: _className,
+      wide: _wide,
+      multiline: _multiline,
+      ...rest
+    } = props;
+    control = (
+      <textarea
+        {...shared}
+        {...rest}
+      />
+    );
+  } else {
+    const {
+      label: _label,
+      hint: _hint,
+      error: _error,
+      className: _className,
+      wide: _wide,
+      multiline: _multiline,
+      unit,
+      ...rest
+    } = props;
+    control = (
+      <span className={styles.control}>
+        <input
+          {...shared}
+          {...rest}
+        />
+        {unit && <span>{unit}</span>}
+      </span>
+    );
+  }
+
+  return (
+    <div className={classes}>
       <label htmlFor={id}>{label}</label>
       {hint && <p id={hintId}>{hint}</p>}
       {control}
@@ -44,36 +97,6 @@ const Field = (props: Props) => {
         </p>
       )}
     </div>
-  );
-
-  if (props.multiline) {
-    const { label, hint, error, className, wide, multiline: _multiline, ...rest } = props;
-    return wrap(
-      label,
-      hint,
-      extra(wide, className),
-      <textarea
-        id={id}
-        aria-describedby={[hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined}
-        aria-invalid={error ? true : undefined}
-        {...rest}
-      />,
-      error,
-    );
-  }
-
-  const { label, hint, error, className, wide, multiline: _multiline, ...rest } = props;
-  return wrap(
-    label,
-    hint,
-    extra(wide, className),
-    <input
-      id={id}
-      aria-describedby={[hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined}
-      aria-invalid={error ? true : undefined}
-      {...rest}
-    />,
-    error,
   );
 };
 
