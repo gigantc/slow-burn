@@ -28,7 +28,12 @@ const EntryLink = ({ entry, hideTag = false }: { entry: Entry; hideTag?: boolean
       />
     )}
     <h3>{entry.name}</h3>
-    <small className={styles.meta}>{entry.meta}</small>
+    <small
+      className={styles.meta}
+      title={entry.meta}
+    >
+      {entry.meta}
+    </small>
     <Stars
       className={styles.stars}
       rating={entry.rating}

@@ -13,7 +13,9 @@
     'name name'
     'meta meta';
   grid-template-columns:1fr auto;
+  flex:1;
   align-items:center;
+  align-content:start;
   gap:v.$space-12;
   padding:v.$space-20;
   background-color:v.$card;
@@ -33,7 +35,13 @@
     justify-self:start;
   }
   h3{ grid-area:name; }
-  .meta{ grid-area:meta; }
+  .meta{
+    grid-area:meta;
+    min-width:0px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
   .stars{
     grid-area:stars;
     justify-self:end;
@@ -48,6 +56,14 @@
     padding:v.$space-12;
     border-radius:v.$radius-field;
     box-shadow:none;
+
+    // Phone rows keep up to two lines (-webkit-line-clamp is how every browser clamps lines)
+    .meta{
+      display:-webkit-box;
+      -webkit-box-orient:vertical;
+      -webkit-line-clamp:2;
+      white-space:normal;
+    }
 
     .tag{
       grid-row:1 / 3;

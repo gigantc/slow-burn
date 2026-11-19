@@ -12,6 +12,9 @@
   padding:0px;
   list-style:none;
 
+  // Cards in a row share the tallest one's height
+  li{ display:flex; }
+
   @include v.breakpoint(v.$bp-md){
     grid-template-columns:1fr;
     gap:v.$space-sm;

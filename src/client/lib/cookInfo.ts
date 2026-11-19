@@ -60,7 +60,7 @@ export const pastTimes = ({ date, start, end }: PastDates) => {
   return { cookedOn: date, startedAt, endedAt };
 };
 
-/** A cook as a generic list entry: "Nov 8 · 11h 40m · Post oak". */
+/** A cook as a generic list entry: "Nov 8 · 11h 40m · Fogo Premium" (date, duration, charcoal). */
 export const cookToEntry = (cook: CookWithEvents, meatName: string): Entry => ({
   id: cook.id,
   category: 'cook',
@@ -70,7 +70,7 @@ export const cookToEntry = (cook: CookWithEvents, meatName: string): Entry => ({
     cook.startedAt && cook.endedAt
       ? formatDuration(new Date(cook.endedAt).getTime() - new Date(cook.startedAt).getTime())
       : null,
-    ...cookDetails({ weightLbs: null, wood: cook.wood, charcoal: cook.charcoal }),
+    cook.charcoal,
   ]
     .filter(Boolean)
     .join(' · '),
