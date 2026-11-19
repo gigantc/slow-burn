@@ -10,6 +10,9 @@ export const config = {
   nodeEnv: env.NODE_ENV ?? 'development',
   isProd: env.NODE_ENV === 'production',
   port: Number(env.PORT ?? 3100),
+  // Only the local Apache hop is trusted for X-Forwarded-*; trusting every hop would let a client
+  // pick its own IP by sending a spoofed X-Forwarded-For (which defeats login throttling).
+  trustProxy: env.NODE_ENV === 'production' ? (env.TRUST_PROXY ?? '127.0.0.1') : false,
   host: env.HOST ?? '127.0.0.1',
   dbPath: resolve(env.DB_PATH ?? './data/slowburn.db'),
   // Photo files (see server/photos/storage.ts). Relative paths resolve from the working directory.
@@ -18,6 +21,11 @@ export const config = {
   passwordHash: env.APP_PASSWORD_HASH ?? '',
   sessionCookie: 'slowburn_session',
   sessionMaxAgeSeconds: 60 * 60 * 24 * 365,
+  // Login throttling (see auth/rateLimit.ts)
+  loginWindowMs: 15 * 60 * 1000,
+  loginMaxFailuresPerIp: 5,
+  loginMaxFailuresGlobal: 50,
+  loginTrackedIpsMax: 1000,
   // Relative to the working directory (repo root in dev, /opt/slow-burn in prod)
   clientDir: resolve('dist/client'),
   migrationsDir: resolve('drizzle'),

@@ -10,6 +10,8 @@ export class ApiRequestError extends Error {
     readonly status: number,
     readonly code: string,
     message: string,
+    // Seconds from the Retry-After header, when the server sent one
+    readonly retryAfter?: number,
   ) {
     super(message);
   }
@@ -47,6 +49,7 @@ export const api = async <T>(
       res.status,
       err?.code ?? 'unknown',
       err?.message ?? 'Request failed.',
+      Number(res.headers.get('Retry-After')) || undefined,
     );
   }
   return data as T;

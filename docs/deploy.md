@@ -28,7 +28,7 @@ Run on the server, in order. Examples assume `slowburn.gigantc.com` and `/opt/sl
    chmod 640 /opt/slow-burn/.env
    ```
 
-   Production values: `NODE_ENV=production`, `PORT=3100`, `HOST=127.0.0.1`, `DB_PATH=/opt/slow-burn/data/slowburn.db`.
+   Production values: `NODE_ENV=production`, `PORT=3100`, `HOST=127.0.0.1`, `DB_PATH=/opt/slow-burn/data/slowburn.db`, `PHOTOS_DIR=/opt/slow-burn/data/photos`.
 
 3. Enable the Apache proxy modules:
 
@@ -65,13 +65,14 @@ Run on the server, in order. Examples assume `slowburn.gigantc.com` and `/opt/sl
    npm run deploy
    ```
 
-8. Nightly backup, in root's crontab (`crontab -e`). Uses SQLite's online backup, so it is safe while the app runs:
+8. Nightly backup, in root's crontab (`crontab -e`). The database uses SQLite's online backup, so it is safe while the app runs. Photos are immutable files, so a mirror with `rsync` is enough (deleted photos stay in the mirror until it's pruned by hand):
 
    ```cron
    15 3 * * * sqlite3 /opt/slow-burn/data/slowburn.db ".backup /opt/slow-burn/backups/slowburn-$(date +\%F).db" && find /opt/slow-burn/backups -name 'slowburn-*.db' -mtime +30 -delete
+   20 3 * * * rsync -a /opt/slow-burn/data/photos/ /opt/slow-burn/backups/photos/
    ```
 
-   Needs the `sqlite3` CLI (`apt install sqlite3`).
+   Needs the `sqlite3` CLI (`apt install sqlite3`). These backups live on the same droplet; copy `/opt/slow-burn/backups` off the server (or turn on DigitalOcean backups) for real protection.
 
 ## Every deploy
 

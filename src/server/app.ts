@@ -18,7 +18,7 @@ import { tastingRoutes } from './routes/tastings.js';
 export const buildApp = async () => {
   const app = Fastify({
     logger: { level: config.isProd ? 'info' : 'debug' },
-    trustProxy: config.isProd,
+    trustProxy: config.trustProxy,
   }).withTypeProvider<TypeBoxTypeProvider>();
 
   app.setErrorHandler(errorHandler);

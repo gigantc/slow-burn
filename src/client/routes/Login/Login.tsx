@@ -4,6 +4,7 @@ import { Navigate } from 'react-router';
 import Button from '@/components/Button/Button';
 import PasswordField from '@/components/PasswordField/PasswordField';
 import Logo from '@/components/Logo/Logo';
+import { ApiRequestError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import styles from './Login.module.scss';
 
@@ -28,7 +29,14 @@ const Login = () => {
     try {
       await login(password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not sign in.');
+      if (err instanceof ApiRequestError && err.status === 429) {
+        const minutes = Math.max(1, Math.ceil((err.retryAfter ?? 60) / 60));
+        setError(
+          `Too many attempts. Try again in ${minutes} ${minutes === 1 ? 'minute' : 'minutes'}.`,
+        );
+      } else {
+        setError(err instanceof Error ? err.message : 'Could not sign in.');
+      }
       setBusy(false);
     }
   };
