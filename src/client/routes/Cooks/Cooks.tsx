@@ -61,7 +61,7 @@ const Cooks = () => {
       {ready && entries.length > 0 && (
         <EntryList
           entries={entries}
-          single
+          hideTag
         />
       )}
       {ready && finished.length > 0 && entries.length === 0 && (

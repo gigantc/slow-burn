@@ -77,7 +77,7 @@ const Tastings = () => {
       {ready && entries.length > 0 && (
         <EntryList
           entries={entries}
-          single={view.category !== null}
+          hideTag={view.category !== null}
         />
       )}
       {ready && tastings.length > 0 && entries.length === 0 && (

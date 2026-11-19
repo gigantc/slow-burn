@@ -8,13 +8,13 @@ import styles from './EntryList.module.scss';
 const EntryList = ({
   entries,
   phoneCount,
-  single = false,
+  hideTag = false,
 }: {
   entries: readonly Entry[];
   /** Phone shows only the first this many (a teaser); desktop always shows them all. */
   phoneCount?: number;
-  /** A list of one category: entries show no tag or wash. */
-  single?: boolean;
+  /** Leave out each entry's category tag (a list of one category); the wash stays. */
+  hideTag?: boolean;
 }) => {
   const phone = useMediaQuery(`(max-width:${BP_MD}px)`);
   const shown = phone && phoneCount !== undefined ? entries.slice(0, phoneCount) : entries;
@@ -25,7 +25,7 @@ const EntryList = ({
         <li key={entry.id}>
           <EntryLink
             entry={entry}
-            single={single}
+            hideTag={hideTag}
           />
         </li>
       ))}

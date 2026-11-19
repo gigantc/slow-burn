@@ -16,18 +16,17 @@ export type Entry = {
 };
 
 /**
- * A row on phone, a card on desktop. In a mixed list (the default) it carries its category: the
- * tag, a wash of the category color, and stars in that color. `single` is for a list of one
- * category: none of that.
+ * A row on phone, a card on desktop. It always carries its category: a wash of the category color
+ * and stars in that color. `hideTag` only leaves out the category tag (a list of one category).
  */
-const EntryLink = ({ entry, single = false }: { entry: Entry; single?: boolean }) => (
+const EntryLink = ({ entry, hideTag = false }: { entry: Entry; hideTag?: boolean }) => (
   <Link
-    className={[styles.entry, styles[entry.category], single ? styles.plain : styles.washed]
+    className={[styles.entry, styles[entry.category], styles.washed, hideTag && styles.plain]
       .filter(Boolean)
       .join(' ')}
     to={entry.href}
   >
-    {!single && (
+    {!hideTag && (
       <CategoryTag
         className={styles.tag}
         category={entry.category}
