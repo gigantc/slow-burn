@@ -20,9 +20,3 @@
     gap:v.$space-sm;
   }
 }
-
-.three{
-  @include v.breakpoint(v.$bp-md){
-    li:nth-child(n+4){ display:none; }
-  }
-}

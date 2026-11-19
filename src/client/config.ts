@@ -52,7 +52,8 @@ export const GREETING_PERIODS: readonly { name: string; from: number }[] = [
 ];
 
 // Entries shown in Home's "Lately" (desktop grid; the phone list trims it in CSS).
-export const LATELY_COUNT = 6;
+export const LATELY_COUNT = 12;
+export const LATELY_COUNT_PHONE = 3;
 
 // Staple-meat chips under the meat picker (the selected meat is not repeated).
 export const MEAT_CHIP_COUNT = 4;

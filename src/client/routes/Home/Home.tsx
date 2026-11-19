@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import ActionTile from '@/components/ActionTile/ActionTile';
 import EntryList from '@/components/EntryList/EntryList';
 import LiveCookCard from '@/components/LiveCookCard/LiveCookCard';
-import { LATELY_COUNT } from '@/config';
+import { LATELY_COUNT, LATELY_COUNT_PHONE } from '@/config';
 import { useActiveCook, useCooks } from '@/lib/cookHooks';
 import { greeting } from '@/lib/format';
 import { latelyEntries } from '@/lib/lately';
@@ -53,7 +53,7 @@ const Home = () => {
           {entries.length > 0 ? (
             <EntryList
               entries={entries}
-              phoneThree
+              phoneCount={LATELY_COUNT_PHONE}
             />
           ) : (
             <p>Nothing logged yet. Start a cook and it will show up here.</p>
