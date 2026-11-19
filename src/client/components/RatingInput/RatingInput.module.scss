@@ -64,3 +64,40 @@
     }
   }
 }
+
+//////////////////////////////////////
+// Compact: inline in a header row
+
+.compact{
+  // The legend stays for screen readers
+  legend{
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip-path:inset(50%);
+  }
+
+  div{
+    display:flex;
+    gap:0px;
+  }
+
+  button{
+    width:44px;
+    height:44px;
+    background:none;
+    box-shadow:none;
+    border-radius:v.$radius-md;
+
+    svg{
+      width:2.2rem;
+      height:2.2rem;
+    }
+
+    &[aria-pressed='true']{
+      background:none;
+      color:v.$accent;
+    }
+  }
+}

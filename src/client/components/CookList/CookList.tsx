@@ -1,9 +1,10 @@
 import Card from '@/components/Card/Card';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
 import { useActiveCook, useCooks } from '@/lib/cookHooks';
-import { clockTime, formatDuration, localDate } from '@/lib/format';
+import { cookDate, cookDetails } from '@/lib/cookInfo';
+import { clockTime, formatDuration } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
-import { cookTags, cookToCard } from './cookCard';
+import { cookToCard } from './cookCard';
 import styles from './CookList.module.scss';
 
 /** A page of all cooks: the cook in progress pinned first, then the rest newest first. */
@@ -25,8 +26,8 @@ const CookList = ({ title }: { title: string }) => {
           <Card
             variant="resume"
             title={meatName(active.meatId)}
-            date={localDate(active.startedAt)}
-            tags={cookTags(active)}
+            date={cookDate(active)}
+            tags={cookDetails(active)}
             status={`Started ${clockTime(active.startedAt)} · ${formatDuration(now - new Date(active.startedAt).getTime())}`}
             href={`/cooks/${active.id}`}
           />

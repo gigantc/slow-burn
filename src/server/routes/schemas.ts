@@ -13,6 +13,9 @@ const nullable = <T extends TSchema>(schema: T) => Type.Union([Type.Null(), sche
 const isoTimestamp = () =>
   Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?Z$' });
 
+// A local calendar date, YYYY-MM-DD.
+const calendarDate = () => Type.String({ pattern: '^\\d{4}-\\d{2}-\\d{2}$' });
+
 const text = (maxLength: number) => nullable(Type.String({ maxLength }));
 
 export const idParam = Type.String({ pattern: '^[A-Za-z0-9_-]{1,64}$' });
@@ -26,8 +29,11 @@ export const cookBody = Type.Object({
   prep: text(5000),
   smoker: text(200),
   wood: text(200),
+  // Optional: requests queued before these columns existed still validate.
+  charcoal: Type.Optional(text(200)),
   targetPitTempF: nullable(Type.Integer({ minimum: 0, maximum: 1500 })),
   targetInternalTempF: nullable(Type.Integer({ minimum: 0, maximum: 1500 })),
+  cookedOn: Type.Optional(nullable(calendarDate())),
   startedAt: nullable(isoTimestamp()),
   endedAt: nullable(isoTimestamp()),
   finalInternalTempF: nullable(Type.Integer({ minimum: 0, maximum: 1500 })),

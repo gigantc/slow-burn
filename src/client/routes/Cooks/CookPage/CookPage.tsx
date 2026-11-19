@@ -1,5 +1,6 @@
 import { useParams } from 'react-router';
 import { useCook, useCooks } from '@/lib/cookHooks';
+import { isLiveCook } from '@/lib/cookInfo';
 import CookDetail from '../CookDetail/CookDetail';
 import CookMissing from '../CookMissing/CookMissing';
 import LiveCook from '../LiveCook/LiveCook';
@@ -11,7 +12,7 @@ const CookPage = () => {
   const { ready } = useCooks();
 
   if (!cook) return ready ? <CookMissing /> : null;
-  return cook.startedAt && !cook.endedAt ? <LiveCook cook={cook} /> : <CookDetail cook={cook} />;
+  return isLiveCook(cook) ? <LiveCook cook={cook} /> : <CookDetail cook={cook} />;
 };
 
 export default CookPage;

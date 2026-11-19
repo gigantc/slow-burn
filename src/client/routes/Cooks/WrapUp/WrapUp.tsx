@@ -21,6 +21,8 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   const meatName = useMeatName(cook.meatId);
   const navigate = useNavigate();
   const back = useBack();
+  // A cook logged after the fact keeps whatever times it has; only live cooks get an end time.
+  const past = cook.source === 'import';
   // Editing a finished cook's wrap-up was pushed from the detail page, so saving goes back to it.
   const [editing] = useState(Boolean(cook.endedAt));
   // The default end keeps full precision. The input only shows minutes, and truncating "now"
@@ -34,13 +36,14 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   const [notes, setNotes] = useState(cook.notes ?? '');
   const [nextTime, setNextTime] = useState(cook.nextTimeNote ?? '');
 
-  const endIso = edited === null ? defaultEnd : fromLocalInput(edited);
-  const endMs = new Date(endIso).getTime();
-  const total = cook.startedAt ? endMs - new Date(cook.startedAt).getTime() : null;
+  const endIso = past ? cook.endedAt : edited === null ? defaultEnd : fromLocalInput(edited);
+  const endMs = endIso ? new Date(endIso).getTime() : null;
+  const total =
+    cook.startedAt && endMs !== null ? endMs - new Date(cook.startedAt).getTime() : null;
   const invalid = total !== null && total < 0;
   // Rested runs from the logged Rest event to the end; no Rest event, no stat.
   const restEvent = latestEvent(cook.events, 'rest');
-  const rested = restEvent ? endMs - new Date(restEvent.at).getTime() : null;
+  const rested = restEvent && endMs !== null ? endMs - new Date(restEvent.at).getTime() : null;
   const temp = Number(finalTemp);
   const hasTemp = finalTemp.trim() !== '' && !Number.isNaN(temp);
 
@@ -79,27 +82,33 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
       crumb={{ to: `/cooks/${cook.id}`, label: meatName, current: 'Wrap up' }}
       meta={meatName}
     >
-      <StatTiles>
-        <StatTile
-          label="Total time"
-          value={total === null ? '--' : invalid ? 'Check end' : formatDuration(total)}
-        />
-        {rested !== null && rested >= 0 && (
-          <StatTile
-            label="Rested"
-            value={formatDuration(rested)}
+      {(total !== null || (rested !== null && rested >= 0)) && (
+        <StatTiles>
+          {total !== null && (
+            <StatTile
+              label="Total time"
+              value={invalid ? 'Check end' : formatDuration(total)}
+            />
+          )}
+          {rested !== null && rested >= 0 && (
+            <StatTile
+              label="Rested"
+              value={formatDuration(rested)}
+            />
+          )}
+        </StatTiles>
+      )}
+      <FieldGrid wide>
+        {!past && (
+          <Field
+            label="End time"
+            type="datetime-local"
+            value={edited ?? toLocalInput(defaultEnd)}
+            onChange={(e) => setEdited(e.target.value)}
+            error={invalid ? END_BEFORE_START : undefined}
+            required
           />
         )}
-      </StatTiles>
-      <FieldGrid wide>
-        <Field
-          label="End time"
-          type="datetime-local"
-          value={edited ?? toLocalInput(defaultEnd)}
-          onChange={(e) => setEdited(e.target.value)}
-          error={invalid ? END_BEFORE_START : undefined}
-          required
-        />
         <Field
           label="Final temp"
           unit="°F"

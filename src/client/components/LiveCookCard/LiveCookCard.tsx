@@ -1,8 +1,8 @@
 import { Link } from 'react-router';
 import type { CookWithEvents } from 'shared/types';
 import Icon from '@/components/Icon/Icon';
-import { cookTags } from '@/components/CookList/cookCard';
 import { useMeatName } from '@/lib/cookHooks';
+import { cookDetails } from '@/lib/cookInfo';
 import { latestEvent } from '@/lib/cookEvents';
 import { clockTime, formatDuration } from '@/lib/format';
 import { useNow } from '@/lib/useNow';
@@ -33,7 +33,7 @@ const LiveCookCard = ({ cook }: { cook: CookWithEvents }) => {
       <span className={styles.eyebrow}>On the pit</span>
       <h3>{meat}</h3>
       <small className={styles.meta}>
-        {[...cookTags(cook), `since ${clockTime(started)}`].join(' · ')}
+        {[...cookDetails(cook), `since ${clockTime(started)}`].join(' · ')}
       </small>
       <p className={styles.elapsed}>
         <small>Elapsed</small>

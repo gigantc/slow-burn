@@ -2,6 +2,7 @@
 // Meat helpers
 
 import type { CookWithEvents, Meat } from 'shared/types';
+import { cookDate } from '@/lib/cookInfo';
 
 /**
  * Meats ordered as staples: most cooks first; ties go to the one cooked longest ago (so a
@@ -10,7 +11,7 @@ import type { CookWithEvents, Meat } from 'shared/types';
 export const rankStaples = (meats: readonly Meat[], cooks: readonly CookWithEvents[]): Meat[] => {
   const stats = new Map<string, { count: number; latest: string }>();
   for (const cook of cooks) {
-    const when = cook.startedAt ?? cook.createdAt;
+    const when = cookDate(cook);
     const entry = stats.get(cook.meatId) ?? { count: 0, latest: when };
     entry.count += 1;
     if (when > entry.latest) entry.latest = when;

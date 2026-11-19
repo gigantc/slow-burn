@@ -5,6 +5,7 @@ import styles from './TempChart.module.scss';
 export type Reading = { at: number; value: number };
 
 type Props = {
+  className?: string;
   title?: string;
   /** Pit and meat readings in °F, oldest first; `at` is epoch ms. */
   pit: readonly Reading[];
@@ -17,6 +18,10 @@ type Props = {
   /** Stretches spent wrapped: a shaded band, with a dashed line where each wrap began. */
   wraps?: readonly WrapSpan[];
 };
+
+/** Worth drawing once at least one series has a line (2+ readings); one lone dot says nothing. */
+export const hasTrend = (pit: readonly Reading[], meat: readonly Reading[]) =>
+  pit.length >= 2 || meat.length >= 2;
 
 const WIDTH = 600;
 const HEIGHT = 170;
@@ -49,7 +54,16 @@ const summary = (
 };
 
 /** Pit and meat temperatures over the cook: a fluid inline SVG with no chart library. */
-const TempChart = ({ title = 'So far', pit, meat, start, end, targetMeat, wraps = [] }: Props) => {
+const TempChart = ({
+  className,
+  title = 'So far',
+  pit,
+  meat,
+  start,
+  end,
+  targetMeat,
+  wraps = [],
+}: Props) => {
   const values = [...pit, ...meat].map((r) => r.value);
   if (targetMeat) values.push(targetMeat);
   // Breathing room above and below, and never a span under MIN_SPAN degrees so a couple of
@@ -67,7 +81,7 @@ const TempChart = ({ title = 'So far', pit, meat, start, end, targetMeat, wraps 
   const latest = meat[meat.length - 1];
 
   return (
-    <figure className={styles.chart}>
+    <figure className={className ? `${styles.chart} ${className}` : styles.chart}>
       <figcaption>
         <h3>{title}</h3>
         <span>Pit</span>

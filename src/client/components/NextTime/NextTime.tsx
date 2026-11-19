@@ -5,8 +5,9 @@ import styles from './NextTime.module.scss';
 
 type CardProps = {
   variant?: 'card';
-  /** The small "From your ..." line. */
-  source: ReactNode;
+  className?: string;
+  /** The small "From your ..." line; leave it out where the page already says whose cook it is. */
+  source?: ReactNode;
   /** That cook's rating; shown after the source on phone only. */
   rating?: number;
   children: ReactNode;
@@ -60,20 +61,22 @@ const NextTime = (props: CardProps | StripProps | FieldProps) => {
     );
   }
 
-  const { source, rating, children } = props;
+  const { source, rating, children, className } = props;
   return (
-    <aside className={styles.card}>
+    <aside className={className ? `${styles.card} ${className}` : styles.card}>
       <Eyebrow />
       <p>{children}</p>
-      <small>
-        {source}
-        {rating !== undefined && (
-          <span>
-            {' · '}
-            <Stars rating={rating} />
-          </span>
-        )}
-      </small>
+      {(source || rating !== undefined) && (
+        <small>
+          {source}
+          {rating !== undefined && (
+            <span>
+              {' · '}
+              <Stars rating={rating} />
+            </span>
+          )}
+        </small>
+      )}
     </aside>
   );
 };

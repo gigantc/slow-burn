@@ -9,13 +9,14 @@ import Icon from '@/components/Icon/Icon';
 import NextTime from '@/components/NextTime/NextTime';
 import Sheet from '@/components/Sheet/Sheet';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
-import TempChart from '@/components/TempChart/TempChart';
+import TempChart, { hasTrend } from '@/components/TempChart/TempChart';
 import TempTile from '@/components/TempTile/TempTile';
 import UndoToast from '@/components/UndoToast/UndoToast';
 import type { Toast } from '@/components/UndoToast/UndoToast';
 import { addEvent, deleteCook, deleteEvent, markOffPit } from '@/lib/cookActions';
 import { eventDef, isWrapped, latestEvent, readings, wrapSpans } from '@/lib/cookEvents';
 import { useMeatName } from '@/lib/cookHooks';
+import { cookDetails, cookTargets } from '@/lib/cookInfo';
 import { clockTime, formatClock } from '@/lib/format';
 import { meatProgress, pitProgress } from '@/lib/liveStats';
 import { useNextTimeNote } from '@/lib/nextTime';
@@ -25,7 +26,7 @@ import { useWakeLock } from '@/lib/useWakeLock';
 import EventGrid from '../EventGrid/EventGrid';
 import EventSheet from '../EventSheet/EventSheet';
 import type { EventTarget } from '../EventSheet/EventSheet';
-import Timeline from '../Timeline/Timeline';
+import { TimelineCard } from '../Timeline/Timeline';
 import styles from './LiveCook.module.scss';
 
 const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
@@ -73,13 +74,8 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
   }));
   const pitNow = latestEvent(cook.events, 'pit_temp')?.value ?? null;
   const meatNow = latestEvent(cook.events, 'internal_temp')?.value ?? null;
-  const targets = [
-    cook.targetInternalTempF ? `${cook.targetInternalTempF}° meat` : '',
-    cook.targetPitTempF ? `${cook.targetPitTempF}° pit` : '',
-  ].filter(Boolean);
-  const details = [cook.weightLbs === null ? '' : `${cook.weightLbs} lb`, cook.wood ?? ''].filter(
-    Boolean,
-  );
+  const targets = cookTargets(cook);
+  const details = cookDetails(cook);
 
   return (
     <div className={styles.live}>
@@ -109,9 +105,7 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
         <h1>{meatName}</h1>
         <small className={styles.meta}>
           {details.join(' · ')}
-          {targets.length > 0 && (
-            <span>{`${details.length > 0 ? ' · ' : ''}Target ${targets.join(', ')}`}</span>
-          )}
+          {targets && <span>{`${details.length > 0 ? ' · ' : ''}${targets}`}</span>}
         </small>
       </header>
       <div className={styles.main}>
@@ -138,7 +132,7 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
             progress={meatProgress(cook.events, cook.targetInternalTempF)}
           />
         </div>
-        {pit.length + meat.length >= 2 && (
+        {hasTrend(pit, meat) && (
           <div className={styles.chart}>
             <TempChart
               pit={pit}
@@ -158,13 +152,11 @@ const LiveCook = ({ cook }: { cook: CookWithEvents }) => {
         />
       </div>
       {cook.events.length > 0 && (
-        <section className={styles.log}>
-          <h2>Timeline</h2>
-          <Timeline
-            events={cook.events}
-            onSelect={(event) => setTarget({ mode: 'edit', event })}
-          />
-        </section>
+        <TimelineCard
+          className={styles.log}
+          events={cook.events}
+          onSelect={(event) => setTarget({ mode: 'edit', event })}
+        />
       )}
       <SyncStatus quiet />
       <Sheet

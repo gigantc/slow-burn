@@ -4,6 +4,7 @@
 import { useSyncExternalStore } from 'react';
 import { useMemo } from 'react';
 import type { CookWithEvents, Meat } from 'shared/types';
+import { isLiveCook } from '@/lib/cookInfo';
 import { getCookState, getSyncState, subscribe } from '@/lib/cookStore';
 
 const useCookState = () => useSyncExternalStore(subscribe, getCookState);
@@ -16,10 +17,10 @@ export const useCook = (id: string | undefined): CookWithEvents | undefined => {
   return cooks.find((cook) => cook.id === id);
 };
 
-/** Started and not ended; if there are several, the most recently started. */
+/** On the pit now (see isLiveCook); if there are several, the most recent. */
 export const useActiveCook = (): CookWithEvents | undefined => {
   const { cooks } = useCookState();
-  return cooks.find((cook) => cook.startedAt && !cook.endedAt);
+  return cooks.find(isLiveCook);
 };
 
 export const useSyncStatus = () => useSyncExternalStore(subscribe, getSyncState);

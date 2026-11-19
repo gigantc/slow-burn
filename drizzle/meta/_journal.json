@@ -36,6 +36,13 @@
       "when": 1795041334260,
       "tag": "0004_drop_old_cook_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1795111642582,
+      "tag": "0005_stiff_pyro",
+      "breakpoints": true
     }
   ]
 }

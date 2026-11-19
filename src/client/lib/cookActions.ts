@@ -10,7 +10,8 @@ import { requestSync } from '@/lib/sync';
 import { fetchNextTime } from '@/lib/transport';
 
 export type CookFields = Omit<Cook, 'id' | 'createdAt' | 'updatedAt' | 'source'>;
-export type CookInput = Partial<CookFields> & { id?: string };
+/** `source` is set when saving: 'import' for a cook logged after the fact, so it is never live. */
+export type CookInput = Partial<CookFields> & { id?: string; source?: Cook['source'] };
 export type EventInput = Pick<CookEvent, 'type'> &
   Partial<Pick<CookEvent, 'at' | 'value' | 'note'>>;
 
@@ -20,8 +21,10 @@ const BLANK: CookFields = {
   prep: null,
   smoker: null,
   wood: null,
+  charcoal: null,
   targetPitTempF: null,
   targetInternalTempF: null,
+  cookedOn: null,
   startedAt: null,
   endedAt: null,
   finalInternalTempF: null,

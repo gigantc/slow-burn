@@ -83,6 +83,16 @@ export const timeAgo = (iso: string, now: number) => {
 // datetime-local values are zone-less local wall-clock time at minute precision. Every
 // conversion to and from stored UTC ISO timestamps goes through toLocalInput/fromLocalInput.
 
+/** Today's local date, YYYY-MM-DD. */
+export const today = () => localDate(new Date().toISOString());
+
+/** The local date after a YYYY-MM-DD one. */
+export const nextDay = (date: string) => {
+  const next = new Date(`${date}T00:00:00`);
+  next.setDate(next.getDate() + 1);
+  return localDate(next.toISOString());
+};
+
 /** ISO timestamp to the value format of <input type="datetime-local"> (local time). */
 export const toLocalInput = (iso: string) => {
   const d = new Date(iso);

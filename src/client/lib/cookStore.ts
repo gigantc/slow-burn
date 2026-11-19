@@ -4,6 +4,7 @@
 // synchronously, then persists the change and its outbox ops in one transaction.
 
 import type { CookWithEvents, Meat } from 'shared/types';
+import { compareCooks } from '@/lib/cookInfo';
 import { dbGetAll, dbWrite } from '@/lib/idb';
 import type { WriteOp } from '@/lib/idb';
 import type { NewOutboxOp, OutboxOp, SyncState } from '@/lib/types';
@@ -40,10 +41,7 @@ export const getMutationVersion = () => version;
 //////////////////////////////////////
 // State setters
 
-const newest = (cook: CookWithEvents) => cook.startedAt ?? cook.createdAt;
-
-const sorted = (cooks: Iterable<CookWithEvents>) =>
-  [...cooks].sort((a, b) => newest(b).localeCompare(newest(a)));
+const sorted = (cooks: Iterable<CookWithEvents>) => [...cooks].sort(compareCooks);
 
 export const setSyncState = (patch: Partial<SyncState>) => {
   syncState = { ...syncState, ...patch };

@@ -57,6 +57,18 @@
   }
 }
 
+// Quiet destructive action: danger-colored text, no fill
+.dangerText{
+  min-height:44px;
+  padding:0px;
+  color:v.$danger;
+
+  &:hover:not(:disabled){
+    background-color:v.$hover;
+    color:v.$danger;
+  }
+}
+
 // Primary actions: forms, sheets, anything tapped mid-cook
 .lg{
   min-height:v.$button-lg;

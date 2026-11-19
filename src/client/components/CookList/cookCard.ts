@@ -1,18 +1,14 @@
 import type { CookWithEvents } from 'shared/types';
 import type { EntryCardProps } from '@/components/Card/Card';
 import type { Entry } from '@/components/EntryLink/EntryLink';
-import { formatDuration, formatMonthDay, localDate } from '@/lib/format';
-
-export const cookTags = (cook: CookWithEvents) =>
-  [cook.weightLbs === null ? null : `${cook.weightLbs} lb`, cook.wood].flatMap((tag) =>
-    tag ? [tag] : [],
-  );
+import { cookDate, cookDetails } from '@/lib/cookInfo';
+import { formatDuration, formatMonthDay } from '@/lib/format';
 
 export const cookToCard = (cook: CookWithEvents, meatName: string): EntryCardProps => ({
   type: 'cook',
   title: meatName,
-  tags: cookTags(cook),
-  date: localDate(cook.startedAt ?? cook.createdAt),
+  tags: cookDetails(cook),
+  date: cookDate(cook),
   detail:
     cook.startedAt && cook.endedAt
       ? formatDuration(new Date(cook.endedAt).getTime() - new Date(cook.startedAt).getTime())
@@ -27,11 +23,11 @@ export const cookToEntry = (cook: CookWithEvents, meatName: string): Entry => ({
   category: 'cook',
   name: meatName,
   meta: [
-    formatMonthDay(cook.startedAt ?? cook.createdAt),
+    formatMonthDay(cookDate(cook)),
     cook.startedAt && cook.endedAt
       ? formatDuration(new Date(cook.endedAt).getTime() - new Date(cook.startedAt).getTime())
       : null,
-    cook.wood,
+    ...cookDetails({ weightLbs: null, wood: cook.wood, charcoal: cook.charcoal }),
   ]
     .filter(Boolean)
     .join(' · '),

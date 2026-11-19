@@ -3,7 +3,7 @@
 // Client-generated ids, upserts, and last-write-wins on the client's `updatedAt`.
 
 import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
-import { and, asc, desc, eq, isNotNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { meatKey } from '../../shared/meats.js';
 import type {
   Cook,
@@ -63,21 +63,23 @@ export const cookRoutes: FastifyPluginAsyncTypebox = async (app) => {
         .where(
           and(
             eq(cooks.meatId, request.query.meatId),
-            isNotNull(cooks.endedAt),
+            // Finished: anything but a cook still on the pit
+            sql`not (${cooks.source} = 'app' and ${cooks.startedAt} is not null and ${cooks.endedAt} is null)`,
             sql`trim(coalesce(${cooks.nextTimeNote}, '')) <> ''`,
           ),
         )
-        .orderBy(desc(cooks.endedAt))
+        .orderBy(desc(sql`coalesce(${cooks.cookedOn}, ${cooks.endedAt}, ${cooks.createdAt})`))
         .limit(1)
         .get();
 
       const { cook } = row ?? {};
-      if (!row || !cook?.endedAt || !cook.nextTimeNote || !cook.meatId) return reply.send(null);
+      const date = cook?.cookedOn ?? cook?.endedAt ?? cook?.createdAt;
+      if (!row || !date || !cook?.nextTimeNote || !cook.meatId) return reply.send(null);
       const note: NextTimeNote = {
         cookId: cook.id,
         meatId: cook.meatId,
         meatName: row.meatName,
-        endedAt: cook.endedAt,
+        date,
         nextTimeNote: cook.nextTimeNote,
       };
       return reply.send(note);

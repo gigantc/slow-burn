@@ -1,49 +1,188 @@
 //////////////////////////////////////
 // Cook detail
+// Desktop: header, a main column (chart, prep, notes) and an aside (stats, next time, timeline).
+// Phone: one column in a reading order set with `order`: stats, next time, chart, notes,
+// timeline, actions.
 
 //imports
 @use 'scss/variables' as v;
 
 .detail{
   display:flex;
-  flex-direction:column;
-  gap:v.$space-lg;
-  max-width:v.$container-width;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  gap:28px v.$space-32;
 
-  header h1{ padding:v.$space-sm 0px 0px 0px; }
+  @include v.breakpoint(v.$bp-md){
+    flex-direction:column;
+    flex-wrap:nowrap;
+    align-items:stretch;
+    gap:v.$space-20;
+  }
 
-  .meta{
+  //////////////////////////////////////
+  // Header
+
+  > header{
+    display:grid;
+    grid-template-areas:
+      'crumb edit'
+      'title edit'
+      'rating edit'
+      'meta edit';
+    grid-template-columns:minmax(0, 1fr) auto;
+    align-items:end;
+    gap:v.$space-sm v.$space-md;
+    flex:0 0 100%;
+
+    nav{ grid-area:crumb; }
+    h1{ grid-area:title; }
+    .meta{ grid-area:meta; }
+    .rating{ grid-area:rating; }
+    .edit{ grid-area:edit; }
+
+    .back,
+    .eyebrow{ display:none; }
+
+    .meta{
+      color:v.$muted;
+      font-size:1.5rem;
+    }
+
+    // Stars with a quiet "Rate it" while unrated; the first star lines up with the title
+    .rating{
+      display:flex;
+      align-items:center;
+      gap:v.$space-sm;
+      margin:0px 0px 0px -12px;
+
+      small{ color:v.$muted; }
+    }
+    .eyebrow{ @include v.eyebrow; }
+
+    @include v.breakpoint(v.$bp-md){
+      grid-template-areas:
+        'back edit'
+        'eyebrow eyebrow'
+        'title title'
+        'rating rating'
+        'meta meta';
+      grid-template-columns:44px 44px;
+      justify-content:space-between;
+      align-items:center;
+      gap:v.$space-xs;
+      margin:0px -12px;
+
+      nav{ display:none; }
+
+      .back{
+        display:flex;
+        grid-area:back;
+        align-items:center;
+        justify-content:center;
+        width:44px;
+        height:44px;
+        border-radius:v.$radius-md;
+        color:v.$text;
+
+        &:focus-visible{
+          outline:none;
+          box-shadow:inset 0px 0px 0px 2px v.$accent;
+        }
+      }
+
+      // The Edit button shrinks to a plain 44px icon button
+      .edit{
+        min-height:44px;
+        padding:0px;
+        background:none;
+        border-radius:v.$radius-md;
+
+        span{ display:none; }
+      }
+
+      .eyebrow{
+        display:block;
+        grid-area:eyebrow;
+        margin:v.$space-sm 12px 0px 12px;
+        color:v.$type;
+      }
+      h1,
+      .meta{ margin:0px 12px; }
+      .rating{ margin:0px; }
+      .meta{ font-size:1.4rem; }
+    }
+  }
+
+  @include v.category-classes;
+
+  //////////////////////////////////////
+  // Columns
+
+  .main,
+  .aside{
     display:flex;
-    flex-wrap:wrap;
-    gap:v.$space-xs v.$space-md;
-    color:v.$muted;
+    flex-direction:column;
+    min-width:0px;
+    gap:v.$space-lg;
+  }
+  .main{ flex:3 1 520px; }
+  .aside{
+    flex:2 1 320px;
+    gap:v.$space-md;
+  }
+
+  // The phone order: the two columns dissolve into one list
+  @include v.breakpoint(v.$bp-md){
+    .main,
+    .aside{ display:contents; }
+
+    .stats{ order:1; }
+    .next{ order:2; }
+    .chart{ order:3; }
+    .notes{ order:4; }
+    .log{ order:5; }
+    .actions{ order:6; }
   }
 
   .stats{
-    display:grid;
-    grid-template-columns:auto 1fr;
-    gap:v.$space-sm v.$space-lg;
-    margin:0px;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    grid-auto-flow:row;
 
-    // Wrapper divs group each dt/dd for React keys; they take no part in the layout
-    div{ display:contents; }
-    dt{ color:v.$muted; }
-    dd{
-      margin:0px;
-      font-weight:600;
+    &[data-count='1']{ grid-template-columns:1fr; }
+
+    @include v.breakpoint(v.$bp-md){
+      grid-template-columns:repeat(auto-fit, minmax(0, 1fr));
+      grid-auto-flow:column;
+
+      &[data-count='4']{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        grid-auto-flow:row;
+      }
     }
   }
 
   .notes{
-    color:v.$text;
-    white-space:pre-wrap;
+    display:flex;
+    flex-direction:column;
+    gap:v.$space-sm;
+
+    p{
+      max-width:640px;
+      white-space:pre-wrap;
+    }
+
+    @include v.breakpoint(v.$bp-md){ max-width:none; }
   }
 
+  // Edit wrap-up, then a quiet Delete beneath it: left-aligned under the notes on desktop,
+  // full width on phone
   .actions{
     display:flex;
-    flex-wrap:wrap;
-    gap:v.$space-md;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:v.$space-sm;
 
-    button{ flex:1; }
+    @include v.breakpoint(v.$bp-md){ align-items:stretch; }
   }
 }

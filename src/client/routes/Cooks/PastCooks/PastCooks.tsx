@@ -1,5 +1,6 @@
 import type { CookWithEvents } from 'shared/types';
 import Stars from '@/components/Stars/Stars';
+import { cookDate, cookDetails } from '@/lib/cookInfo';
 import { formatDay, formatDuration } from '@/lib/format';
 import styles from './PastCooks.module.scss';
 
@@ -9,7 +10,7 @@ const meta = (cook: CookWithEvents) =>
     cook.startedAt && cook.endedAt
       ? formatDuration(new Date(cook.endedAt).getTime() - new Date(cook.startedAt).getTime())
       : null,
-    cook.wood,
+    ...cookDetails({ weightLbs: null, wood: cook.wood, charcoal: cook.charcoal }),
   ]
     .filter(Boolean)
     .join(' · ');
@@ -21,7 +22,7 @@ const PastCooks = ({ meatName, cooks }: { meatName: string; cooks: CookWithEvent
     <ul>
       {cooks.map((cook) => (
         <li key={cook.id}>
-          <strong>{formatDay(cook.endedAt ?? cook.createdAt)}</strong>
+          <strong>{formatDay(cookDate(cook))}</strong>
           {cook.rating !== null && <Stars rating={cook.rating} />}
           <small>{meta(cook)}</small>
         </li>

@@ -7,33 +7,15 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CookWithEvents, Meat, NextTimeNote } from 'shared/types';
 import { fetchNextTimeNote } from '@/lib/cookActions';
 import { useCooks } from '@/lib/cookHooks';
+import { cookDate, isLiveCook } from '@/lib/cookInfo';
 
-/** The most recent finished cook of this meat, with or without a note. */
-export const findLastCook = (
-  cooks: readonly CookWithEvents[],
-  meatId: string,
-  excludeId?: string,
-): CookWithEvents | null =>
-  cooks.reduce<CookWithEvents | null>(
-    (best, cook) =>
-      cook.id !== excludeId &&
-      cook.endedAt &&
-      cook.meatId === meatId &&
-      (!best?.endedAt || cook.endedAt > best.endedAt)
-        ? cook
-        : best,
-    null,
-  );
-
-/** Finished cooks of this meat, newest first. */
+/** Finished cooks of this meat, newest first (the store keeps cooks in that order). */
 export const findPastCooks = (
   cooks: readonly CookWithEvents[],
   meatId: string,
   excludeId?: string,
 ): CookWithEvents[] =>
-  cooks
-    .filter((cook) => cook.id !== excludeId && cook.endedAt && cook.meatId === meatId)
-    .sort((a, b) => (b.endedAt ?? '').localeCompare(a.endedAt ?? ''));
+  cooks.filter((cook) => cook.id !== excludeId && cook.meatId === meatId && !isLiveCook(cook));
 
 export const findNextTimeNote = (
   cooks: readonly CookWithEvents[],
@@ -42,22 +24,20 @@ export const findNextTimeNote = (
   excludeId?: string,
 ): NextTimeNote | null => {
   const meat = meats.find((m) => m.id === meatId);
-  let best: NextTimeNote | null = null;
+  // The store is newest first, so the first cook with a note is the latest.
   for (const cook of cooks) {
     const note = cook.nextTimeNote?.trim();
-    if (!meat || cook.id === excludeId || !cook.endedAt || !note || cook.meatId !== meatId)
+    if (!meat || cook.id === excludeId || isLiveCook(cook) || !note || cook.meatId !== meatId)
       continue;
-    if (!best || cook.endedAt > best.endedAt) {
-      best = {
-        cookId: cook.id,
-        meatId,
-        meatName: meat.name,
-        endedAt: cook.endedAt,
-        nextTimeNote: note,
-      };
-    }
+    return {
+      cookId: cook.id,
+      meatId,
+      meatName: meat.name,
+      date: cookDate(cook),
+      nextTimeNote: note,
+    };
   }
-  return best;
+  return null;
 };
 
 export const useNextTimeNote = (meatId: string, excludeId?: string): NextTimeNote | null => {

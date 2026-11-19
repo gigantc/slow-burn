@@ -1,3 +1,4 @@
+import { Children } from 'react';
 import type { ReactNode } from 'react';
 import styles from './StatTile.module.scss';
 
@@ -9,9 +10,14 @@ const StatTile = ({ label, value }: { label: string; value: ReactNode }) => (
   </div>
 );
 
-/** A row of StatTiles that shares the width equally. */
-export const StatTiles = ({ children }: { children: ReactNode }) => (
-  <div className={styles.row}>{children}</div>
+/** A row of StatTiles that shares the width equally; four wrap into two by two. */
+export const StatTiles = ({ className, children }: { className?: string; children: ReactNode }) => (
+  <div
+    className={className ? `${styles.row} ${className}` : styles.row}
+    data-count={Children.toArray(children).length}
+  >
+    {children}
+  </div>
 );
 
 export default StatTile;

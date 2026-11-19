@@ -1,19 +1,17 @@
 import { useNavigate } from 'react-router';
 import { addEvent, saveCook } from '@/lib/cookActions';
-import { fromLocalInput } from '@/lib/format';
+import { pastTimes } from '@/lib/cookInfo';
+import type { PastDates } from '@/lib/cookInfo';
 import CookForm from '../CookForm/CookForm';
-import type { PastDates, Setup } from '../CookForm/CookForm';
+import type { Setup } from '../CookForm/CookForm';
 
 const NewCook = () => {
   const navigate = useNavigate();
 
   const onSave = (setup: Setup, past: PastDates | null) => {
     if (past) {
-      const cook = saveCook({
-        ...setup,
-        startedAt: fromLocalInput(past.startedAt),
-        endedAt: fromLocalInput(past.endedAt),
-      });
+      // Logged after the fact: 'import' keeps it from ever counting as live.
+      const cook = saveCook({ ...setup, ...pastTimes(past), source: 'import' });
       navigate(`/cooks/${cook.id}/wrap-up`, { replace: true });
       return;
     }

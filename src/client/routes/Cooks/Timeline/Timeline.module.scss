@@ -64,3 +64,22 @@
     white-space:pre-wrap;
   }
 }
+
+//////////////////////////////////////
+// Card
+
+.card{
+  min-width:0px;
+  padding:v.$space-20 22px;
+  background-color:v.$panel-alt;
+  border-radius:v.$radius-lg;
+
+  h2{ margin:0px 0px v.$space-sm 0px; }
+
+  > p{ color:v.$muted; }
+
+  @include v.breakpoint(v.$bp-md){
+    padding:0px;
+    background:none;
+  }
+}

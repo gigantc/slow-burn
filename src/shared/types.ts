@@ -19,8 +19,11 @@ export type Cook = {
   /** Still stored, but no longer asked for. */
   smoker: string | null;
   wood: string | null;
+  charcoal: string | null;
   targetPitTempF: number | null;
   targetInternalTempF: number | null;
+  /** Local date (YYYY-MM-DD) of a cook logged after the fact; the times may be unknown. */
+  cookedOn: string | null;
   startedAt: string | null;
   endedAt: string | null;
   finalInternalTempF: number | null;
@@ -62,7 +65,8 @@ export type NextTimeNote = {
   cookId: string;
   meatId: string;
   meatName: string;
-  endedAt: string;
+  /** The cook's `cookedOn` date (YYYY-MM-DD) or, without one, its end timestamp. */
+  date: string;
   nextTimeNote: string;
 };
 

@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from 'react';
 import styles from './Button.module.scss';
 
 type Common = {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'dangerText';
   /** `lg` is the primary-action size (60px on phone, 52px on desktop). */
   size?: 'md' | 'lg';
   /** Spans both columns inside a form section grid. */
@@ -11,7 +11,12 @@ type Common = {
 };
 
 type ButtonProps = Common & ButtonHTMLAttributes<HTMLButtonElement> & { to?: undefined };
-type LinkProps = Common & { to: string; className?: string; children: React.ReactNode };
+type LinkProps = Common & {
+  to: string;
+  className?: string;
+  'aria-label'?: string;
+  children: React.ReactNode;
+};
 
 /** A button, or a router link styled as one when `to` is given. */
 const Button = (props: ButtonProps | LinkProps) => {
@@ -31,6 +36,7 @@ const Button = (props: ButtonProps | LinkProps) => {
       <Link
         className={classes}
         to={rest.to}
+        aria-label={rest['aria-label']}
       >
         {rest.children}
       </Link>

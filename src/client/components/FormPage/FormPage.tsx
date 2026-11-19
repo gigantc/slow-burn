@@ -125,9 +125,20 @@ export const FormPage = ({
 /** Grid for Field cards inside the form: two across on phone, as many as fit on desktop. */
 export const FieldGrid = ({
   wide = false,
+  threeUp = false,
   children,
 }: {
   /** For wide controls (date and time): one per row on phone. */
   wide?: boolean;
+  /** Exactly three short fields: three across, phone included. */
+  threeUp?: boolean;
   children: ReactNode;
-}) => <div className={wide ? `${styles.grid} ${styles.wide}` : styles.grid}>{children}</div>;
+}) => (
+  <div
+    className={[styles.grid, wide && styles.wide, threeUp && styles.threeUp]
+      .filter(Boolean)
+      .join(' ')}
+  >
+    {children}
+  </div>
+);

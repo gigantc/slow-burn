@@ -38,10 +38,14 @@ export const cooks = sqliteTable(
     prep: text('prep'),
     smoker: text('smoker'),
     wood: text('wood'),
+    charcoal: text('charcoal'),
     targetPitTempF: integer('target_pit_temp_f'),
     targetInternalTempF: integer('target_internal_temp_f'),
     // Required by the API; nullable here because the column was added to existing rows.
     meatId: text('meat_id').references(() => meats.id, { onDelete: 'restrict' }),
+    // The local calendar date (YYYY-MM-DD) of a cook logged after the fact, when its start and
+    // end times aren't known. Cooks with times derive their date from startedAt.
+    cookedOn: text('cooked_on'),
     startedAt: text('started_at'),
     endedAt: text('ended_at'),
     finalInternalTempF: integer('final_internal_temp_f'),

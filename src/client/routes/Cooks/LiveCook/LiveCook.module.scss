@@ -203,17 +203,7 @@
 
   .log{
     flex:2 1 300px;
-    min-width:0px;
-    padding:v.$space-20 22px;
-    background-color:v.$panel-alt;
-    border-radius:v.$radius-lg;
 
-    h2{ margin:0px 0px v.$space-sm 0px; }
-
-    @include v.breakpoint(v.$bp-md){
-      flex:none;
-      padding:0px;
-      background:none;
-    }
+    @include v.breakpoint(v.$bp-md){ flex:none; }
   }
 }

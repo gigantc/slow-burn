@@ -43,7 +43,11 @@
   }
 
   // No browser dropdown arrow on inputs with datalist suggestions; they still show while typing
-  input[list]::-webkit-calendar-picker-indicator{ display:none; }
+  // (display:none doesn't hide it in current Chrome; opacity does)
+  input[list]::-webkit-calendar-picker-indicator{
+    opacity:0;
+    pointer-events:none;
+  }
 
   .control{
     display:flex;

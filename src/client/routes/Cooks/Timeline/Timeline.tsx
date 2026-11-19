@@ -43,4 +43,21 @@ const Timeline = ({ events, onSelect }: Props) => {
   );
 };
 
+type CardProps = Props & { className?: string };
+
+/** The timeline in its titled card (the right column on desktop, a plain section on phone). */
+export const TimelineCard = ({ className, events, onSelect }: CardProps) => (
+  <section className={className ? `${styles.card} ${className}` : styles.card}>
+    <h2>Timeline</h2>
+    {events.length > 0 ? (
+      <Timeline
+        events={events}
+        onSelect={onSelect}
+      />
+    ) : (
+      <p>No events were logged.</p>
+    )}
+  </section>
+);
+
 export default Timeline;
