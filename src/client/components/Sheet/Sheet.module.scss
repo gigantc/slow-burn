@@ -25,10 +25,9 @@
   margin:auto;
   padding:v.$space-lg;
   overflow:auto;
-  background-color:v.$panel;
-  border:1px solid v.$border;
+  background-color:v.$card;
   border-radius:v.$radius-lg;
-  box-shadow:v.$shadow;
+  box-shadow:v.$elevation;
   animation:fade 0.15s ease-out;
 
   @include v.breakpoint(v.$bp-md){
@@ -37,7 +36,6 @@
     max-height:calc(100dvh - #{v.$space-xl});
     margin:0px;
     padding:v.$space-lg v.$space-md calc(#{v.$space-lg} + env(safe-area-inset-bottom)) v.$space-md;
-    border-width:1px 0px 0px 0px;
     border-radius:v.$radius-xl v.$radius-xl 0px 0px;
     animation-name:slide;
   }

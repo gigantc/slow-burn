@@ -29,6 +29,10 @@ const PATHS = {
   chevronDown: 'M6 9l6 6 6-6',
   chevron: 'M9 6l6 6-6 6',
   close: 'M6 6l12 12 M18 6L6 18',
+  sync: 'M20 11a8 8 0 0 0-14.9-3 M4 4v4h4 M4 13a8 8 0 0 0 14.9 3 M20 20v-4h-4',
+  cigar:
+    'M4 20L17 7 M7 20l-3-3 M10.5 13.5l3 3 M18 3c1.2 1.2 1.2 2.6 0 3.8 M21.5 6.5c1.2 1.2 1.2 2.6 0 3.8',
+  wine: 'M8 3h8l1 6a5 5 0 0 1-10 0z M12 14v7 M8 21h8',
   camera: 'M4 8h3l2-3h6l2 3h3v11H4z M12 10a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z',
   upload: 'M12 16V4 M7 9l5-5 5 5 M4 20h16',
 } as const;

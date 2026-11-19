@@ -46,19 +46,6 @@ export const useFeaturedPhoto = (
   return photos.find((photo) => photo.featured) ?? photos[0];
 };
 
-/** Every entry's featured photo (else its first), keyed `cook:<id>` / `tasting:<id>`, for lists. */
-export const useFeaturedPhotoIndex = (): ReadonlyMap<string, Photo> => {
-  const { photos } = useStoreState();
-  return useMemo(() => {
-    const index = new Map<string, Photo>();
-    for (const photo of photos) {
-      const key = `${photo.ownerType}:${photo.ownerId}`;
-      if (!index.has(key) || photo.featured) index.set(key, photo);
-    }
-    return index;
-  }, [photos]);
-};
-
 /** The photo operations for a cook or tasting that exists: everything saves straight away. */
 export const useStoredPhotos = (ownerType: PhotoOwnerType, ownerId: string): PhotoOps => {
   const photos = usePhotos(ownerType, ownerId);

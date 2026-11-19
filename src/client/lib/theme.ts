@@ -3,7 +3,7 @@
 // Saved choice wins, otherwise the system preference. The inline script in index.html
 // applies the same choice before first paint; applyTheme also syncs <meta name="theme-color">.
 
-import { useCallback, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { THEME_STORAGE_KEY } from '@/config';
 
 export type Theme = 'light' | 'dark';
@@ -37,21 +37,33 @@ const applyTheme = (theme: Theme) => {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', chrome);
 };
 
+const listeners = new Set<() => void>();
+let current: Theme | null = null;
+
 export const initTheme = (): Theme => {
-  const theme = readSaved() ?? systemTheme();
-  applyTheme(theme);
-  return theme;
+  current = readSaved() ?? systemTheme();
+  applyTheme(current);
+  return current;
 };
 
-export const useTheme = () => {
-  const [theme, setTheme] = useState<Theme>(initTheme);
+const getTheme = () => current ?? initTheme();
 
-  const toggle = useCallback(() => {
-    const next: Theme = theme === 'dark' ? 'light' : 'dark';
-    applyTheme(next);
-    save(next);
-    setTheme(next);
-  }, [theme]);
-
-  return { theme, toggle };
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
 };
+
+const setTheme = (next: Theme) => {
+  if (next === getTheme()) return;
+  current = next;
+  applyTheme(next);
+  save(next);
+  listeners.forEach((listener) => listener());
+};
+
+/** One shared state: the sidebar's and the phone menu's toggles always agree. */
+export const useTheme = () => ({
+  theme: useSyncExternalStore(subscribe, getTheme),
+  setTheme,
+  toggle: () => setTheme(getTheme() === 'dark' ? 'light' : 'dark'),
+});

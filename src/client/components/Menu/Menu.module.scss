@@ -1,36 +1,64 @@
 //////////////////////////////////////
 // Menu
-// Phone menu sheet. Panel placement lives in Sheet; this is just the theme switch.
+// The phone menu sheet: a grab handle, then plain 56px rows (an icon, a label, the control at the
+// right) with a hairline between. Panel ground, corners and placement live in Sheet.
 
 //imports
 @use 'scss/variables' as v;
 
-.switch{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  min-height:v.$tap-target;
-  padding:v.$space-xs;
-  background-color:v.$raised;
+.handle{
+  flex:none;
+  align-self:center;
+  width:40px;
+  height:4px;
+  margin:calc(-1 * #{v.$space-sm}) 0px 0px 0px;
+  background-color:v.$field-ring;
   border-radius:v.$radius-pill;
-  color:v.$muted;
+}
 
-  &:focus-visible{
-    outline:none;
-    box-shadow:inset 0px 0px 0px 2px v.$accent;
-  }
+.rows{
+  display:flex;
+  flex-direction:column;
+  margin:0px;
+  padding:0px;
+  list-style:none;
 
-  span{
+  li{
     display:flex;
     align-items:center;
-    justify-content:center;
-    gap:v.$space-sm;
-    border-radius:v.$radius-pill;
-    font:600 1.4rem/1 v.$font-body;
+    gap:v.$space-12;
+    min-height:v.$tap-target;
+    padding:0px v.$space-xs;
+    color:v.$text;
+    font:500 1.6rem/1 v.$font-body;
+
+    & + li{ box-shadow:inset 0px 1px 0px v.$border; }
+
+    svg{
+      flex:none;
+      width:2.2rem;
+      height:2.2rem;
+      color:v.$muted;
+    }
   }
 
-  span[data-active='true']{
-    background-color:v.$card;
-    box-shadow:v.$shadow-card;
-    color:v.$text;
+  // The switch sits at the right end of its row
+  [role='switch']{ margin-left:auto; }
+
+  .signOut{
+    display:flex;
+    align-items:center;
+    gap:v.$space-12;
+    width:100%;
+    min-height:v.$tap-target;
+    color:v.$danger;
+    font:500 1.6rem/1 v.$font-body;
+    text-align:left;
+
+    svg{ color:inherit; }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 2px v.$accent;
+    }
   }
 }

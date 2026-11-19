@@ -1,0 +1,87 @@
+//////////////////////////////////////
+// Theme toggle
+// The two names either side of a 60 x 32 track, all in one 44px-tall switch. The thumb sits behind the icons and slides (transform
+// only) over the active one; the thumb and the icon on it come from the theme's toggle tokens, the other icon stays muted.
+
+//imports
+@use 'scss/variables' as v;
+
+$track-width:60px;
+$track-height:32px;
+$thumb:28px;
+$inset:2px;
+
+.toggle{
+  display:inline-flex;
+  flex:none;
+  align-items:center;
+  justify-content:center;
+  gap:v.$space-sm;
+  min-width:v.$field-height;
+  min-height:v.$field-height;
+  padding:0px v.$space-sm;
+  background:none;
+  border-radius:v.$radius-pill;
+  font:600 1.4rem/1 v.$font-body;
+
+  // The names: the active one in text color, the other muted
+  > [data-theme-name]{
+    color:v.$muted;
+    transition:color 0.2s;
+
+    &[data-active='true']{ color:v.$text; }
+  }
+  &.sky > [data-theme-name]:not([data-active='true']){ color:v.$sky-dim; }
+
+  .track{
+    position:relative;
+    display:grid;
+    grid-template-columns:repeat(2, #{$thumb});
+    align-items:center;
+    justify-items:center;
+    width:$track-width;
+    height:$track-height;
+    padding:0px $inset;
+    background-color:v.$raised;
+    border-radius:v.$radius-pill;
+    color:v.$muted;
+  }
+
+  .thumb{
+    position:absolute;
+    top:$inset;
+    left:$inset;
+    width:$thumb;
+    height:$thumb;
+    background-color:v.$toggle-thumb;
+    border-radius:v.$radius-pill;
+    box-shadow:inset 0px 0px 0px 1px v.$field-ring;
+    transition:transform 0.2s ease-out;
+  }
+
+  svg{
+    position:relative;
+    width:1.8rem;
+    height:1.8rem;
+    transition:color 0.2s;
+  }
+
+  // Dawn (off): the thumb is over the sun. Dusk (on): it has slid over the moon.
+  svg:first-of-type{ color:v.$toggle-thumb-icon; }
+  &[aria-checked='true']{
+    .thumb{ transform:translateX(#{$thumb}); }
+    svg:first-of-type{ color:v.$muted; }
+    svg:last-of-type{ color:v.$toggle-thumb-icon; }
+  }
+
+  &:focus-visible{
+    outline:none;
+    box-shadow:inset 0px 0px 0px 2px v.$accent;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .thumb,
+    svg,
+    > [data-theme-name]{ transition:none; }
+  }
+}

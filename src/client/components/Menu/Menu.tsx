@@ -1,9 +1,8 @@
 import { useRef, useState } from 'react';
-import Button from '@/components/Button/Button';
 import Icon from '@/components/Icon/Icon';
 import Sheet from '@/components/Sheet/Sheet';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
-import { THEME_LABELS } from '@/config';
+import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
 import { useAuth } from '@/lib/auth';
 import { useTheme } from '@/lib/theme';
 import styles from './Menu.module.scss';
@@ -13,7 +12,7 @@ import styles from './Menu.module.scss';
 const Menu = ({ triggerClassName }: { triggerClassName?: string }) => {
   const [open, setOpen] = useState(false);
   const { logout } = useAuth();
-  const { theme, toggle } = useTheme();
+  const { theme } = useTheme();
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   const signOut = () => {
@@ -40,32 +39,31 @@ const Menu = ({ triggerClassName }: { triggerClassName?: string }) => {
         label="Menu"
         returnFocusRef={triggerRef}
       >
-        <button
-          className={styles.switch}
-          type="button"
-          role="switch"
-          aria-checked={theme === 'dark'}
-          aria-label={`${THEME_LABELS.dark} theme`}
-          onClick={toggle}
-        >
-          <span data-active={theme === 'light'}>
-            <Icon name="sun" />
-            {THEME_LABELS.light}
-          </span>
-          <span data-active={theme === 'dark'}>
-            <Icon name="moon" />
-            {THEME_LABELS.dark}
-          </span>
-        </button>
-        <Button
-          size="lg"
-          variant="secondary"
-          onClick={signOut}
-        >
-          <Icon name="logout" />
-          Sign out
-        </Button>
-        <SyncStatus />
+        <span
+          className={styles.handle}
+          aria-hidden="true"
+        />
+        <ul className={styles.rows}>
+          <li>
+            <Icon name={theme === 'dark' ? 'moon' : 'sun'} />
+            Theme
+            <ThemeToggle />
+          </li>
+          <li>
+            <Icon name="sync" />
+            <SyncStatus />
+          </li>
+          <li>
+            <button
+              className={styles.signOut}
+              type="button"
+              onClick={signOut}
+            >
+              <Icon name="logout" />
+              Sign out
+            </button>
+          </li>
+        </ul>
       </Sheet>
     </>
   );

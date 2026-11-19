@@ -1,7 +1,6 @@
 import EntryLink from '@/components/EntryLink/EntryLink';
 import type { Entry } from '@/components/EntryLink/EntryLink';
 import { BP_MD } from '@/config';
-import { useFeaturedPhotoIndex } from '@/lib/photoHooks';
 import { useMediaQuery } from '@/lib/useMediaQuery';
 import styles from './EntryList.module.scss';
 
@@ -9,15 +8,14 @@ import styles from './EntryList.module.scss';
 const EntryList = ({
   entries,
   phoneCount,
-  hideTag = false,
+  single = false,
 }: {
   entries: readonly Entry[];
   /** Phone shows only the first this many (a teaser); desktop always shows them all. */
   phoneCount?: number;
-  /** Leave out each entry's category tag (a list of one category). */
-  hideTag?: boolean;
+  /** A list of one category: entries show no tag or wash. */
+  single?: boolean;
 }) => {
-  const photos = useFeaturedPhotoIndex();
   const phone = useMediaQuery(`(max-width:${BP_MD}px)`);
   const shown = phone && phoneCount !== undefined ? entries.slice(0, phoneCount) : entries;
 
@@ -27,8 +25,7 @@ const EntryList = ({
         <li key={entry.id}>
           <EntryLink
             entry={entry}
-            hideTag={hideTag}
-            photo={photos.get(`${entry.category === 'cook' ? 'cook' : 'tasting'}:${entry.id}`)}
+            single={single}
           />
         </li>
       ))}

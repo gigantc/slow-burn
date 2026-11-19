@@ -27,6 +27,8 @@ export type TastingCategoryDef = {
   noteFields: readonly TastingFieldDef[];
   /** Label for the photo slot, once photos exist. */
   photoLabel: string;
+  /** The category's icon (a name from the client's Icon component). Not used by a screen yet. */
+  icon: string;
 };
 
 export const tastingCategories = [
@@ -61,6 +63,7 @@ export const tastingCategories = [
       { key: 'finish', label: 'Finish', kind: 'text' },
     ],
     photoLabel: 'Add a photo of the bottle',
+    icon: 'glass',
   },
   {
     key: 'cigar',
@@ -83,6 +86,7 @@ export const tastingCategories = [
       { key: 'finish', label: 'Finish', kind: 'text' },
     ],
     photoLabel: 'Add a photo of the band',
+    icon: 'cigar',
   },
   {
     key: 'wine',
@@ -105,6 +109,7 @@ export const tastingCategories = [
       { key: 'finish', label: 'Finish', kind: 'text' },
     ],
     photoLabel: 'Add a photo of the label',
+    icon: 'wine',
   },
 ] as const satisfies readonly TastingCategoryDef[];
 

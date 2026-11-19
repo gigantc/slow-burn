@@ -5,6 +5,7 @@
 // Spec: docs/design-system.md
 
 //imports
+@use 'sass:color';
 @use 'sass:map';
 
 //////////////////////////////////////
@@ -22,11 +23,16 @@ $theme-light:(
   panel-alt:#fbf6ec,
   border:#e0d3ba,
   field-ring:#e0d3ba,
+  // The theme switch's thumb and the icon on it (the thumb is lighter than the raised track)
+  toggle-thumb:#fbf6ec,
+  toggle-thumb-icon:#2e2340,
   hover:rgba(255, 250, 240, 0.5),
   // Text
   text:#2e2340,
   muted:#6b5f7a,
   muted-sky:#4f4360,
+  // A clearly dimmer text on the sky (~58% of text): the inactive name on the theme switch
+  sky-dim:rgba(46, 35, 64, 0.58),
   // Accent
   accent:#b83c16,
   accent-hover:#8a2a0e,
@@ -59,7 +65,8 @@ $theme-light:(
   logo-tagline:#a52c10,
   // Translucent ground for fields sitting on the sky (sign-in)
   sky-field:rgba(255, 250, 240, 0.6),
-  shadow:(0px 0px 0px 6px rgba(255, 250, 240, 0.35), 0px 24px 60px rgba(90, 40, 60, 0.18)),
+  // Floating layers (sheets, popovers, dropdowns, toasts): a soft drop shadow, no ring
+  elevation:(0px 12px 32px rgba(90, 40, 60, 0.16)),
   shadow-card:(0px 6px 20px rgba(90, 40, 60, 0.08)),
   shadow-inverse:(0px 10px 30px rgba(46, 35, 64, 0.25)),
 );
@@ -74,10 +81,13 @@ $theme-dark:(
   panel-alt:#241b28,
   border:#352839,
   field-ring:#43344a,
+  toggle-thumb:#4a3b52,
+  toggle-thumb-icon:#ff8a4c,
   hover:rgba(255, 245, 225, 0.07),
   text:#f6ead9,
   muted:#b9a9b8,
   muted-sky:#e6d9cc,
+  sky-dim:rgba(246, 234, 217, 0.58),
   accent:#ff8a4c,
   accent-hover:#ffc09a,
   accent-soft:#ffb38a,
@@ -104,7 +114,7 @@ $theme-dark:(
   logo-b:#ffc15e,
   logo-tagline:#ffb38a,
   sky-field:rgba(28, 21, 32, 0.6),
-  shadow:(0px 0px 0px 6px rgba(255, 245, 225, 0.07), 0px 24px 60px rgba(0, 0, 0, 0.5)),
+  elevation:(0px 12px 32px rgba(0, 0, 0, 0.4)),
   shadow-card:none,
   shadow-inverse:(inset 0px 0px 0px 1px rgba(255, 255, 255, 0.08)),
 );
@@ -151,6 +161,9 @@ $hover:var(--hover);
 $text:var(--text);
 $muted:var(--muted);
 $muted-sky:var(--muted-sky);
+$sky-dim:var(--sky-dim);
+$toggle-thumb:var(--toggle-thumb);
+$toggle-thumb-icon:var(--toggle-thumb-icon);
 $accent:var(--accent);
 $accent-hover:var(--accent-hover);
 $accent-soft:var(--accent-soft);
@@ -178,7 +191,7 @@ $logo-a:var(--logo-a);
 $logo-b:var(--logo-b);
 $logo-tagline:var(--logo-tagline);
 $sky-field:var(--sky-field);
-$shadow:var(--shadow);
+$elevation:var(--elevation);
 $shadow-card:var(--shadow-card);
 $shadow-inverse:var(--shadow-inverse);
 
@@ -194,6 +207,29 @@ $cat-soft:var(--cat-soft, var(--cook-soft));
 $cat-on:var(--cat-on, var(--on-accent));
 // Text that follows the category on a tasting screen and is plain text elsewhere (Cancel link)
 $cat-text:var(--cat, var(--text));
+
+// The category wash of an entry card or row (docs/design-system.md, "Category wash"): the
+// category color fades in from the leading corner into `card`. Include it once in a module whose
+// elements carry the category class and `.washed`; every category in $categories gets its wash.
+// Dawn blends the tint; Dusk the accent at 32%. Desktop cards run at 160deg, phone rows (wide and
+// short) sideways at 100deg.
+@mixin category-wash{
+  @each $key, $themes in $categories{
+    $tint:map.get($themes, light, soft);
+    $accent:map.get($themes, dark, ink);
+    $glow:color.change($accent, $alpha:0.32);
+    $clear:color.change($accent, $alpha:0);
+
+    .#{$key}.washed{
+      background:linear-gradient(160deg, $tint 0%, $tint 25%, $card 80%);
+      @include breakpoint($bp-md){ background:linear-gradient(100deg, $tint 0%, $tint 15%, $card 65%); }
+    }
+    :global([data-theme='dark']) .#{$key}.washed{
+      background:linear-gradient(160deg, $glow 0%, $clear 72%), $card;
+      @include breakpoint($bp-md){ background:linear-gradient(100deg, $glow 0%, $clear 65%), $card; }
+    }
+  }
+}
 
 // Gives a component one class per category (.cook, .whisky ...) that sets $type and $type-soft.
 @mixin category-classes{

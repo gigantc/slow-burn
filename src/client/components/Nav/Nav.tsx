@@ -4,16 +4,15 @@ import Button from '@/components/Button/Button';
 import Icon from '@/components/Icon/Icon';
 import Menu from '@/components/Menu/Menu';
 import SyncStatus from '@/components/SyncStatus/SyncStatus';
-import { NAV_ITEMS, THEME_LABELS } from '@/config';
+import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
+import { NAV_ITEMS } from '@/config';
 import { useAuth } from '@/lib/auth';
-import { useTheme } from '@/lib/theme';
 import styles from './Nav.module.scss';
 
 // One <nav>, two looks. Desktop: the sidebar on the sky (brand, New cook, links, status, theme,
 // sign out). Phone: the tab bar (links plus the Menu tab, which opens the menu sheet).
 const Nav = () => {
   const { logout } = useAuth();
-  const { theme, toggle } = useTheme();
 
   return (
     <nav
@@ -41,14 +40,10 @@ const Nav = () => {
       ))}
       <div className={styles.bottom}>
         <SyncStatus />
-        <button
+        <ThemeToggle
           className={styles.theme}
-          type="button"
-          onClick={toggle}
-        >
-          Theme
-          <span>{THEME_LABELS[theme]}</span>
-        </button>
+          onSky
+        />
         <button
           type="button"
           onClick={() => void logout()}

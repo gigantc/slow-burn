@@ -1,7 +1,5 @@
 import { Link } from 'react-router';
-import type { Photo } from 'shared/types';
 import CategoryTag from '@/components/CategoryTag/CategoryTag';
-import PhotoImage from '@/components/PhotoImage/PhotoImage';
 import Stars from '@/components/Stars/Stars';
 import type { EntryType } from '@/config';
 import styles from './EntryLink.module.scss';
@@ -18,33 +16,18 @@ export type Entry = {
 };
 
 /**
- * A row on phone, a card on desktop. With a photo it shows the thumbnail: across the top of the
- * card, or filling the tag column of the row (the tag moves onto its bottom edge).
+ * A row on phone, a card on desktop. In a mixed list (the default) it carries its category: the
+ * tag, a wash of the category color, and stars in that color. `single` is for a list of one
+ * category: none of that.
  */
-const EntryLink = ({
-  entry,
-  hideTag = false,
-  photo,
-}: {
-  entry: Entry;
-  hideTag?: boolean;
-  photo?: Photo;
-}) => (
+const EntryLink = ({ entry, single = false }: { entry: Entry; single?: boolean }) => (
   <Link
-    className={[styles.entry, hideTag && styles.plain, photo && styles.withPhoto]
+    className={[styles.entry, styles[entry.category], single ? styles.plain : styles.washed]
       .filter(Boolean)
       .join(' ')}
     to={entry.href}
   >
-    {/* Decorative: the link's own text already says what it is */}
-    {photo && (
-      <PhotoImage
-        className={styles.photo}
-        photo={photo}
-        alt=""
-      />
-    )}
-    {!hideTag && (
+    {!single && (
       <CategoryTag
         className={styles.tag}
         category={entry.category}

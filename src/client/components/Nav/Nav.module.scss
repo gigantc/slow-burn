@@ -72,11 +72,12 @@
     padding:0px v.$space-sm;
     color:v.$text;
 
-    button{
+    > button:not([role='switch']){
       display:flex;
       align-items:center;
       justify-content:space-between;
       min-height:44px;
+      border-radius:v.$radius-md;
       color:v.$muted-sky;
       font:500 1.4rem/1 v.$font-body;
       text-align:left;
@@ -87,10 +88,11 @@
         box-shadow:inset 0px 0px 0px 2px v.$accent;
       }
     }
-    .theme{
-      color:v.$text;
 
-      span{ color:v.$muted-sky; }
+    // The theme switch: its names line up with the other rows' text
+    .theme{
+      align-self:flex-start;
+      margin:0px 0px 0px calc(-1 * #{v.$space-sm});
     }
   }
 
