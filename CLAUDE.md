@@ -12,8 +12,6 @@ A personal, phone-first journal for backyard rituals: logging smoking cooks as a
 
 - **Requirements:** product brief (Claude Doc): https://claude.ai/artifact/6sehEn6JqjofPmVYrbKsiR
 - **Current phase:** kickoff. The folder was created on 2026-11-18; no code, no git repo yet.
-- **Hard deadline:** smoke the Thanksgiving turkey on **Thu 2026-11-26**. The cook MVP must be usable on the phone by **Wed 2026-11-25**.
-
 ---
 
 ## Background
@@ -43,7 +41,7 @@ This replaces The Dock (`~/Sites/dev/The-Dock`), an all-in-one notes/lists/journ
 - **Photos:** server disk, resized to WebP on upload. Not built yet.
 - **Offline:** PWA service worker (`vite-plugin-pwa`, `/api` is network-only) plus a local-first data layer in `src/client/lib/`: IndexedDB cache and outbox (`idb.ts`, `cookStore.ts`), a sync engine (`sync.ts`), one transport module (`transport.ts`), actions and hooks (`cookActions.ts`, `cookHooks.ts`). Writes land locally first and sync in the background; the server resolves conflicts last-write-wins on the client's `updatedAt`. Ratings are 1 to 5 stars; temps are °F.
 - **Hosting:** DigitalOcean, systemd + Apache reverse proxy + certbot. See [docs/deploy.md](docs/deploy.md).
-- **Design:** Sonoran palette in two themes, **Dawn** (light) and **Dusk** (dark), user toggle (labels in `THEME_LABELS`, client config; internal keys stay `light`/`dark`), defaults to the system setting. Tokens in `src/client/scss/_variables.scss`; fonts are self-hosted variable woff2 in `src/client/fonts/` (Fraunces for h1-h3, DM Sans for everything else; tokens `$font-display` and `$font-body`).
+- **Design:** Sonoran palette in two themes, **Dawn** (light) and **Dusk** (dark), user toggle (labels in `THEME_LABELS`, client config; internal keys stay `light`/`dark`), defaults to the system setting. Tokens in `src/client/scss/_variables.scss`; fonts are self-hosted variable woff2 in `src/client/fonts/` (Fraunces for h1-h3, DM Sans for everything else; tokens `$font-display` and `$font-body`). The redesign spec (palettes, category colors, sky gradients, components, screens) is [docs/design-system.md](docs/design-system.md); the design canvas is https://claude.ai/artifact/WvB2upNaVGdWnYCqPobF3E.
 - **Not used:** Firebase, Netlify, Tailwind.
 
 ---
@@ -111,12 +109,10 @@ Client imports use `@/` (src/client) and `shared/` (src/shared). Server imports 
 - **Next up:**
   1. Bug: on desktop the sticky form action bar overlaps the bottom of the last section card (panel needs bottom padding equal to the bar height).
   2. Continue the walkthrough (detail, Cooks tab, home). Wrap-up is good for now.
-  3. Test on a real phone: `vite --host` over Wi-Fi now; a private staging deploy later in the week for PWA install + offline (dFree decides when). Deadline: turkey Thu 2026-11-26.
+  3. Test on a real phone: `vite --host` over Wi-Fi now; a private staging deploy later in the week for PWA install + offline (dFree decides when).
   4. PWA icons from `src/client/components/Logo/logo.svg` once the logo is settled.
   5. Polish pile: Dusk whisky card muddy, Dusk wine too saturated, Dawn secondary button on the backdrop washed out, Undo toast covers the Note button.
   6. Later: "Manage meats" (rename, merge, delete unused) in the menu.
 - **Dev DB note:** a running `npm run dev` re-applies migrations as files change, so stop it while the schema is being edited.
 - **Data to re-enter:** The Dock's smoking and whisky notes are free-text Firestore entries (no structured fields). They'll be re-entered by hand as test data, which is why a cook with zero events and a past date is valid.
-- **Open questions:**
-  - Do tastings (whisky/cigar) need to work by Thanksgiving, or is the turkey alone enough? (Also asked as a comment in the brief.)
-- **Decided:** rating is 5 stars (integer 1 to 5), the same for cooks and tastings. Temps are °F only. Sign out and the Dawn/Dusk theme switch live in a menu (sidebar popover on desktop, tab-bar sheet on phone).
+- **Decided:** no deadline (the Thanksgiving target was dropped on 2026-11-19). Rating is 5 stars (integer 1 to 5), the same for cooks and tastings. Temps are °F only. Sign out and the Dawn/Dusk theme switch live in a menu (sidebar popover on desktop, tab-bar sheet on phone).
