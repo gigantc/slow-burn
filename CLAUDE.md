@@ -110,7 +110,7 @@ Client imports use `@/` (src/client) and `shared/` (src/shared). Server imports 
   1. Bug: on desktop the sticky form action bar overlaps the bottom of the last section card (panel needs bottom padding equal to the bar height).
   2. Continue the walkthrough (detail, Cooks tab, home). Wrap-up is good for now.
   3. Test on a real phone: `vite --host` over Wi-Fi now; a private staging deploy later in the week for PWA install + offline (dFree decides when).
-  4. PWA icons from `src/client/components/Logo/logo.svg` once the logo is settled.
+  4. ~~PWA icons~~ Done 2026-11-19: logo finalized and exported (see Logo in docs/design-system.md). Still to do: build the horizontal lockup into the `Logo` component for the sidebar and header.
   5. Polish pile: Dusk whisky card muddy, Dusk wine too saturated, Dawn secondary button on the backdrop washed out, Undo toast covers the Note button.
   6. Later: "Manage meats" (rename, merge, delete unused) in the menu.
 - **Dev DB note:** a running `npm run dev` re-applies migrations as files change, so stop it while the schema is being edited.

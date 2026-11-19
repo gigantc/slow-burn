@@ -89,6 +89,49 @@ Category tags (Home "Lately" lists): pill or square with category tint backgroun
 
 ---
 
+## Logo
+
+Final logo (canvas Logo page, "Logo set" row): the double flame with **SLOW BURN** in DM Sans 700, tracked 0.24em. No new font; the letters are outlined in the exported SVGs.
+
+### Files
+
+| File | Use |
+| --- | --- |
+| `src/client/components/Logo/logo-badge-on-dark.svg`, `-on-light.svg` | Stacked badge (flame, name, tagline). Sign-in screen, splash, About. |
+| `src/client/components/Logo/logo-horizontal-on-dark.svg`, `-on-light.svg` | Flame + name on one line. Desktop sidebar, phone header, email. |
+| `src/client/components/Logo/flame.svg` | The flame alone, full color. |
+| `src/client/components/Logo/logo.svg` | The flame alone, one color (`currentColor`). |
+| `public/icons/icon-192.png`, `icon-512.png` | PWA icons: flame on an ink tile with rounded corners. |
+| `public/icons/maskable-512.png` | PWA maskable icon: full-bleed ink, flame inside the 80% safe circle. |
+| `public/icons/apple-touch-icon.png` | iOS home screen (180, full bleed; iOS rounds the corners). |
+| `public/icons/favicon.svg`, `favicon-32.png` | Browser tab: the flame alone, no tile. |
+
+For the in-app sidebar and header, build the lockup in the `Logo` component (inline SVG, so the name can follow the theme's `text` color) rather than switching between the on-light and on-dark files. Path data can be copied from the SVGs.
+
+### Proportions (in units of the name's font size, em)
+
+- **Badge:** flame 2.47em tall, centered above the name; 0.3em gaps; tagline "SMOKE · SIP · SAVOR · REPEAT" at 0.3em, DM Sans 600, tracked 0.3em.
+- **Horizontal:** flame 2.41em tall, vertically **centered** on the name (not on the baseline), 0.7em gap.
+- **Flame shape:** width = 0.575 x height (viewBox `55 6 145 252`), gradient bottom `#d54d24` to tip `#f5a623`.
+- **Icon tiles:** flame about 70% of the tile height on ink `#2e2340`.
+
+### Color
+
+| On | Name | Tagline |
+| --- | --- | --- |
+| Dark / ink / Dusk sky | `#fbf6ec` | `#ffb38a` |
+| Light / cream / Dawn sky | `#2e2340` | `#a52c10` |
+
+One-color uses (stamps, mask icons): flame in ember `#b83c16`, ink or cream; never recolor the gradient.
+
+### Rules
+
+- **Clear space:** one cap height of SLOW BURN on every side.
+- **Minimum sizes:** badge 200px wide with the tagline, smaller drops the tagline; horizontal name 13px or larger; flame alone 12px tall or larger.
+- Don't stretch, re-space, or set the name in another weight or face.
+
+---
+
 ## Typography
 
 Fonts are already self-hosted: **Fraunces** (`$font-display`) and **DM Sans** (`$font-body`). No other faces.
@@ -142,7 +185,7 @@ Fonts are already self-hosted: **Fraunces** (`$font-display`) and **DM Sans** (`
 ### Desktop
 
 - Two-part shell: **sidebar** (`flex: 1 1 220px`, sky gradient, no border) + **content** (`flex: 999 1 560px; min-width: 0`). The parent row wraps, so on narrow windows the sidebar stacks on top instead of squeezing.
-- Sidebar, top to bottom: logo + wordmark, **New cook** primary button, nav (Home, Cooks, Tastings), spacer, sync status, Theme toggle (shows Dawn / Dusk), Sign out. This replaces the menu popover on desktop.
+- Sidebar, top to bottom: horizontal logo lockup (see Logo), **New cook** primary button, nav (Home, Cooks, Tastings), spacer, sync status, Theme toggle (shows Dawn / Dusk), Sign out. This replaces the menu popover on desktop.
 - Content header: breadcrumb (14px muted, parent is a link), then the h1. Optional right-side control (search on Home, category switch on Tasting, Edit on Detail).
 - Two-column screens are a wrapping flex row: main `flex: 2 to 3 1 ~500px`, aside `flex: 1 to 2 1 ~300px`, 32px gap.
 - Desktop forms do **not** use the sticky bar: actions sit inline, right-aligned, under the form (Cancel secondary + primary).
