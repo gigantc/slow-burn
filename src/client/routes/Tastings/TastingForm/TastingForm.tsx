@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { getTastingCategory, tastingCategories } from 'shared/tastingCategories';
 import type { TastingCategoryKey, TastingFieldDef } from 'shared/tastingCategories';
 import type { Tasting } from 'shared/types';
+import AutoTextarea from '@/components/AutoTextarea/AutoTextarea';
 import CategorySwitch from '@/components/CategorySwitch/CategorySwitch';
 import ChoiceField from '@/components/ChoiceField/ChoiceField';
 import Field from '@/components/Field/Field';
@@ -12,6 +13,7 @@ import PhotoImage from '@/components/PhotoImage/PhotoImage';
 import PhotoPicker from '@/components/PhotoPicker/PhotoPicker';
 import PhotoSheet from '@/components/PhotoSheet/PhotoSheet';
 import RatingInput from '@/components/RatingInput/RatingInput';
+import SuggestField from '@/components/SuggestField/SuggestField';
 import { clockTime, formatMonthDay, today } from '@/lib/format';
 import { useDraftPhotos, useStoredPhotos } from '@/lib/photoHooks';
 import type { PhotoOps } from '@/lib/photoHooks';
@@ -85,13 +87,12 @@ const TastingForm = ({
 
   // Suggestions from what's been logged: makers across everything, field values within a category
   const makers = useMemo(() => distinctValues(tastings.map((t) => t.maker)), [tastings]);
-  const suggestions = (field: TastingFieldDef) =>
-    distinctValues(
-      tastings
-        .filter((t) => t.category === values.category)
-        .map((t) => t.details[field.key])
-        .filter((value) => typeof value === 'string'),
-    );
+  const usedValues = (field: TastingFieldDef) =>
+    tastings
+      .filter((t) => t.category === values.category)
+      .map((t) => t.details[field.key])
+      .filter((value) => typeof value === 'string');
+  const suggestions = (field: TastingFieldDef) => distinctValues(usedValues(field));
 
   const setDetail = (key: string, value: string) =>
     setValues((v) => ({ ...v, details: { ...v.details, [key]: value } }));
@@ -223,20 +224,31 @@ const TastingForm = ({
           <div className={styles.specs}>
             {specFields
               .filter((field) => field.kind !== 'choice')
-              .map((field) => (
-                <Field
-                  key={`${values.category}-${field.key}`}
-                  className={field.kind === 'number' ? styles.numberSpec : undefined}
-                  label={field.label}
-                  unit={field.unit}
-                  list={field.kind === 'text' ? `${listId}-${field.key}` : undefined}
-                  inputMode={field.kind === 'number' ? 'decimal' : undefined}
-                  placeholder={field.placeholder}
-                  value={values.details[field.key] ?? ''}
-                  onChange={(e) => setDetail(field.key, e.target.value)}
-                  error={triedSubmit && badNumber(field) ? 'Numbers only.' : undefined}
-                />
-              ))}
+              .map((field) =>
+                field.kind === 'suggest' ? (
+                  <SuggestField
+                    key={`${values.category}-${field.key}`}
+                    label={field.label}
+                    options={field.options ?? []}
+                    used={usedValues(field)}
+                    value={values.details[field.key] ?? ''}
+                    onChange={(value) => setDetail(field.key, value)}
+                  />
+                ) : (
+                  <Field
+                    key={`${values.category}-${field.key}`}
+                    className={field.kind === 'number' ? styles.numberSpec : undefined}
+                    label={field.label}
+                    unit={field.unit}
+                    list={field.kind === 'text' ? `${listId}-${field.key}` : undefined}
+                    inputMode={field.kind === 'number' ? 'decimal' : undefined}
+                    placeholder={field.placeholder}
+                    value={values.details[field.key] ?? ''}
+                    onChange={(e) => setDetail(field.key, e.target.value)}
+                    error={triedSubmit && badNumber(field) ? 'Numbers only.' : undefined}
+                  />
+                ),
+              )}
             <Field
               className={styles.date}
               label="Date"
@@ -255,8 +267,7 @@ const TastingForm = ({
               {noteFields.map((field) => (
                 <label key={`${values.category}-${field.key}`}>
                   <span>{field.label}</span>
-                  <textarea
-                    rows={2}
+                  <AutoTextarea
                     placeholder={field.placeholder}
                     value={values.details[field.key] ?? ''}
                     onChange={(e) => setDetail(field.key, e.target.value)}
@@ -268,7 +279,6 @@ const TastingForm = ({
           <Field
             multiline
             label="Notes"
-            rows={3}
             value={values.notes}
             onChange={(e) => setValues((v) => ({ ...v, notes: e.target.value }))}
           />

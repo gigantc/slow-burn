@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'react';
+import AutoTextarea from '@/components/AutoTextarea/AutoTextarea';
 import styles from './Field.module.scss';
 
 type Common = {
@@ -19,7 +20,11 @@ export type InputProps = Common & {
   action?: ReactNode;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-type TextareaProps = Common & { multiline: true } & TextareaHTMLAttributes<HTMLTextAreaElement>;
+type TextareaProps = Common & {
+  multiline: true;
+  /** Starts at 3 rows instead of 6, for quick notes (it still grows). */
+  short?: boolean;
+} & TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 // A card with the label above and a borderless control inside. Three looks: number (with a
 // unit), text (the default) and textarea (multiline).
@@ -33,6 +38,7 @@ const Field = (props: InputProps | TextareaProps) => {
     styles.field,
     props.multiline ? styles.textarea : props.unit ? styles.number : styles.text,
     wide && styles.wide,
+    props.multiline && props.short && styles.short,
     error && styles.invalid,
     className,
   ]
@@ -54,10 +60,11 @@ const Field = (props: InputProps | TextareaProps) => {
       className: _className,
       wide: _wide,
       multiline: _multiline,
+      short: _short,
       ...rest
     } = props;
     control = (
-      <textarea
+      <AutoTextarea
         {...shared}
         {...rest}
       />

@@ -74,7 +74,7 @@
 }
 
 .textarea textarea{
-  min-height:calc(1.5em * 3);
+  min-height:calc(1.5em * 6);
   font:400 1.6rem/1.5 v.$font-body;
-  resize:vertical;
 }
+.short textarea{ min-height:calc(1.5em * 3); }

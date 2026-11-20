@@ -63,7 +63,8 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
   const save = () => {
     if (!draft) return;
     const edited = photos.find((p) => p.id === draft.id);
-    if (edited && draft.text.trim() !== (edited.caption ?? '')) ops.setCaption(draft.id, draft.text);
+    if (edited && draft.text.trim() !== (edited.caption ?? ''))
+      ops.setCaption(draft.id, draft.text);
     setDraft(null);
   };
   const close = () => {
@@ -88,7 +89,6 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
     const el = track.current;
     if (el) el.scrollLeft = index * el.clientWidth;
     // Only on mount: later changes come from the scroll position
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // The photo follows the scroll position once it stops moving

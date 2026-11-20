@@ -108,6 +108,7 @@ const EventForm = ({ cook, target, onClose, onLogged, onDelete }: FormProps) => 
       {(editing || def.takesNote) && (
         <Field
           multiline
+          short
           label="Note"
           value={note}
           onChange={(e) => setNote(e.target.value)}

@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import type { CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
 import Field from '@/components/Field/Field';
@@ -29,6 +29,8 @@ type Props = {
   submitLabel: string;
   /** `past` is set for a cook logged after the fact (a date, optionally with times). */
   onSave: (setup: Setup, past: PastDates | null) => void;
+  /** Wrap-up fields for a finished cook, shown after the setup. The screen holds their state. */
+  wrapUp?: { fields: ReactNode; dirty: boolean; invalid: boolean };
 };
 
 const orNull = (value: string) => value.trim() || null;
@@ -37,7 +39,7 @@ const numberOrNull = (value: string) => {
   return value.trim() === '' || Number.isNaN(n) ? null : n;
 };
 
-const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
+const CookForm = ({ initial, title, submitLabel, onSave, wrapUp }: Props) => {
   const { cooks } = useCooks();
   const listId = useId();
 
@@ -82,6 +84,7 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
 
   useUnsaved(
     (!initial && past) ||
+      Boolean(wrapUp?.dirty) ||
       JSON.stringify(values) !== JSON.stringify(baseline) ||
       JSON.stringify(dates) !== JSON.stringify(initialDates),
   );
@@ -109,7 +112,7 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
       title={title}
       onSubmit={submit}
       submitLabel={initial ? submitLabel : past ? 'Continue to wrap-up' : submitLabel}
-      submitDisabled={badRange}
+      submitDisabled={badRange || Boolean(wrapUp?.invalid)}
       cancelFallback={initial ? `/cooks/${initial.id}` : '/'}
       crumb={initial ? { to: `/cooks/${initial.id}`, label: initialMeatName } : undefined}
       meta={
@@ -212,11 +215,11 @@ const CookForm = ({ initial, title, submitLabel, onSave }: Props) => {
       <Field
         multiline
         label="Prep"
-        rows={3}
         placeholder="Rub, injection, trim, overnight dry brine..."
         value={values.prep}
         onChange={set('prep')}
       />
+      {wrapUp?.fields}
       {!initial && (
         <Button
           type="button"

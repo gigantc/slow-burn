@@ -2,74 +2,34 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import type { CookWithEvents } from 'shared/types';
-import Field from '@/components/Field/Field';
-import { FieldGrid, FormPage } from '@/components/FormPage/FormPage';
-import NextTime from '@/components/NextTime/NextTime';
+import { FormPage } from '@/components/FormPage/FormPage';
 import PhotoSection from '@/components/PhotoSection/PhotoSection';
-import RatingInput from '@/components/RatingInput/RatingInput';
 import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
 import { saveCook } from '@/lib/cookActions';
-import { latestEvent } from '@/lib/cookEvents';
 import { useCook, useCooks, useMeatName } from '@/lib/cookHooks';
-import { formatDuration, fromLocalInput, toLocalInput } from '@/lib/format';
+import { formatDuration } from '@/lib/format';
 import { useStoredPhotos } from '@/lib/photoHooks';
 import { useUnsaved } from '@/lib/unsaved';
 import { useBack } from '@/lib/useBack';
 import CookMissing from '../CookMissing/CookMissing';
-
-const END_BEFORE_START = 'End time is before the start time.';
+import { useWrapUp, WrapUpFields } from '../WrapUpFields/WrapUpFields';
 
 const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
   const meatName = useMeatName(cook.meatId);
   const navigate = useNavigate();
   const back = useBack();
-  // A cook logged after the fact keeps whatever times it has; only live cooks get an end time.
-  const past = cook.source === 'import';
   // Editing a finished cook's wrap-up was pushed from the detail page, so saving goes back to it.
   const [editing] = useState(Boolean(cook.endedAt));
-  // The default end keeps full precision. The input only shows minutes, and truncating "now"
-  // could land it before a start time that has seconds. An edited value replaces it.
-  const [defaultEnd] = useState(() => cook.endedAt ?? new Date().toISOString());
-  const [edited, setEdited] = useState<string | null>(null);
-  const initialTemp =
-    (cook.finalInternalTempF ?? latestEvent(cook.events, 'internal_temp')?.value)?.toString() ?? '';
-  const [finalTemp, setFinalTemp] = useState(initialTemp);
-  const [rating, setRating] = useState(cook.rating);
-  const [notes, setNotes] = useState(cook.notes ?? '');
-  const [nextTime, setNextTime] = useState(cook.nextTimeNote ?? '');
+  const wrap = useWrapUp(cook);
   // Photos save as they are added, not with the form
   const photos = useStoredPhotos('cook', cook.id);
 
-  const endIso = past ? cook.endedAt : edited === null ? defaultEnd : fromLocalInput(edited);
-  const endMs = endIso ? new Date(endIso).getTime() : null;
-  const total =
-    cook.startedAt && endMs !== null ? endMs - new Date(cook.startedAt).getTime() : null;
-  const invalid = total !== null && total < 0;
-  // Rested runs from the logged Rest event to the end; no Rest event, no stat.
-  const restEvent = latestEvent(cook.events, 'rest');
-  const rested = restEvent && endMs !== null ? endMs - new Date(restEvent.at).getTime() : null;
-  const temp = Number(finalTemp);
-  const hasTemp = finalTemp.trim() !== '' && !Number.isNaN(temp);
-
-  useUnsaved(
-    edited !== null ||
-      finalTemp !== initialTemp ||
-      rating !== cook.rating ||
-      notes !== (cook.notes ?? '') ||
-      nextTime !== (cook.nextTimeNote ?? ''),
-  );
+  useUnsaved(wrap.dirty);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    if (invalid) return;
-    saveCook({
-      id: cook.id,
-      endedAt: endIso,
-      finalInternalTempF: hasTemp ? temp : null,
-      rating,
-      notes: notes.trim() || null,
-      nextTimeNote: nextTime.trim() || null,
-    });
+    if (wrap.invalid) return;
+    saveCook({ id: cook.id, ...wrap.fields });
     if (editing) back(`/cooks/${cook.id}`);
     else navigate(`/cooks/${cook.id}`, { replace: true });
   };
@@ -79,7 +39,7 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
       title="How'd it go?"
       onSubmit={submit}
       submitLabel="Save cook"
-      submitDisabled={invalid}
+      submitDisabled={wrap.invalid}
       cancelFallback={`/cooks/${cook.id}`}
       cancelLabel="Back to cook"
       barCancel={false}
@@ -94,57 +54,25 @@ const WrapUpForm = ({ cook }: { cook: CookWithEvents }) => {
         />
       }
     >
-      {(total !== null || (rested !== null && rested >= 0)) && (
+      {(wrap.total !== null || (wrap.rested !== null && wrap.rested >= 0)) && (
         <StatTiles>
-          {total !== null && (
+          {wrap.total !== null && (
             <StatTile
               label="Total time"
-              value={invalid ? 'Check end' : formatDuration(total)}
+              value={wrap.invalid ? 'Check end' : formatDuration(wrap.total)}
             />
           )}
-          {rested !== null && rested >= 0 && (
+          {wrap.rested !== null && wrap.rested >= 0 && (
             <StatTile
               label="Rested"
-              value={formatDuration(rested)}
+              value={formatDuration(wrap.rested)}
             />
           )}
         </StatTiles>
       )}
-      <FieldGrid wide>
-        {!past && (
-          <Field
-            label="End time"
-            type="datetime-local"
-            value={edited ?? toLocalInput(defaultEnd)}
-            onChange={(e) => setEdited(e.target.value)}
-            error={invalid ? END_BEFORE_START : undefined}
-            required
-          />
-        )}
-        <Field
-          label="Final meat temp"
-          unit="°F"
-          inputMode="decimal"
-          value={finalTemp}
-          onChange={(e) => setFinalTemp(e.target.value)}
-        />
-      </FieldGrid>
-      <RatingInput
-        value={rating}
-        onChange={setRating}
-      />
-      <Field
-        multiline
-        label="Notes"
-        rows={3}
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
-      <NextTime
-        variant="field"
-        hint={`Shown first when you start your next ${meatName.toLowerCase()}.`}
-        value={nextTime}
-        onChange={(e) => setNextTime(e.target.value)}
+      <WrapUpFields
+        wrap={wrap}
+        meatName={meatName}
       />
     </FormPage>
   );

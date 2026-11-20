@@ -1,4 +1,5 @@
 import type { ReactNode, TextareaHTMLAttributes } from 'react';
+import AutoTextarea from '@/components/AutoTextarea/AutoTextarea';
 import Icon from '@/components/Icon/Icon';
 import Stars from '@/components/Stars/Stars';
 import styles from './NextTime.module.scss';
@@ -53,10 +54,7 @@ const NextTime = (props: CardProps | StripProps | FieldProps) => {
       <label className={`${styles.card} ${styles.field}`}>
         <Eyebrow />
         <small>{hint}</small>
-        <textarea
-          rows={3}
-          {...rest}
-        />
+        <AutoTextarea {...rest} />
       </label>
     );
   }

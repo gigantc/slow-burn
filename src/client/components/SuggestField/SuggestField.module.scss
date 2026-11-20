@@ -1,0 +1,44 @@
+//////////////////////////////////////
+// Suggest field
+// A Field with a popup list under it (the list looks like the meat picker's).
+
+//imports
+@use 'scss/variables' as v;
+
+.suggest{
+  position:relative;
+  min-width:0px;
+
+  svg{
+    width:2rem;
+    height:2rem;
+    color:v.$muted;
+  }
+
+  ul{
+    position:absolute;
+    top:calc(100% + #{v.$space-xs});
+    right:0px;
+    left:0px;
+    z-index:20;
+    max-height:calc(#{v.$field-height} * 5.5);
+    margin:0px;
+    padding:v.$space-xs;
+    overflow:auto;
+    background-color:v.$card;
+    border-radius:v.$radius-field;
+    box-shadow:v.$elevation;
+    list-style:none;
+  }
+
+  li{
+    display:flex;
+    align-items:center;
+    padding:0px v.$space-md;
+    border-radius:v.$radius-md;
+    cursor:pointer;
+    @include v.field-height;
+
+    &[aria-selected='true']{ background-color:v.$raised; }
+  }
+}

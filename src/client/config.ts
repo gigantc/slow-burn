@@ -11,6 +11,14 @@ export const APP_NAME = 'Slow Burn';
 // Set after a successful login or session check, so a reload while offline stays signed in.
 export const AUTH_HINT_KEY = 'slowburn-authed';
 
+// Where the layout switches to phone (`$bp-md` in _variables.scss); keep the two in step.
+export const PHONE_QUERY = '(max-width: 768px)';
+
+// Swipe-down to close a phone sheet: how far (fraction of its height) or how fast (px/ms) counts.
+export const SHEET_DISMISS_DISTANCE = 0.3;
+export const SHEET_DISMISS_VELOCITY = 0.5;
+export const SHEET_SETTLE_MS = 220;
+
 //////////////////////////////////////
 // Offline data and sync
 

@@ -1,0 +1,11 @@
+//////////////////////////////////////
+// Wrap-up fields
+
+//imports
+@use 'scss/variables' as v;
+
+// Heading of the wrap-up group when it follows other fields
+.title{
+  @include v.group-legend;
+  margin:v.$space-md 0px 0px 0px;
+}

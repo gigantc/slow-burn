@@ -6,11 +6,14 @@
 export type TastingFieldDef = {
   key: string;
   label: string;
-  /** `choice` is a single pick from `options` (whisky Type); the value is stored as that string. */
-  kind: 'text' | 'number' | 'choice';
+  /**
+   * `choice` is a single pick from `options` (whisky Type); the value is stored as that string.
+   * `suggest` is free text that offers `options` (and past values) as suggestions; any text is kept.
+   */
+  kind: 'text' | 'number' | 'choice' | 'suggest';
   /** Shown after a number, e.g. "yr", "%". */
   unit?: string;
-  /** The allowed values of a `choice` field. Editing the list is a data change. */
+  /** The allowed values of a `choice` field, or the suggestions of a `suggest` one. Editing the list is a data change. */
   options?: readonly string[];
   placeholder?: string;
 };
@@ -76,7 +79,25 @@ export const tastingCategories = [
         kind: 'choice',
         options: ['Mild', 'Mild-Medium', 'Medium', 'Medium-Full', 'Full'],
       },
-      { key: 'vitola', label: 'Vitola', kind: 'text' },
+      {
+        key: 'vitola',
+        label: 'Vitola',
+        kind: 'suggest',
+        options: [
+          'Robusto',
+          'Toro',
+          'Churchill',
+          'Corona',
+          'Petit Corona',
+          'Gordo',
+          'Belicoso',
+          'Torpedo',
+          'Lancero',
+          'Perfecto',
+          'Lonsdale',
+          'Gran Toro',
+        ],
+      },
       { key: 'wrapper', label: 'Wrapper', kind: 'text' },
       { key: 'smokeTime', label: 'Smoke time', kind: 'number', unit: 'min' },
     ],
@@ -100,7 +121,33 @@ export const tastingCategories = [
         options: ['Red', 'White', 'Rosé', 'Sparkling', 'Dessert'],
       },
       { key: 'vintage', label: 'Vintage', kind: 'number' },
-      { key: 'varietal', label: 'Varietal', kind: 'text' },
+      {
+        key: 'varietal',
+        label: 'Varietal',
+        kind: 'suggest',
+        options: [
+          'Cabernet Sauvignon',
+          'Merlot',
+          'Pinot Noir',
+          'Syrah/Shiraz',
+          'Zinfandel',
+          'Malbec',
+          'Tempranillo',
+          'Sangiovese',
+          'Grenache',
+          'Cabernet Franc',
+          'Petite Sirah',
+          'Red Blend',
+          'Chardonnay',
+          'Sauvignon Blanc',
+          'Pinot Grigio/Gris',
+          'Riesling',
+          'Chenin Blanc',
+          'Moscato',
+          'Viognier',
+          'White Blend',
+        ],
+      },
       { key: 'region', label: 'Region', kind: 'text' },
     ],
     noteFields: [
@@ -120,7 +167,7 @@ export const tastingCategoryKeys = tastingCategories.map((c) => c.key) as Tastin
 export const getTastingCategory = (key: TastingCategoryKey): TastingCategoryDef =>
   tastingCategories.find((c) => c.key === key) ?? tastingCategories[0];
 
-/** Field values keyed by field key; text fields hold strings, number fields numbers. */
+/** Field values keyed by field key; text, choice and suggest fields hold strings, number fields numbers. */
 export type TastingDetails = Record<string, string | number>;
 
 export const DETAIL_TEXT_MAX = 5000;
@@ -128,7 +175,8 @@ export const DETAIL_NUMBER_MAX = 1_000_000;
 
 /**
  * Keep only the category's own fields: unknown keys and blank values are dropped, text is
- * trimmed, a choice that isn't one of its options is dropped. Returns undefined when a text or
+ * trimmed, a choice that isn't one of its options is dropped (a suggest field keeps any text).
+ * Returns undefined when a text or
  * number value has the wrong type for its field's kind.
  */
 export const cleanDetails = (

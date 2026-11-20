@@ -1,6 +1,6 @@
 //////////////////////////////////////
 // Sheet
-// Desktop: a centered dialog. Phone: a bottom sheet.
+// Desktop: a centered dialog. Phone: a bottom sheet that swipes down to close (see Sheet.tsx).
 
 //imports
 @use 'scss/variables' as v;
@@ -31,6 +31,7 @@
   animation:fade 0.15s ease-out;
 
   @include v.breakpoint(v.$bp-md){
+    overscroll-behavior:contain;
     inset:auto 0px 0px 0px;
     width:auto;
     max-height:calc(100dvh - #{v.$space-xl});

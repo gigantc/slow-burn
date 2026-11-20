@@ -1,0 +1,9 @@
+//////////////////////////////////////
+// Auto textarea
+// Grows with its content (see the component); never scrolls inside or resizes by hand.
+
+.auto{
+  field-sizing:content;
+  overflow:hidden;
+  resize:none;
+}

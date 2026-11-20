@@ -67,8 +67,8 @@ div.name input{ font:600 2.2rem/1.3 v.$font-display; }
     border:0px;
     border-radius:0px;
     color:v.$text;
+    min-height:calc(1.45em * 2);
     font:400 1.6rem/1.45 v.$font-body;
-    resize:vertical;
 
     &:focus-visible{ outline:none; }
   }

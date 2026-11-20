@@ -38,7 +38,7 @@ const Shell = () => {
         {brandSky && (
           <header>
             <Brand />
-            <SyncStatus />
+            <SyncStatus quiet />
           </header>
         )}
         <Outlet />

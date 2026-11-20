@@ -136,12 +136,6 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
         )}
         <div className={styles.actions}>
           <Button
-            variant="secondary"
-            onClick={() => navigate(`/cooks/${cook.id}/wrap-up`)}
-          >
-            Edit wrap-up
-          </Button>
-          <Button
             variant="dangerText"
             onClick={() => setConfirming(true)}
           >
