@@ -8,11 +8,17 @@ Slow Burn runs as one Node process (Fastify serves `/api` and the built client) 
 
 Run on the server, in order. Examples assume `slowburn.gigantc.com` and `/opt/slow-burn`.
 
+0. Build tools. `better-sqlite3` has no prebuilt binary for every Node release (none for Node 26 at first deploy), so `npm ci` may compile it from source:
+
+   ```bash
+   apt update && apt install -y build-essential sqlite3
+   ```
+
 1. Create the service user and directories:
 
    ```bash
    useradd --system --home /opt/slow-burn --shell /usr/sbin/nologin slowburn
-   mkdir -p /opt/slow-burn/data /opt/slow-burn/backups
+   mkdir -p /opt/slow-burn/data/photos /opt/slow-burn/backups
    chown -R slowburn:slowburn /opt/slow-burn/data /opt/slow-burn/backups
    ```
 

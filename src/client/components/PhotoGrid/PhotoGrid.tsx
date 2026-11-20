@@ -12,14 +12,15 @@ type Props = {
   onOpen: (id: string) => void;
   /** The add tile (a PhotoPicker), last in the grid. */
   add?: ReactNode;
+  className?: string;
 };
 
 /** Square thumbnails in order. The featured one is badged and one still uploading is marked. */
-const PhotoGrid = ({ photos, name, onOpen, add }: Props) => {
+const PhotoGrid = ({ photos, name, onOpen, add, className }: Props) => {
   const { pendingBlobs } = useStoreState();
 
   return (
-    <ul className={styles.grid}>
+    <ul className={className ? `${styles.grid} ${className}` : styles.grid}>
       {photos.map((photo) => {
         const alt = photo.caption ?? `${name} photo`;
         return (

@@ -181,7 +181,7 @@ const TastingForm = ({
           )}
           {featured && (
             <PhotoGrid
-              photos={photos.photos.filter((photo) => photo !== featured)}
+              photos={photos.photos}
               name={values.name || 'Tasting'}
               onOpen={setOpenPhoto}
               add={

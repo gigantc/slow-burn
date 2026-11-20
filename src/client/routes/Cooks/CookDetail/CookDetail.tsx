@@ -4,7 +4,9 @@ import type { CookWithEvents } from 'shared/types';
 import Button from '@/components/Button/Button';
 import ConfirmSheet from '@/components/ConfirmSheet/ConfirmSheet';
 import DetailHeader from '@/components/DetailHeader/DetailHeader';
+import PhotoGrid from '@/components/PhotoGrid/PhotoGrid';
 import PhotoMosaic from '@/components/PhotoMosaic/PhotoMosaic';
+import PhotoPicker from '@/components/PhotoPicker/PhotoPicker';
 import PhotoSheet from '@/components/PhotoSheet/PhotoSheet';
 import NextTime from '@/components/NextTime/NextTime';
 import StatTile, { StatTiles } from '@/components/StatTile/StatTile';
@@ -108,6 +110,29 @@ const CookDetail = ({ cook }: { cook: CookWithEvents }) => {
             <h2>Notes</h2>
             <p>{cook.notes}</p>
           </section>
+        )}
+        {photos.photos.length > 0 ? (
+          <PhotoGrid
+            className={styles.gallery}
+            photos={photos.photos}
+            name={meatName}
+            onOpen={setOpenPhoto}
+            add={
+              <PhotoPicker
+                label="Add photos"
+                onPick={photos.add}
+              />
+            }
+          />
+        ) : (
+          <PhotoPicker
+            className={styles.gallery}
+            variant="button"
+            label="Add photos"
+            onPick={photos.add}
+          >
+            Add photos
+          </PhotoPicker>
         )}
         <div className={styles.actions}>
           <Button

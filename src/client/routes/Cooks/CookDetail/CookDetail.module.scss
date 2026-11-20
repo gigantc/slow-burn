@@ -48,8 +48,9 @@
     .next{ order:2; }
     .chart{ order:3; }
     .notes{ order:4; }
-    .log{ order:5; }
-    .actions{ order:6; }
+    .gallery{ order:5; }
+    .log{ order:6; }
+    .actions{ order:7; }
   }
 
   .stats{
@@ -67,6 +68,13 @@
         grid-auto-flow:row;
       }
     }
+  }
+
+  // The "Add photos" button of a cook without any sits at its natural width
+  button.gallery{
+    align-self:flex-start;
+
+    @include v.breakpoint(v.$bp-md){ align-self:stretch; }
   }
 
   .notes{

@@ -48,7 +48,6 @@ const TastingDetail = () => {
   });
 
   const hasPhotos = photos.photos.length > 0;
-  const others = photos.photos.filter((photo) => !photo.featured);
 
   return (
     <div className={hasPhotos ? `${styles.detail} ${styles.withHero}` : styles.detail}>
@@ -92,7 +91,7 @@ const TastingDetail = () => {
         )}
         {hasPhotos ? (
           <PhotoGrid
-            photos={others}
+            photos={photos.photos}
             name={tasting.name}
             onOpen={setOpenPhoto}
             add={
@@ -104,8 +103,7 @@ const TastingDetail = () => {
           />
         ) : (
           <PhotoPicker
-            className={styles.addPhotos}
-            variant="bare"
+            variant="button"
             label="Add photos"
             onPick={photos.add}
           >

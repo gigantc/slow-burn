@@ -10,10 +10,11 @@ type Props = {
   label: string;
   /**
    * `tile`: a small square (in a grid, or the phone slot). `zone`: the big drop area. `bare`: just
-   * the button, for a parent that styles it (the live cook's action grid).
+   * the button, for a parent that styles it (the live cook's action grid). `button`: a raised
+   * button with its text.
    */
-  variant?: 'tile' | 'zone' | 'bare';
-  /** Visible text for `bare` and the phone `zone`. */
+  variant?: 'tile' | 'zone' | 'bare' | 'button';
+  /** Visible text for `bare`, `button` and the phone `zone`. */
   children?: ReactNode;
   className?: string;
 };
@@ -75,7 +76,7 @@ const PhotoPicker = ({ onPick, label, variant = 'tile', children, className }: P
         ) : variant === 'zone' ? (
           <span className={styles.short}>{children}</span>
         ) : (
-          variant === 'bare' && children
+          (variant === 'bare' || variant === 'button') && children
         )}
       </button>
       <input

@@ -56,29 +56,6 @@
     }
   }
 
-  // The "Add photos" button of an entry without any
-  .addPhotos{
-    display:flex;
-    align-items:center;
-    gap:v.$space-sm;
-    min-height:v.$button-md;
-    padding:0px v.$space-lg;
-    background-color:v.$raised;
-    border-radius:v.$radius-field;
-    color:v.$text;
-    font:600 1.5rem/1 v.$font-body;
-
-    svg{
-      width:2rem;
-      height:2rem;
-    }
-    &:hover{ background-color:color-mix(in srgb, v.$raised 85%, v.$text); }
-    &:focus-visible{
-      outline:none;
-      box-shadow:inset 0px 0px 0px 3px v.$text;
-    }
-  }
-
   // Phone: the photo first, then the tiles, then the rest. The flex bases above are widths, not
   // heights, and `.withHero` is repeated so these beat its desktop rules.
   @include v.breakpoint(v.$bp-md){

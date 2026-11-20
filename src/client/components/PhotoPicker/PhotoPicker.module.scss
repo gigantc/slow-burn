@@ -1,7 +1,7 @@
 //////////////////////////////////////
 // Photo picker
 // `tile` and `zone` are dashed-ring drop targets in the category (or accent) color; `bare` takes
-// whatever its parent gives a button.
+// whatever its parent gives a button; `button` is a labelled raised button (camera icon + text).
 
 //imports
 @use 'scss/variables' as v;
@@ -43,6 +43,32 @@
     small{
       color:v.$muted;
       font-weight:400;
+    }
+  }
+
+  &.button{
+    display:flex;
+    align-items:center;
+    gap:v.$space-sm;
+    min-height:v.$button-md;
+    padding:0px v.$space-lg;
+    background-color:v.$raised;
+    border-radius:v.$radius-field;
+    color:v.$text;
+    font:600 1.5rem/1 v.$font-body;
+
+    svg{
+      width:2rem;
+      height:2rem;
+    }
+    &:hover{ background-color:color-mix(in srgb, v.$raised 85%, v.$text); }
+    &:focus-visible{
+      outline:none;
+      box-shadow:inset 0px 0px 0px 3px v.$text;
+    }
+    &:disabled{
+      cursor:progress;
+      opacity:0.6;
     }
   }
 

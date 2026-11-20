@@ -20,6 +20,7 @@ const PATHS = {
   box: 'M3 8l9-5 9 5v8l-9 5-9-5z M3 8l9 5 9-5 M12 13v8',
   boxOpen: 'M3 11v5l9 5 9-5v-5 M3 11l9 5 9-5 M3 11l4-5 5 3 5-3 4 5',
   wood: 'M3 17l14-10 M7 21l14-10 M3 17l4 4 M17 7l4 4',
+  trash: 'M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v5 M14 11v5',
   pencil: 'M4 20h4L19 9l-4-4L4 16z M13 7l4 4',
   pause: 'M8 5v14 M16 5v14',
   check: 'M5 12l5 5L20 7',

@@ -13,20 +13,17 @@ type Props = {
   addLabel: string;
   /** A heading above the grid ("Photos"). */
   title?: string;
-  /** Leave the featured photo out (a screen that shows it large elsewhere). */
-  skipFeatured?: boolean;
 };
 
 /** Photos of an entry: the grid, an add tile, and the sheet that opens on a tap. */
-const PhotoSection = ({ ops, name, addLabel, title, skipFeatured = false }: Props) => {
+const PhotoSection = ({ ops, name, addLabel, title }: Props) => {
   const [openId, setOpenId] = useState<string | null>(null);
-  const shown = skipFeatured ? ops.photos.filter((photo) => !photo.featured) : ops.photos;
 
   return (
     <section className={styles.section}>
       {title && <h2>{title}</h2>}
       <PhotoGrid
-        photos={shown}
+        photos={ops.photos}
         name={name}
         onOpen={setOpenId}
         add={

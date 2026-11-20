@@ -1,54 +1,132 @@
 //////////////////////////////////////
-// Photo sheet
-// Lives in the shared Sheet panel: the photo at the top, a strip of thumbnails when there are
-// several, then the caption and actions.
+// Photo viewer
+// Full screen on a dark ground in both themes (below the Sheet, so the delete confirmation sits
+// on top). Rows: close, the swipe track, then the caption, counter and toolbar.
 
 //imports
 @use 'scss/variables' as v;
 
-.large{
-  display:block;
-  align-self:center;
-  width:auto;
-  max-width:100%;
-  height:auto;
-  max-height:50dvh;
-  border-radius:v.$radius-field;
-}
-
-.strip{
-  display:flex;
-  gap:v.$space-sm;
-  margin:0px;
-  padding:0px;
-  overflow-x:auto;
-  list-style:none;
-
-  li{ flex:none; }
+.viewer{
+  position:fixed;
+  inset:0px;
+  z-index:39;
+  display:grid;
+  grid-template-rows:auto minmax(0, 1fr) auto;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background-color:v.$inverse;
+  color:v.$inverse-text;
+  animation:fade 0.15s ease-out;
 
   button{
-    display:block;
-    width:56px;
-    height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:v.$button-md;
+    height:v.$button-md;
     padding:0px;
-    overflow:hidden;
-    border-radius:v.$radius-md;
-    opacity:0.6;
+    background-color:color-mix(in srgb, v.$inverse-text 12%, transparent);
+    border-radius:v.$radius-pill;
+    color:v.$inverse-text;
+    transition:background-color 0.15s;
 
-    &[aria-current='true']{
-      opacity:1;
-      box-shadow:inset 0px 0px 0px 3px v.$cat;
-    }
+    &:hover:not(:disabled){ background-color:color-mix(in srgb, v.$inverse-text 20%, transparent); }
     &:focus-visible{
       outline:none;
-      box-shadow:inset 0px 0px 0px 3px v.$text;
+      box-shadow:inset 0px 0px 0px 2px v.$inverse-text;
+    }
+    &:disabled{ opacity:0.3; }
+  }
+
+  .close{
+    justify-self:end;
+    margin:v.$space-sm v.$space-sm 0px 0px;
+  }
+
+  //////////////////////////////////////
+  // Swipe track: one photo per slide
+
+  .track{
+    display:flex;
+    min-height:0px;
+    margin:0px;
+    padding:0px;
+    overflow-x:auto;
+    list-style:none;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+    touch-action:pan-x;
+    user-select:none;
+
+    &::-webkit-scrollbar{ display:none; }
+    &[data-dragging='true']{
+      scroll-snap-type:none;
+      cursor:grabbing;
+    }
+
+    li{
+      flex:none;
+      width:100%;
+      scroll-snap-align:center;
+      scroll-snap-stop:always;
+    }
+
+    img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      pointer-events:none;
     }
   }
 
-  img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
+  // Desktop only: a mouse has no swipe (it can drag too)
+  .step{
+    position:absolute;
+    top:50%;
+    translate:0px -50%;
+
+    @include v.breakpoint(v.$bp-md){ display:none; }
   }
+  .prev{ left:v.$space-md; }
+  .next{ right:v.$space-md; }
+
+  //////////////////////////////////////
+  // Caption, counter and toolbar
+
+  footer{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:v.$space-sm;
+    padding:v.$space-12 v.$space-md v.$space-md v.$space-md;
+
+    p{
+      max-width:640px;
+      margin:0px;
+      color:v.$inverse-muted;
+      text-align:center;
+    }
+    small{ color:v.$inverse-muted; }
+    .caption{ width:min(640px, 100%); }
+  }
+
+  .tools{
+    display:flex;
+    gap:v.$space-12;
+
+    button{
+      border-radius:v.$radius-field;
+
+      &[aria-pressed='true']{
+        background-color:color-mix(in srgb, v.$inverse-accent 25%, transparent);
+        color:v.$inverse-accent-text;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion:reduce){ animation:none; }
+}
+
+@keyframes fade{
+  from{ opacity:0; }
 }
