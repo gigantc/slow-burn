@@ -1,7 +1,8 @@
 //////////////////////////////////////
 // Photo viewer
 // Full screen on a dark ground in both themes (below the Sheet, so the delete confirmation sits
-// on top). Rows: close, the swipe track, then the caption, counter and toolbar.
+// on top). Rows: close, the swipe track (or the reposition stage), then the caption, counter
+// and toolbar.
 
 //imports
 @use 'scss/variables' as v;
@@ -46,6 +47,8 @@
   // Swipe track: one photo per slide
 
   .track{
+    grid-row:2;
+    grid-column:1;
     display:flex;
     min-height:0px;
     margin:0px;
@@ -75,6 +78,40 @@
       width:100%;
       height:100%;
       object-fit:contain;
+      pointer-events:none;
+    }
+  }
+
+  // Reposition mode: the track stays put (it keeps its scroll position) but hides and can't swipe
+  .track[inert]{ visibility:hidden; }
+
+  // The photo in a 3:2 frame, as large as the stage allows
+  .stage{
+    grid-row:2;
+    grid-column:1;
+    display:grid;
+    place-items:center;
+    min-height:0px;
+    padding:0px v.$space-md;
+    container-type:size;
+  }
+  .frame{
+    width:min(100cqw, 150cqh);
+    aspect-ratio:3 / 2;
+    overflow:hidden;
+    background-color:v.$sunken;
+    border-radius:v.$radius-field;
+    cursor:grab;
+    touch-action:none;
+    user-select:none;
+
+    &:active{ cursor:grabbing; }
+    img{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      object-position:var(--focus, 50% 50%);
       pointer-events:none;
     }
   }
@@ -113,6 +150,19 @@
   .tools{
     display:flex;
     gap:v.$space-12;
+
+    // Cancel, Center, Save: words instead of icons
+    .text{
+      width:auto;
+      padding:0px v.$space-lg;
+      font:600 1.5rem/1 v.$font-body;
+    }
+    .primary{
+      background-color:v.$inverse-accent;
+      color:v.$inverse;
+
+      &:hover:not(:disabled){ background-color:v.$inverse-accent-text; }
+    }
 
     button{
       border-radius:v.$radius-field;

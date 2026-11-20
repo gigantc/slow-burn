@@ -131,6 +131,9 @@ export const photos = sqliteTable(
     featured: integer('featured', { mode: 'boolean' }).notNull().default(false),
     sort: integer('sort').notNull().default(0),
     caption: text('caption'),
+    // Focal point in percent (0 to 100) for cropped views; null is the center
+    focusX: integer('focus_x'),
+    focusY: integer('focus_y'),
     width: integer('width').notNull(),
     height: integer('height').notNull(),
     createdAt: text('created_at').notNull().default(now),

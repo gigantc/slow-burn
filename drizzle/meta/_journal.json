@@ -57,6 +57,13 @@
       "when": 1795121151830,
       "tag": "0007_empty_alice",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1795194451360,
+      "tag": "0008_unique_deadpool",
+      "breakpoints": true
     }
   ]
 }

@@ -10,6 +10,7 @@ import {
   makeDrafts,
   makeFeatured,
   setCaption,
+  setFocus,
 } from '@/lib/photoActions';
 import type { DraftPhoto } from '@/lib/photoActions';
 import { photoUrl } from '@/lib/photoInfo';
@@ -24,6 +25,7 @@ export type PhotoOps = {
   photos: readonly PhotoItem[];
   add: (files: File[]) => Promise<unknown>;
   setCaption: (id: string, caption: string) => void;
+  setFocus: (id: string, x: number | null, y: number | null) => void;
   makeFeatured: (id: string) => void;
   remove: (id: string) => void;
 };
@@ -54,6 +56,7 @@ export const useStoredPhotos = (ownerType: PhotoOwnerType, ownerId: string): Pho
       photos,
       add: (files) => addPhotos(ownerType, ownerId, files),
       setCaption,
+      setFocus,
       makeFeatured,
       remove: (id) => void deletePhoto(id),
     }),
@@ -91,6 +94,8 @@ export const useDraftPhotos = (
         setDrafts((list) =>
           list.map((d) => (d.id === id ? { ...d, caption: text.trim() || null } : d)),
         ),
+      setFocus: (id, x, y) =>
+        setDrafts((list) => list.map((d) => (d.id === id ? { ...d, focusX: x, focusY: y } : d))),
       makeFeatured: (id) => setDrafts((list) => list.map((d) => ({ ...d, featured: d.id === id }))),
       remove: (id) =>
         setDrafts((list) => {

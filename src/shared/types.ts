@@ -90,6 +90,9 @@ export type Photo = {
   featured: boolean;
   sort: number;
   caption: string | null;
+  /** Where the crop of a cropped view stays centered, in percent (0 to 100); null is the center. */
+  focusX: number | null;
+  focusY: number | null;
   /** Of the display size (1600px long edge at most). */
   width: number;
   height: number;
@@ -100,6 +103,8 @@ export type Photo = {
 /** Body of PATCH /api/photos/:id. Only `featured: true` is accepted; another photo being featured unsets it. */
 export type PhotoPatch = {
   caption?: string | null;
+  focusX?: number | null;
+  focusY?: number | null;
   featured?: true;
   sort?: number;
   updatedAt: string;

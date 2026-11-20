@@ -159,14 +159,14 @@ export const photoRoutes: FastifyPluginAsyncTypebox = async (app) => {
   });
 
   //////////////////////////////////////
-  // Edit: caption, featured, sort (last-write-wins on updatedAt)
+  // Edit: caption, focus, featured, sort (last-write-wins on updatedAt)
 
   app.patch(
     '/photos/:id',
     { schema: { params: photoParams, body: photoPatchBody } },
     async (request) => {
       const { id } = request.params;
-      const { caption, featured, sort, updatedAt } = request.body;
+      const { caption, focusX, focusY, featured, sort, updatedAt } = request.body;
 
       return db.transaction((tx) => {
         const current = tx.select().from(photos).where(eq(photos.id, id)).get();
@@ -176,6 +176,8 @@ export const photoRoutes: FastifyPluginAsyncTypebox = async (app) => {
         tx.update(photos)
           .set({
             ...(caption !== undefined && { caption: caption?.trim() || null }),
+            ...(focusX !== undefined && { focusX }),
+            ...(focusY !== undefined && { focusY }),
             ...(sort !== undefined && { sort }),
             ...(featured && { featured: true }),
             updatedAt,

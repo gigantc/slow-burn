@@ -55,6 +55,11 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
   const [dragging, setDragging] = useState(false);
   const [draft, setDraft] = useState<{ id: string; text: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  // Reposition mode: the focal point being set, in percent. Closing or leaving cancels it.
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const frame = useRef<HTMLDivElement>(null);
+  const grab = useRef<{ px: number; py: number; x: number; y: number } | null>(null);
+  const entered = useRef(false);
 
   //////////////////////////////////////
   // Caption
@@ -133,11 +138,62 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
   };
 
   //////////////////////////////////////
+  // Reposition: drag the photo inside a 3:2 frame (the phone hero's shape) to set its focal point
+
+  const clamp = (n: number) => Math.min(100, Math.max(0, n));
+  function nudge(dx: number, dy: number) {
+    setPos((p) => p && { x: clamp(p.x + dx), y: clamp(p.y + dy) });
+  }
+  function stopRepositioning() {
+    setPos(null);
+  }
+  const startRepositioning = () => {
+    save();
+    setPos({ x: photo?.focusX ?? 50, y: photo?.focusY ?? 50 });
+  };
+  const saveFocus = () => {
+    if (!photo || !pos) return;
+    const x = Math.round(pos.x);
+    const y = Math.round(pos.y);
+    ops.setFocus(photo.id, x === 50 && y === 50 ? null : x, x === 50 && y === 50 ? null : y);
+    setPos(null);
+  };
+
+  // Moving the photo right by d pixels shows more of its left side: the focus moves the other way,
+  // by d as a share of how far the photo overflows the frame on that axis
+  const onGrab = (e: PointerEvent<HTMLDivElement>) => {
+    if (!pos || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    grab.current = { px: e.clientX, py: e.clientY, x: pos.x, y: pos.y };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onPan = (e: PointerEvent<HTMLDivElement>) => {
+    const g = grab.current;
+    if (!g || !photo) return;
+    const el = e.currentTarget;
+    const scale = Math.max(el.clientWidth / photo.width, el.clientHeight / photo.height);
+    const overflowX = photo.width * scale - el.clientWidth;
+    const overflowY = photo.height * scale - el.clientHeight;
+    setPos({
+      x: overflowX > 1 ? clamp(g.x - (100 * (e.clientX - g.px)) / overflowX) : g.x,
+      y: overflowY > 1 ? clamp(g.y - (100 * (e.clientY - g.py)) / overflowY) : g.y,
+    });
+  };
+
+  // Focus follows the toolbar swap, so keys and the focus trap keep working
+  useEffect(() => {
+    if (!entered.current) {
+      entered.current = true;
+      return;
+    }
+    root.current?.querySelector<HTMLElement>(pos ? '[data-primary]' : '[data-reposition]')?.focus();
+  }, [pos === null]);
+
+  //////////////////////////////////////
   // Keys and focus: Escape closes, arrows move, Tab stays inside, focus returns on close
 
-  const keys = useRef({ close, goTo, index, locked: false });
+  const keys = useRef({ close, goTo, index, locked: false, nudge, stopRepositioning });
   useEffect(() => {
-    keys.current = { close, goTo, index, locked: deleting };
+    keys.current = { close, goTo, index, locked: deleting, nudge, stopRepositioning };
   });
 
   useEffect(() => {
@@ -150,12 +206,22 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
       );
     panel.querySelector<HTMLElement>('[data-autofocus]')?.focus();
 
+    const frameOpen = () => panel.querySelector('[data-frame]') !== null;
     const onKeyDown = (e: KeyboardEvent) => {
       // The delete confirmation has its own keys
       if (keys.current.locked) return;
       if (e.key === 'Escape') {
         e.preventDefault();
-        keys.current.close();
+        // While repositioning, Escape backs out of that first
+        if (frameOpen()) keys.current.stopRepositioning();
+        else keys.current.close();
+      } else if (frameOpen() && e.key.startsWith('Arrow')) {
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 2;
+        keys.current.nudge(
+          e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0,
+          e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0,
+        );
       } else if (
         (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
         !(e.target instanceof HTMLInputElement)
@@ -213,6 +279,7 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
           ref={track}
           className={styles.track}
           data-dragging={dragging}
+          inert={pos !== null}
           onScroll={onScroll}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -230,7 +297,28 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
             </li>
           ))}
         </ul>
-        {photos.length > 1 && (
+        {pos && photo && (
+          <div className={styles.stage}>
+            <div
+              ref={frame}
+              className={styles.frame}
+              data-frame
+              role="group"
+              aria-label="Reposition photo: drag, or use the arrow keys"
+              onPointerDown={onGrab}
+              onPointerMove={onPan}
+              onPointerUp={() => (grab.current = null)}
+              onPointerCancel={() => (grab.current = null)}
+            >
+              <PhotoImage
+                photo={{ ...photo, focusX: pos.x, focusY: pos.y }}
+                size="display"
+                alt=""
+              />
+            </div>
+          </div>
+        )}
+        {photos.length > 1 && !pos && (
           <>
             <button
               className={`${styles.step} ${styles.prev}`}
@@ -253,54 +341,98 @@ const Viewer = ({ ops, name, openId, onOpen }: Props) => {
           </>
         )}
         <footer>
-          {editing ? (
-            <Field
-              className={styles.caption}
-              label="Caption"
-              value={editing.text}
-              maxLength={500}
-              autoFocus
-              onChange={(e) => setDraft({ id: editing.id, text: e.target.value })}
-              onBlur={save}
-              onKeyDown={onFieldKey}
-            />
+          {pos ? (
+            <>
+              <small>Drag the photo to choose what stays in view</small>
+              <div
+                className={styles.tools}
+                role="toolbar"
+                aria-label="Reposition"
+              >
+                <button
+                  className={styles.text}
+                  type="button"
+                  onClick={stopRepositioning}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={styles.text}
+                  type="button"
+                  onClick={() => setPos({ x: 50, y: 50 })}
+                >
+                  Center
+                </button>
+                <button
+                  className={`${styles.text} ${styles.primary}`}
+                  type="button"
+                  data-primary
+                  onClick={saveFocus}
+                >
+                  Save
+                </button>
+              </div>
+            </>
           ) : (
-            photo.caption && <p>{photo.caption}</p>
+            <>
+              {editing ? (
+                <Field
+                  className={styles.caption}
+                  label="Caption"
+                  value={editing.text}
+                  maxLength={500}
+                  autoFocus
+                  onChange={(e) => setDraft({ id: editing.id, text: e.target.value })}
+                  onBlur={save}
+                  onKeyDown={onFieldKey}
+                />
+              ) : (
+                photo.caption && <p>{photo.caption}</p>
+              )}
+              {photos.length > 1 && (
+                <small aria-live="polite">{`${index + 1} / ${photos.length}`}</small>
+              )}
+              <div
+                className={styles.tools}
+                role="toolbar"
+                aria-label="Photo actions"
+              >
+                <button
+                  type="button"
+                  aria-label="Make featured"
+                  aria-pressed={photo.featured}
+                  onClick={() => !photo.featured && ops.makeFeatured(photo.id)}
+                >
+                  <Icon
+                    name="star"
+                    filled={photo.featured}
+                  />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Reposition"
+                  data-reposition
+                  onClick={startRepositioning}
+                >
+                  <Icon name="move" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Edit caption"
+                  onClick={() => setDraft({ id: photo.id, text: photo.caption ?? '' })}
+                >
+                  <Icon name="pencil" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Delete photo"
+                  onClick={() => setDeleting(true)}
+                >
+                  <Icon name="trash" />
+                </button>
+              </div>
+            </>
           )}
-          {photos.length > 1 && (
-            <small aria-live="polite">{`${index + 1} / ${photos.length}`}</small>
-          )}
-          <div
-            className={styles.tools}
-            role="toolbar"
-            aria-label="Photo actions"
-          >
-            <button
-              type="button"
-              aria-label="Make featured"
-              aria-pressed={photo.featured}
-              onClick={() => !photo.featured && ops.makeFeatured(photo.id)}
-            >
-              <Icon
-                name="star"
-                filled={photo.featured}
-              />
-            </button>
-            <button
-              type="button"
-              aria-label="Edit caption"
-              onClick={() => setDraft({ id: photo.id, text: photo.caption ?? '' })}
-            >
-              <Icon name="pencil" />
-            </button>
-            <button
-              type="button"
-              aria-label="Delete photo"
-              onClick={() => setDeleting(true)}
-            >
-              <Icon name="trash" />
-            </button>
-          </div>
         </footer>
       </div>
       <ConfirmSheet

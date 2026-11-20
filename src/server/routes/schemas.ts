@@ -99,6 +99,8 @@ export const PHOTO_CAPTION_MAX = 500;
 
 export const photoPatchBody = Type.Object({
   caption: Type.Optional(text(PHOTO_CAPTION_MAX)),
+  focusX: Type.Optional(nullable(Type.Integer({ minimum: 0, maximum: 100 }))),
+  focusY: Type.Optional(nullable(Type.Integer({ minimum: 0, maximum: 100 }))),
   // Only true: some other photo being featured is what unsets one
   featured: Type.Optional(Type.Literal(true)),
   sort: Type.Optional(Type.Integer({ minimum: 0, maximum: 100000 })),

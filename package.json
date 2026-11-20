@@ -17,6 +17,7 @@
     "start": "node --env-file-if-exists=.env dist/server/index.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=.env src/server/db/migrate.ts",
+    "db:pull": "bash deploy/pull-db.sh",
     "hash-password": "node scripts/hash-password.mjs",
     "session-key": "node scripts/session-key.mjs",
     "deploy": "bash deploy/deploy.sh",

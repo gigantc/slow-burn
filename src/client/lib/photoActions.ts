@@ -1,7 +1,7 @@
 //////////////////////////////////////
 // Photo actions
 // Local-first, like every other action: a picked photo is resized, kept in IndexedDB and shown
-// at once, and the outbox uploads it when there is a connection. Edits (caption, featured) and
+// at once, and the outbox uploads it when there is a connection. Edits (caption, focus, featured) and
 // deletes queue behind the upload, so the server sees them in order. A photo deleted before its
 // upload went out is simply cancelled.
 
@@ -65,6 +65,8 @@ const makePhoto = (
     featured: existing.length === 0,
     sort: existing.reduce((top, p) => Math.max(top, p.sort), -1) + 1,
     caption: null,
+    focusX: null,
+    focusY: null,
     width: image.width,
     height: image.height,
     createdAt: now,
@@ -120,6 +122,14 @@ export const commitDrafts = (drafts: readonly DraftPhoto[]) => {
     ops: [
       ...photos.map(uploadOp),
       // The server features the first one uploaded; if the person picked another, say so
+      // The server knows nothing of a focal point set before the upload
+      ...photos
+        .filter((photo) => photo.focusX !== null)
+        .map((photo) => ({
+          method: 'PATCH' as const,
+          path: photoPath(photo.id),
+          body: { focusX: photo.focusX, focusY: photo.focusY, updatedAt: now },
+        })),
       ...(wanted && wanted.id !== photos[0]?.id
         ? [
             {
@@ -147,6 +157,18 @@ export const setCaption = (id: string, text: string) => {
   commit({
     photoUpserts: [{ ...photo, caption, updatedAt }],
     ops: [{ method: 'PATCH', path: photoPath(id), body: { caption, updatedAt } }],
+  });
+};
+
+/** Set where a cropped view of the photo stays centered (percent, 0 to 100); null is the center. */
+export const setFocus = (id: string, x: number | null, y: number | null) => {
+  const photo = find(id);
+  if (!photo || (x === photo.focusX && y === photo.focusY)) return;
+
+  const updatedAt = new Date().toISOString();
+  commit({
+    photoUpserts: [{ ...photo, focusX: x, focusY: y, updatedAt }],
+    ops: [{ method: 'PATCH', path: photoPath(id), body: { focusX: x, focusY: y, updatedAt } }],
   });
 };
 
